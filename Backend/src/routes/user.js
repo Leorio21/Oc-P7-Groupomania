@@ -15,10 +15,11 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-router.post('/signup', emailValidator, passwordValidator, userCtrl.signup);
+router.post('/signup', limiter, emailValidator, passwordValidator, userCtrl.signup);
+
+router.post('/login', userCtrl.login);
 
 router.put('/:id', auth, multer.fields([{name: 'avatar'}, {name: 'bgImg'}]), userCtrl.modify)
 
-router.post('/login', userCtrl.login);
 
 module.exports = router;

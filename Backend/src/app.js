@@ -3,21 +3,12 @@ const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 
-const db = require('./db/connection')
 
 require('dotenv').config();
 
 const userRoutes = require('./routes/user');
 
 const app = express();
-
-db.sequelize.authenticate()
-    .then (() => {
-        console.log('Connection BDD établie')
-        db.sequelize.sync({force: true}) //{force: true}
-    })
-    .catch ((error) => console.error(`Connection BDD impossible : ${error}`)) 
-
 
 app.use(cors());
 app.use(helmet());

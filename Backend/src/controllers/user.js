@@ -1,23 +1,27 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require(`../models/user`);
 const sharp = require('sharp');
 const fs = require('fs/promises');
+
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 exports.signup = async (req, res, next) => {
 
     try {
-        if (await User.findOne({ where: { email: req.body.email } })) {
+        if (await prisma.user.findUnique({ where: { email: req.body.email } })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
         const userName = req.body.email.split('@')[0]
         const [lastName, firstName] = userName.split('.')
         const hash = await bcrypt.hash(req.body.password, 12);
-        await User.create({
-            firstName: firstName,
-            lastName: lastName,
-            email: req.body.email,
-            password: hash
+        await prisma.user.create({
+            data: {
+                firstName: firstName,
+                lastName: lastName,
+                email: req.body.email,
+                password: hash
+            },
         });
 
         return res.status(201).json({ message: 'User enregistré !' });
@@ -28,7 +32,8 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
-        const user = await User.findOne({ where: { email: req.body.email } });
+        const user = await prisma.user.findUnique({ where: { email: req.body.email } });
+        console.log(user)
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
@@ -72,7 +77,7 @@ exports.modify = async (req, res, next) => {
             nameBg = (req.files['bgImg'][0].filename).split('.')[0]
             try {
                 await sharp(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
-            }catch {
+            } catch {
                 throw ('Erreur traiement image 2')
             }
         }
