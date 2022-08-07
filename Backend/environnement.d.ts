@@ -10,7 +10,7 @@ declare global {
     namespace Express {
         interface Request extends JwtPayload{
             auth: {
-                userId: string,
+                userId: number,
                 role: string
             },
             files: {

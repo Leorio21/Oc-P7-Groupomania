@@ -1,5 +1,4 @@
 const MIME_TYPES = new Map<string, string>([
-    ['image/bmp', 'bmp'],
     ['image/jpeg', 'jpg'],
     ['image/png', 'png'],
     ['image/gif', 'gif'],

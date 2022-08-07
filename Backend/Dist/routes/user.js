@@ -44,4 +44,5 @@ const limiter = (0, express_rate_limit_1.default)({
 router.post('/signup', limiter, email_1.default, password_1.default, userCtrl.signup);
 router.post('/login', userCtrl.login);
 router.put('/:id', auth_1.default, (0, multer_1.default)({ storage: multer_config_1.fileStorage, limits: multer_config_1.fileLimits, fileFilter: multer_config_1.multerFileFilter }).fields([{ name: 'avatar' }, { name: 'bgImg' }]), userCtrl.modify);
+router.delete('/:id', auth_1.default, userCtrl.deleteUser);
 exports.default = router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.modify = exports.login = exports.signup = void 0;
+exports.deleteUser = exports.modify = exports.login = exports.signup = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sharp_1 = __importDefault(require("sharp"));
@@ -24,8 +24,7 @@ const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (yield prisma.user.findUnique({ where: { email: req.body.email } })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
-        const userName = req.body.email.split('@')[0];
-        const [lastName, firstName] = userName.split('.');
+        const [lastName, firstName] = req.body.email.split('@')[0].split('.');
         const hash = yield bcrypt_1.default.hash(req.body.password, 12);
         yield prisma.user.create({
             data: {
@@ -44,7 +43,11 @@ const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
 exports.signup = signup;
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield prisma.user.findUnique({ where: { email: req.body.email } });
+        const user = yield prisma.user.findUnique({
+            where: {
+                email: req.body.email
+            },
+        });
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
@@ -53,7 +56,6 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
         return res.status(200).json({
-            userId: user.id,
             token: jsonwebtoken_1.default.sign({
                 userId: user.id,
                 role: user.role
@@ -67,41 +69,127 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
 exports.login = login;
 const modify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        /*if (req.body.id != req.auth.userId || req.params.id != req.auth.userId) {
-            throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`
-        }*/
-        let nameAvatar;
-        let nameBg;
-        if (req.files['avatar'][0]) {
-            nameAvatar = (req.files['avatar'][0].filename).split('.')[0];
-            try {
-                yield (0, sharp_1.default)(`./images/${req.files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`);
+        if ((req.body.id == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
+            let adminUser;
+            let validAdmin = false;
+            const user = yield prisma.user.findUnique({
+                where: {
+                    id: +req.params.id
+                },
+            });
+            if (!user) {
+                throw 'Utilisateur introuvable';
             }
-            catch (_a) {
-                throw ('Erreur traiement image 1');
+            if (req.auth.role == 'ADMIN') {
+                adminUser = yield prisma.user.findUnique({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                });
+                if (!adminUser) {
+                    throw 'Utilisateur introuvable';
+                }
+                validAdmin = yield bcrypt_1.default.compare(req.body.password, adminUser.password);
+            }
+            const validUser = yield bcrypt_1.default.compare(req.body.password, user.password);
+            if (validUser || validAdmin) {
+                let nameAvatar;
+                let nameBg;
+                if (req.files['avatar']) {
+                    nameAvatar = (req.files['avatar'][0].filename).split('.')[0];
+                    try {
+                        yield (0, sharp_1.default)(`./images/${req.files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`);
+                        if (user.avatar != null) {
+                            yield promises_1.default.unlink(`images/${user.avatar}`);
+                        }
+                        user.avatar = `${nameAvatar}.webp`;
+                    }
+                    catch (_a) {
+                        throw ('Erreur traiement image 1');
+                    }
+                }
+                if (req.files['bgImg']) {
+                    nameBg = (req.files['bgImg'][0].filename).split('.')[0];
+                    try {
+                        yield (0, sharp_1.default)(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`);
+                        if (user.background != null) {
+                            yield promises_1.default.unlink(`images/${user.background}`);
+                        }
+                        user.background = `${nameBg}.webp`;
+                    }
+                    catch (_b) {
+                        throw ('Erreur traiement image 2');
+                    }
+                }
+                yield prisma.user.update({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                    data: {
+                        avatar: user.avatar,
+                        background: user.background
+                    }
+                });
+                return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });
             }
         }
-        if (req.files['bgImg'][0]) {
-            nameBg = (req.files['bgImg'][0].filename).split('.')[0];
-            try {
-                yield (0, sharp_1.default)(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`);
-            }
-            catch (_b) {
-                throw ('Erreur traiement image 2');
-            }
+        else {
+            throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`;
         }
-        return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });
     }
     catch (error) {
         return res.status(403).json({ message: error });
     }
     finally {
-        if (req.files['avatar'][0]) {
+        if (req.files['avatar']) {
             yield promises_1.default.unlink(`images/${req.files['avatar'][0].filename}`);
         }
-        if (req.files['bgImg'][0]) {
+        if (req.files['bgImg']) {
             yield promises_1.default.unlink(`images/${req.files['bgImg'][0].filename}`);
         }
     }
 });
 exports.modify = modify;
+const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if ((req.body.id == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
+            let adminUser;
+            let validAdmin = false;
+            const user = yield prisma.user.findUnique({
+                where: {
+                    id: +req.params.id
+                },
+            });
+            if (!user) {
+                throw 'Utilisateur introuvable';
+            }
+            if (req.auth.role == 'ADMIN') {
+                adminUser = yield prisma.user.findUnique({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                });
+                if (!adminUser) {
+                    throw 'Utilisateur introuvable';
+                }
+                validAdmin = yield bcrypt_1.default.compare(req.body.password, adminUser.password);
+            }
+            const validUser = yield bcrypt_1.default.compare(req.body.password, user.password);
+            if (validUser || validAdmin) {
+                yield prisma.user.delete({
+                    where: {
+                        id: +req.params.id
+                    },
+                });
+            }
+            return res.status(200).json({ message: 'Utilisateur supprimé' });
+        }
+        else {
+            throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`;
+        }
+    }
+    catch (error) {
+        return res.status(403).json({ message: error });
+    }
+});
+exports.deleteUser = deleteUser;
