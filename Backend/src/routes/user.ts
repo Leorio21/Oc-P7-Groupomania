@@ -22,5 +22,6 @@ router.post('/login', userCtrl.login);
 
 router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).fields([{name: 'avatar'}, {name: 'bgImg'}]), userCtrl.modify)
 
+router.delete('/:id', )
 
 export default router;
