@@ -1,4 +1,5 @@
-const passwordValidator = require('password-validator');
+import passwordValidator from 'password-validator';
+import { Request, Response, NextFunction } from 'express';
 
 // Create a schema
 const passwordSchema = new passwordValidator();
@@ -14,7 +15,7 @@ passwordSchema
 .has().not().spaces()                           // Should not have spaces
 .is().not().oneOf(['P@ssw0rd', 'P@ssword123', 'Azerty@123']);
 
-module.exports = (req, res, next) => {
+export default (req: Request, res: Response, next: NextFunction) => {
     if(passwordSchema.validate(req.body.password)) {
         next();
     } else {

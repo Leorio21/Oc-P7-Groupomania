@@ -1,9 +1,10 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import {Request, Response, NextFunction } from 'express'
 
-module.exports = async (req, res, next) => {
+export default async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.RANDOM_KEY_TOKEN);
+        const token = req.headers.authorization!.split(' ')[1];
+        const decodedToken = jwt.verify(token, process.env.RANDOM_KEY_TOKEN) as jwt.JwtPayload;
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         req.auth = {userId, role};

@@ -1,4 +1,6 @@
-module.exports = (req, res, next) => {
+import {Request, Response, NextFunction } from 'express'
+
+export default (req: Request, res: Response, next: NextFunction) => {
     const mail = req.body.email
     if (mail.match(/^([a-z0-9-]+\.[a-z0-9-]+)(@groupomania.fr)$/i)) {
         next();

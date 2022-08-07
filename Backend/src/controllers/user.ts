@@ -1,12 +1,13 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const sharp = require('sharp');
-const fs = require('fs/promises');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import sharp from 'sharp';
+import fs from 'fs/promises';
+import {Request, Response, NextFunction } from 'express'
 
-const { PrismaClient } = require('@prisma/client')
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient()
 
-exports.signup = async (req, res, next) => {
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         if (await prisma.user.findUnique({ where: { email: req.body.email } })) {
@@ -30,10 +31,9 @@ exports.signup = async (req, res, next) => {
     }
 }
 
-exports.login = async (req, res, next) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await prisma.user.findUnique({ where: { email: req.body.email } });
-        console.log(user)
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
@@ -57,8 +57,7 @@ exports.login = async (req, res, next) => {
     }
 }
 
-exports.modify = async (req, res, next) => {
-    console.log(`Accès modification ${req.params.id} - ${req.body.id} - ${req.auth.userId}`)
+export const modify = async (req: Request, res: Response, next: NextFunction) => {
     try {
         /*if (req.body.id != req.auth.userId || req.params.id != req.auth.userId) {
             throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`
