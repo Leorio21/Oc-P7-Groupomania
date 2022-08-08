@@ -61,7 +61,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const modify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if ((req.body.id == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
+        if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
             let adminUser: User | null;
             let validAdmin: boolean = false;
             const user = await prisma.user.findUnique({
@@ -99,7 +99,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                         }
                         user.avatar = `${nameAvatar}.webp`
                     } catch {
-                        throw ('Erreur traiement image 1')
+                        throw ('Erreur traitement image avatar')
                     }
                 }
                 if (req.files['bgImg']) {
@@ -111,7 +111,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                         }
                         user.background = `${nameBg}.webp`
                     } catch {
-                        throw ('Erreur traiement image 2')
+                        throw ('Erreur traitement image de fond')
                     }
                 }
                 if(validAdmin) {
@@ -121,7 +121,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 }
                 await prisma.user.update({
                     where: {
-                        id: +req.auth.userId 
+                        id: +req.params.id 
                     },
                     data: {
                         firstName: user.firstName,
@@ -133,10 +133,10 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                         role: user.role
                     }
                 });
-                return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });
+                return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });  // *********************** log ctrl
             }
         } else {
-            throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`
+            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`
         }
     } catch (error) {
         return res.status(403).json({ message: error });
@@ -152,7 +152,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if ((req.body.id == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
+        if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
             let adminUser: User | null;
             let validAdmin: boolean = false;
             const user = await prisma.user.findUnique({
@@ -184,7 +184,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
             }
         return res.status(200).json({ message: 'Utilisateur supprimé' })
         } else {
-            throw `Accès refusé ${req.params.id} - ${req.body.id} - ${req.auth.userId}`
+            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`  // *********************** log ctrl
         }
     } catch (error) {
         return res.status(403).json({ message: error });
