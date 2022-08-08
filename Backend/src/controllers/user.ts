@@ -51,7 +51,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                     role: user.role
                 },
                 process.env.RANDOM_KEY_TOKEN,
-                { expiresIn: '24h' }
+                { expiresIn: '48h' }
             )
         });
     } catch (error) {
@@ -87,6 +87,9 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
             if(validUser || validAdmin) {
                 let nameAvatar;
                 let nameBg;
+                if(req.body.newPassword) {
+                    user.password = await bcrypt.hash(req.body.newPassword, 12);
+                }
                 if (req.files['avatar']) {
                     nameAvatar = (req.files['avatar'][0].filename).split('.')[0]
                     try {
@@ -110,6 +113,11 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                     } catch {
                         throw ('Erreur traiement image 2')
                     }
+                }
+                if(validAdmin) {
+                    user.firstName = req.body.firstName;
+                    user.lastName = req.body.lastName;
+                    user.email = req.body.email
                 }
                 await prisma.user.update({
                     where: {

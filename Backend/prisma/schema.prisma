@@ -16,6 +16,38 @@ model User {
     avatar      String?     @db.VarChar(255)
     background  String?     @db.VarChar(255)
     role        Role        @default(USER)
+    post        Post[]
+    like        PostLike[]
+    comment     Comment[]
+}
+
+model Post {
+    id          Int         @id @default(autoincrement())
+    author      User        @relation(fields: [authorId], references: [id])
+    authorId    Int
+    title       String      @db.VarChar(255)
+    content     String      @db.Text
+    image       String?     @db.VarChar(255)
+    like        PostLike[]
+    comment     Comment[]
+}
+
+model PostLike {
+    id          Int         @id @default(autoincrement())
+    postId      Int
+    userId      Int
+    post        Post        @relation(fields: [postId], references: [id])
+    user        User        @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+    id          Int         @id @default(autoincrement())
+    postId      Int
+    userId      Int
+    content     String      @db.Text
+    post        Post        @relation(fields: [postId], references: [id])
+    user        User        @relation(fields: [userId], references: [id])
+
 }
 
 enum Role {

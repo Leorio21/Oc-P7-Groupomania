@@ -59,7 +59,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
             token: jsonwebtoken_1.default.sign({
                 userId: user.id,
                 role: user.role
-            }, process.env.RANDOM_KEY_TOKEN, { expiresIn: '24h' })
+            }, process.env.RANDOM_KEY_TOKEN, { expiresIn: '2m' })
         });
     }
     catch (error) {
@@ -95,6 +95,9 @@ const modify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
             if (validUser || validAdmin) {
                 let nameAvatar;
                 let nameBg;
+                if (req.body.newPassword) {
+                    user.password = yield bcrypt_1.default.hash(req.body.newPassword, 12);
+                }
                 if (req.files['avatar']) {
                     nameAvatar = (req.files['avatar'][0].filename).split('.')[0];
                     try {
@@ -121,13 +124,23 @@ const modify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
                         throw ('Erreur traiement image 2');
                     }
                 }
+                if (validAdmin) {
+                    user.firstName = req.body.firstName;
+                    user.lastName = req.body.lastName;
+                    user.email = req.body.email;
+                }
                 yield prisma.user.update({
                     where: {
                         id: +req.auth.userId
                     },
                     data: {
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        password: user.password,
                         avatar: user.avatar,
-                        background: user.background
+                        background: user.background,
+                        role: user.role
                     }
                 });
                 return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });
