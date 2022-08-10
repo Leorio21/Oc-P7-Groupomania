@@ -13,7 +13,6 @@ export const fileStorage = multer.diskStorage({
             const name = file.originalname.split(' ').join('_');
             const finalName = name.split('.')[0]
             const extension = MIME_TYPES.get(file.mimetype);
-            console.log(finalName)
             callback(null, finalName + Date.now() + '.' + extension);
         }
 });

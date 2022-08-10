@@ -8,12 +8,12 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         req.auth = {userId, role};
-        if (req.body.userId && req.body.userId !== userId) {
-            throw 'UserId non valable';
+        if (req.body.userId && req.body.userId != userId) {
+            throw `Requête non authentifiée ${req.body.userId} - ${userId}`;
         } else {
             next();
         }
-    } catch {
-        return res.status(401).json({ message: 'Requête non authentifiée'});
+    } catch (error) {
+        return res.status(401).json({ error });
     }
 }

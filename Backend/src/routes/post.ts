@@ -27,16 +27,20 @@ router.get('/', auth, limiter, postCtrl.getAllPost);
 
 router.post('/', auth, limiterPost, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.createPost);
 
-router.put('/:id', auth, limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost);
+router.put('/:id', multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost); //auth, limiter, 
 
-router.delete('/:id', auth, limiter, postCtrl.deletePost);
+router.delete('/:id', postCtrl.deletePost); //auth, limiter, 
+
+router.get('/:id/like', auth, limiter, postCtrl.getAllLikePost);
 
 router.post('/:id/like', auth, limiter, postCtrl.likePost);
 
-router.post(':id/comment', auth, limiter, postCtrl.createComment);
+router.get('/:id/comment', postCtrl.getAllCommentPost); //auth, limiter, 
 
-router.put(':id/comment', auth, limiter, postCtrl.modifyComment);
+router.post('/:id/comment', postCtrl.createComment); //auth, limiter, 
 
-router.delete(':id/comment', auth, limiter, postCtrl.deleteComment);
+router.put('/:id/comment/:comId',  postCtrl.modifyComment); //auth, limiter,
+
+router.delete('/:id/comment/:comId', postCtrl.deleteComment); //auth, limiter, 
 
 export default router;

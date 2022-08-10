@@ -10,7 +10,11 @@ const prisma = new PrismaClient()
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        if (await prisma.user.findUnique({ where: { email: req.body.email } })) {
+        if (await prisma.user.findUnique({
+            where: {
+                email: req.body.email
+            }
+        })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
         const [lastName, firstName] = req.body.email.split('@')[0].split('.')

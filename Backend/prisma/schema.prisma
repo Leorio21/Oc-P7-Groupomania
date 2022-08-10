@@ -46,6 +46,7 @@ model Comment {
     postId      Int
     userId      Int
     content     String      @db.Text
+    createdAt   DateTime    @default(now())
     post        Post        @relation(fields: [postId], references: [id])
     user        User        @relation(fields: [userId], references: [id])
 
