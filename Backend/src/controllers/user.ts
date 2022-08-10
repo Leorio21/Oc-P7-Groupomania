@@ -194,3 +194,29 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         return res.status(403).json({ message: error });
     }
 }
+
+export const getOneUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.body.userId == req.auth.userId) {
+            return res.status(403).json({message: 'Requête non authentifiée'})
+        }
+        const userToFind = await prisma.user.findUnique({
+            where: {
+                id: +req.params.id
+            }
+        })
+        if (!userToFind) {
+            return res.status(404).json({ message: 'Utilisateur introuvable'})
+        }
+        const user: {
+            id: number,
+            name: string,
+        } = {
+            id: userToFind.id,
+            name: userToFind.firstName + ' ' + userToFind.lastName
+        }
+        return res.status(200).json({ user })
+    } catch (error) {
+        return res.status(400).json({ error })
+    }
+}

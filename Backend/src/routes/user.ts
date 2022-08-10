@@ -24,4 +24,6 @@ router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileF
 
 router.delete('/:id', auth, userCtrl.deleteUser)
 
+router.get('/:id', auth, userCtrl.getOneUser);
+
 export default router;

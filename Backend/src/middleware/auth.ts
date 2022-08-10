@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 import {Request, Response, NextFunction } from 'express'
 
+
+import { PrismaClient, User } from '@prisma/client';
+const prisma = new PrismaClient()
+
 export default async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.headers.authorization!.split(' ')[1];
@@ -11,6 +15,14 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         if (req.body.userId && req.body.userId != userId) {
             throw `Requête non authentifiée ${req.body.userId} - ${userId}`;
         } else {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                }
+            })
+            if(!user) {
+                throw 'Utilisateur inconnu'
+            }
             next();
         }
     } catch (error) {
