@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-    id          Int         @id @default(autoincrement())
+    id          Int         @db.Int @id @default(autoincrement())
     email       String      @unique @db.VarChar(140)
     firstName   String      @db.VarChar(60)
     lastName    String      @db.VarChar(60)
@@ -22,8 +22,8 @@ model User {
 }
 
 model Post {
-    id          Int         @id @default(autoincrement())
-    authorId    Int
+    id          Int         @db.Int @id @default(autoincrement())
+    authorId    Int         @db.Int
     title       String      @db.VarChar(255)
     content     String      @db.Text
     image       String?     @db.VarChar(255)
@@ -34,21 +34,21 @@ model Post {
 }
 
 model PostLike {
-    id          Int         @id @default(autoincrement())
-    postId      Int
-    userId      Int
+    id          Int         @db.Int @id @default(autoincrement())
+    postId      Int         @db.Int
+    userId      Int         @db.Int
     post        Post        @relation(fields: [postId], references: [id])
     user        User        @relation(fields: [userId], references: [id])
 }
 
 model Comment {
-    id          Int         @id @default(autoincrement())
-    postId      Int
-    userId      Int
+    id          Int         @db.Int @id @default(autoincrement())
+    postId      Int         @db.Int
+    authorId    Int         @db.Int
     content     String      @db.Text
     createdAt   DateTime    @default(now())
     post        Post        @relation(fields: [postId], references: [id])
-    user        User        @relation(fields: [userId], references: [id])
+    author      User        @relation(fields: [authorId], references: [id])
 
 }
 

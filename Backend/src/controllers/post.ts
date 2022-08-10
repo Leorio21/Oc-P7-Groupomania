@@ -69,7 +69,7 @@ export const deletePost = (req: Request, res: Response, next: NextFunction) => {
 
 export const getAllLikePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if(!req.auth.userId || !req.params.id) {
+        if(req.auth.userId != req.body.userId || !req.params.id) {
             throw 'Action non autorisée'
         }
         const likePost = await prisma.postLike.findMany({
@@ -142,13 +142,34 @@ export const getAllCommentPost = (req: Request, res: Response, next: NextFunctio
 
 }
 
-export const createComment = (req: Request, res: Response, next: NextFunction) => {
+export const createComment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.body.userId != req.auth.userId || !req.params.id) {
+            return res.status(403).json({ message: `Action non autorisée ${req.auth.userId} - ${req.body.userId}` })
+        }
+        const post = await prisma.post.findUnique({
+            where: {
+                id: +req.params.id
+            }
+        })
+        if(!post) {
+            throw 'post non trouvé'
+        }
+        await prisma.comment.create({
+            data: {
+                postId: +req.params.id,
+                authorId: req.auth.userId,
+                content: req.body.content,
+            },
+        })
+        return res.status(201).json({message: 'Commentaire enregistré'})
 
+    } catch (error) {
+        return res.status(400).json({ error })
+    }
 }
 
 export const modifyComment = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.params.comId)
-    return res.status(200).json({message: 'bingo'})
 }
 
 export const deleteComment = (req: Request, res: Response, next: NextFunction) => {
