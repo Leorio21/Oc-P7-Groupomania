@@ -3,8 +3,9 @@ import jwt from 'jsonwebtoken';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import {Request, Response, NextFunction } from 'express'
+import UserProfile from '../interface/UserProfile';
 
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User, Post, PostLike } from '@prisma/client';
 const prisma = new PrismaClient()
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,8 +18,8 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
-        const [lastName, firstName] = req.body.email.split('@')[0].split('.')
-        const hash = await bcrypt.hash(req.body.password, 12);
+        const [lastName, firstName]: string[] = req.body.email.split('@')[0].split('.')
+        const hash: string = await bcrypt.hash(req.body.password, 12);
         await prisma.user.create({
             data: {
                 firstName: firstName,
@@ -27,8 +28,8 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
                 password: hash
             },
         });
-
-        return res.status(201).json({ message: 'User enregistré !' });
+        next();
+        //return res.status(201).json({ message: 'User enregistré !' });
     } catch (error) {
         return res.status(400).json({ message: error });
     }
@@ -36,7 +37,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await prisma.user.findUnique({
+        const user: User | null = await prisma.user.findUnique({
             where: {
                 email: req.body.email 
             },
@@ -44,7 +45,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
-        const valid = await bcrypt.compare(req.body.password, user.password);
+        const valid: boolean = await bcrypt.compare(req.body.password, user.password);
         if (!valid) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
@@ -68,7 +69,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
             let adminUser: User | null;
             let validAdmin: boolean = false;
-            const user = await prisma.user.findUnique({
+            const user: User | null = await prisma.user.findUnique({
                 where: {
                     id: +req.params.id 
                 },
@@ -87,10 +88,10 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 }
                 validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
             }
-            const validUser = await bcrypt.compare(req.body.password, user.password);
+            const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
             if(validUser || validAdmin) {
-                let nameAvatar;
-                let nameBg;
+                let nameAvatar:string;
+                let nameBg: string;
                 if(req.body.newPassword) {
                     user.password = await bcrypt.hash(req.body.newPassword, 12);
                 }
@@ -139,6 +140,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 });
                 return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });  // *********************** log ctrl
             }
+            return res.status(403).json({message: 'action non autorisée'})
         } else {
             throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`
         }
@@ -159,7 +161,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
             let adminUser: User | null;
             let validAdmin: boolean = false;
-            const user = await prisma.user.findUnique({
+            const user: User | null = await prisma.user.findUnique({
                 where: {
                     id: +req.params.id 
                 },
@@ -178,17 +180,18 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
                 }
                 validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
             }
-            const validUser = await bcrypt.compare(req.body.password, user.password);
+            const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
             if(validUser || validAdmin) {
                 await prisma.user.delete({
                     where: {
                         id: +req.params.id
                     },
                 })
+                return res.status(200).json({ message: 'Utilisateur supprimé' })
             }
-        return res.status(200).json({ message: 'Utilisateur supprimé' })
+            return res.status(403).json({message: 'action non autorisée'})
         } else {
-            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`  // *********************** log ctrl
+            throw `Accès refusé`
         }
     } catch (error) {
         return res.status(403).json({ message: error });

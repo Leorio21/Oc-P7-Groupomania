@@ -28,6 +28,7 @@ model Post {
     content     String      @db.Text
     image       String?     @db.VarChar(255)
     createdAt   DateTime    @default(now())
+    updatedBy    Role       @default(USER)
     author      User        @relation(fields: [authorId], references: [id])
     like        PostLike[]
     comment     Comment[]
@@ -47,6 +48,7 @@ model Comment {
     authorId    Int         @db.Int
     content     String      @db.Text
     createdAt   DateTime    @default(now())
+    updatedBy    Role       @default(USER)
     post        Post        @relation(fields: [postId], references: [id])
     author      User        @relation(fields: [authorId], references: [id])
 

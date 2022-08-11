@@ -14,15 +14,15 @@ const limiter = rateLimit({
 	max: 5, // Limit each IP to 5 requests per `window` (here, per 60 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-})
+});
 
-router.post('/signup', limiter, emailValidator, passwordValidator, userCtrl.signup);
+router.post('/signup', limiter, emailValidator, passwordValidator, userCtrl.signup, userCtrl.login);
 
 router.post('/login', userCtrl.login);
 
-router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).fields([{name: 'avatar', maxCount: 1}, {name: 'bgImg', maxCount: 1}]), userCtrl.modify)
+router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).fields([{name: 'avatar', maxCount: 1}, {name: 'bgImg', maxCount: 1}]), userCtrl.modify);
 
-router.delete('/:id', auth, userCtrl.deleteUser)
+router.delete('/:id', auth, userCtrl.deleteUser);
 
 router.get('/:id', auth, userCtrl.getUserProfile);
 
