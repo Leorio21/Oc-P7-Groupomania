@@ -29,14 +29,14 @@ router.post('/', auth, limiterPost, multer({storage: fileStorage, limits: fileLi
 
 router.put('/:id', auth, limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost); // A FAIRE
 
-router.delete('/:id', auth, limiter,postCtrl.deletePost); // A FAIRE
+router.delete('/:id', auth, limiter,postCtrl.deletePost);
 
 router.post('/:id/like', auth, limiter, postCtrl.likePost);
 
-router.post('/:id/comment', auth, limiter, postCtrl.createComment); // A FAIRE
+router.post('/:id/comment', auth, limiter, postCtrl.createComment);
 
 router.put('/:id/comment/:comId',  auth, limiter,postCtrl.modifyComment); // A FAIRE
 
-router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment); // A FAIRE  -- EN COURS
+router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment);
 
 export default router;

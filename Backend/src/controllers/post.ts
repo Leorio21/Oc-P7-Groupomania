@@ -93,8 +93,44 @@ export const modifyPost = (req: Request, res: Response, next: NextFunction) => {
 
 }
 
-export const deletePost = (req: Request, res: Response, next: NextFunction) => {
-
+export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            let adminUser: User | null;
+            let validAdmin: boolean = false;
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: +req.params.id 
+                },
+            });
+            if (!post) {
+                throw 'Post introuvable'
+            }
+            if (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+                adminUser = await prisma.user.findUnique({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                });
+                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
+                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
+                }
+                validAdmin = true
+            }
+            if(post.authorId == req.auth.userId || validAdmin) {
+                await prisma.post.delete({
+                    where: {
+                        id: +req.params.id
+                    }
+                })
+            }
+            return res.status(200).json({ message: 'Post supprimé' })
+        } else {
+            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`  // *********************** log ctrl
+        }
+    } catch (error) {
+        return res.status(403).json({ message: error });
+    }
 }
 
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
@@ -193,7 +229,7 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
                     },
                 });
                 if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
-                    throw 'Vous n\'êtes pas administrateur'
+                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
                 }
                 validAdmin = true
             }
