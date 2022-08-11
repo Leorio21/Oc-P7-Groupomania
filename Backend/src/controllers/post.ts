@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 
 import { PrismaClient, Post, User } from '@prisma/client';
 import sharp from 'sharp';
+import { NONAME } from 'dns';
 const prisma = new PrismaClient()
 
 export const getAllPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,6 +12,35 @@ export const getAllPost = async (req: Request, res: Response, next: NextFunction
         return res.status(403).json({ message: 'Action non autorisée' })
         }
         const posts = await prisma.post.findMany({
+            include:{
+                author: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true
+                    }
+                },
+                like: {
+                    include: {
+                        user: {
+                            select: {
+                                firstName: true,
+                                lastName: true
+                            }
+                        }
+                    }
+                },
+                comment: {
+                    include: {
+                        author: {
+                            select: {
+                                firstName: true,
+                                lastName: true
+                            }
+                        }
+                    }
+                }
+            },
             orderBy: {
                 createdAt: "desc"
             }
@@ -67,37 +97,6 @@ export const deletePost = (req: Request, res: Response, next: NextFunction) => {
 
 }
 
-export const getAllLikePost = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        if(req.auth.userId != req.body.userId || !req.params.id) {
-            throw 'Action non autorisée'
-        }
-        const likePost = await prisma.postLike.findMany({
-            where: {
-                postId: +req.params.id
-            }
-        })
-        const userLikePost: ({id: number, name: string} | null)[] = await Promise.all(likePost.map(async (like):Promise<{id: number, name: string} | null> => {
-            const user: User | null = await prisma.user.findUnique({
-                where: {
-                    id: like.userId
-                }
-            })
-            if(user) {
-                return {
-                    id: user.id,
-                    name: user.firstName + ' ' + user.lastName
-                }
-            } else {
-                return null
-            }
-        }))
-        return res.status(200).json({ userLikePost })
-    } catch (error) {
-        return res.status(400).json({ error })
-    }
-}
-
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.body.userId != req.auth.userId) {
@@ -138,14 +137,10 @@ export const likePost = async (req: Request, res: Response, next: NextFunction) 
 
 }
 
-export const getAllCommentPost = (req: Request, res: Response, next: NextFunction) => {
-
-}
-
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.body.userId != req.auth.userId || !req.params.id) {
-            return res.status(403).json({ message: `Action non autorisée ${req.auth.userId} - ${req.body.userId}` })
+            return res.status(403).json({ message: `Action non autorisée ${req.auth.userId} - ${req.body.userId}` })  //  ********** clg controle **********
         }
         const post = await prisma.post.findUnique({
             where: {
@@ -170,6 +165,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 }
 
 export const modifyComment = (req: Request, res: Response, next: NextFunction) => {
+
 }
 
 export const deleteComment = (req: Request, res: Response, next: NextFunction) => {

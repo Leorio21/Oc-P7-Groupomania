@@ -13,7 +13,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         const role = decodedToken.role;
         req.auth = {userId, role};
         if (req.body.userId && req.body.userId != userId) {
-            throw `Requête non authentifiée ${req.body.userId} - ${userId}`;
+            throw `Requête non authentifiée ${req.body.userId} - ${userId}`;  //  ********** clg controle **********
         } else {
             const user = await prisma.user.findUnique({
                 where: {
