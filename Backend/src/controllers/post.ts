@@ -194,6 +194,9 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
                         id: +req.params.id
                     }
                 })
+                if(post.image) {
+                    await fs.unlink(`images/${post.image}`);
+                }
                 return res.status(200).json({ message: 'Post supprimé' })
             }
             return res.status(403).json({message: 'action non autorisée'})
