@@ -88,8 +88,80 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const modifyPost = (req: Request, res: Response, next: NextFunction) => {
-
+export const modifyPost = async (req: Request, res: Response, next: NextFunction) => {
+    let imageName: string | null = null;
+    if(req.body.image != 'null') {
+        console.log('null')
+        imageName = req.body.image
+    }
+    let oldImage: string | null = null
+    let newImage: boolean = false;
+    try {
+        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            let adminUser: User | null;
+            let validAdmin: boolean = false;
+            let authorUpdate: Role = 'USER';
+            const post: Post | null = await prisma.post.findUnique({
+                where: {
+                    id: +req.params.id 
+                },
+            });
+            if (!post) {
+                throw 'Post/Commentaire introuvable'
+            }
+            oldImage = post.image
+            if (post.authorId != req.auth.userId && (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR')) {
+                adminUser = await prisma.user.findUnique({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                });
+                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
+                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
+                }
+                validAdmin = true
+                authorUpdate = adminUser.role
+            }
+            if (req.file) {
+                imageName = (req.file.filename).split('.')[0] + '.webp'
+                try {
+                    await sharp(`./images/${req.file.filename}`).toFile(`images/${imageName}`)
+                    newImage = true;
+                } catch {
+                    throw ('Erreur traiement image')
+                }
+            }
+            if((newImage && oldImage) || (imageName == null && oldImage)) {
+                await fs.unlink(`images/${oldImage}`);
+            }
+            if(post.authorId == req.auth.userId || validAdmin) {
+                await prisma.post.updateMany({
+                    where: {
+                        id: +req.params.id
+                    },
+                    data: {
+                        title: req.body.title,
+                        content: req.body.content,
+                        image: imageName,
+                        updatedBy: authorUpdate
+                    }
+                })
+                return res.status(200).json({ message: 'Commentaire modifié' })
+            }
+            return res.status(403).json({message: 'action non autorisée'})
+        } else {
+            throw `Accès refusé`
+        }
+    } catch (error) {
+        if(req.file && newImage) {
+            fs.unlink(`images/${imageName}`)
+        }
+        return res.status(400).json({ error })
+    } finally {
+        if (req.file) {
+            await fs.unlink(`images/${req.file.filename}`);
+        }
+    }
 }
 
 export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
