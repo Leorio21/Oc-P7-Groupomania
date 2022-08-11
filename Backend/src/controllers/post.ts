@@ -168,7 +168,48 @@ export const modifyComment = (req: Request, res: Response, next: NextFunction) =
 
 }
 
-export const deleteComment = (req: Request, res: Response, next: NextFunction) => {
-
+export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            let adminUser: User | null;
+            let validAdmin: boolean = false;
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: +req.params.id 
+                },
+            });
+            const comment = await prisma.comment.findUnique({
+                where: {
+                    id: +req.params.comId
+                }
+            })
+            if (!post || !comment) {
+                throw 'Post/Commentaire introuvable'
+            }
+            if (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+                adminUser = await prisma.user.findUnique({
+                    where: {
+                        id: +req.auth.userId
+                    },
+                });
+                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
+                    throw 'Vous n\'êtes pas administrateur'
+                }
+                validAdmin = true
+            }
+            if(comment.authorId == req.auth.userId || validAdmin) {
+                await prisma.comment.delete({
+                    where: {
+                        id: +req.params.comId
+                    }
+                })
+            }
+            return res.status(200).json({ message: 'Commentaire supprimé' })
+        } else {
+            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`  // *********************** log ctrl
+        }
+    } catch (error) {
+        return res.status(403).json({ message: error });
+    }
 }
 

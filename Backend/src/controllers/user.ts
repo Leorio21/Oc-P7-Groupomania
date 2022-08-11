@@ -173,7 +173,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
                         id: +req.auth.userId 
                     },
                 });
-                if (!adminUser) {
+                if (!adminUser || adminUser.role != 'ADMIN') {
                     throw 'Utilisateur introuvable'
                 }
                 validAdmin = await bcrypt.compare(req.body.password, adminUser.password);

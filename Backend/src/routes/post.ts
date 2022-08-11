@@ -37,6 +37,6 @@ router.post('/:id/comment', auth, limiter, postCtrl.createComment); // A FAIRE
 
 router.put('/:id/comment/:comId',  auth, limiter,postCtrl.modifyComment); // A FAIRE
 
-router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment); // A FAIRE
+router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment); // A FAIRE  -- EN COURS
 
 export default router;
