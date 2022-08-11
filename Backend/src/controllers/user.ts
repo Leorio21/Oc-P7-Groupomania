@@ -195,25 +195,52 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const getOneUser = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId == req.auth.userId) {
+        if (req.body.userId != req.auth.userId) {
             return res.status(403).json({message: 'Requête non authentifiée'})
         }
-        const userToFind = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 id: +req.params.id
+            },
+            select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatar: true,
+                background: true,
+                post : {
+                    include: {
+                        like: {
+                            include: {
+                                user: {
+                                    select: {
+                                        firstName: true,
+                                        lastName: true
+                                    }
+                                }
+                            }
+                        },
+                        comment: {
+                            include: {
+                                author: {
+                                    select: {
+                                        firstName: true,
+                                        lastName: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: "desc"
+                    }
+                }
             }
         })
-        if (!userToFind) {
+        if (!user) {
             return res.status(404).json({ message: 'Utilisateur introuvable'})
-        }
-        const user: {
-            id: number,
-            name: string,
-        } = {
-            id: userToFind.id,
-            name: userToFind.firstName + ' ' + userToFind.lastName
         }
         return res.status(200).json({ user })
     } catch (error) {
