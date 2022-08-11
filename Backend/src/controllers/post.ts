@@ -206,8 +206,6 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
             let adminUser: User | null;
             let validAdmin: boolean = false;
             let authorUpdate: Role = 'USER';
-            console.log('id post : ' + req.params.id)
-            console.log('id com : ' + req.params.comId)
             const post: Post | null = await prisma.post.findUnique({
                 where: {
                     id: +req.params.id 
@@ -221,7 +219,6 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
             if (!post || !comment) {
                 throw 'Post/Commentaire introuvable'
             }
-            console.log('role' + req.auth.role)
             if (comment.authorId != req.auth.userId && (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR')) {
                 adminUser = await prisma.user.findUnique({
                     where: {
@@ -231,7 +228,6 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
                 if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
                     throw 'Vous n\'êtes pas  modérateur ou administrateur'
                 }
-                console.log('admin')
                 validAdmin = true
                 authorUpdate = adminUser.role
             }

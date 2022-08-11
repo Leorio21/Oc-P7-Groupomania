@@ -35,7 +35,7 @@ router.post('/:id/like', auth, limiter, postCtrl.likePost);
 
 router.post('/:id/comment', auth, limiter, postCtrl.createComment);
 
-router.put('/:id/comment/:comId',  auth, limiter,postCtrl.modifyComment); // A FAIRE
+router.put('/:id/comment/:comId',  auth, limiter,postCtrl.modifyComment);
 
 router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment);
 
