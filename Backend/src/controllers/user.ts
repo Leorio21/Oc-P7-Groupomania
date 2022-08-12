@@ -138,7 +138,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                         role: user.role
                     }
                 });
-                return res.status(201).json({ message: 'UserId : ' + req.auth.userId + ' - role : ' + req.auth.role + ' - User modifié !' });  // *********************** log ctrl
+                return res.status(201).json({ message: 'Utilisateur modifié !' });
             }
             return res.status(403).json({message: 'action non autorisée'})
         } else {

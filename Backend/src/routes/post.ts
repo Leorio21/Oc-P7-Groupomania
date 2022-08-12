@@ -27,7 +27,7 @@ router.get('/', auth, limiter, postCtrl.getAllPost);
 
 router.post('/', auth, limiterPost, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.createPost);
 
-router.put('/:id', auth, limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost); // A FAIRE
+router.put('/:id', auth, limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost);
 
 router.delete('/:id', auth, limiter,postCtrl.deletePost);
 

@@ -201,7 +201,7 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
             }
             return res.status(403).json({message: 'action non autorisée'})
         } else {
-            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`  // *********************** log ctrl
+            throw `Accès refusé`
         }
     } catch (error) {
         return res.status(403).json({ message: error });
@@ -251,7 +251,7 @@ export const likePost = async (req: Request, res: Response, next: NextFunction) 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.body.userId != req.auth.userId || !req.params.id) {
-            return res.status(403).json({ message: `Action non autorisée ${req.auth.userId} - ${req.body.userId}` })  //  ********** clg controle **********
+            return res.status(403).json({ message: `Action non autorisée` })
         }
         const post: Post | null = await prisma.post.findUnique({
             where: {
