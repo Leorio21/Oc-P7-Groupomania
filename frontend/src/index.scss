@@ -1,0 +1,15 @@
+@use './sass/Utils/vars';
+
+*, ::before, ::after {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+    color: vars.$font-color-light;
+}
+
+body {
+    background-color: vars.$color-tertiary;
+}

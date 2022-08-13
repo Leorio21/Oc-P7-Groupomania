@@ -1,0 +1,20 @@
+@use '../../sass/Utils/vars';
+
+.header {
+    padding: 20px;
+    width: 100%;
+    color: vars.$font-color-light;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: vars.$color-primary;
+    & img {
+        height: 100%;
+        width: auto;
+    }
+}
+
+h1 {
+    font-size: 3rem;
+}

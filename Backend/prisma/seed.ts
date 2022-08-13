@@ -18,8 +18,8 @@ const userData: Prisma.UserCreateInput[] = [
         firstName: 'jerome',
         lastName: 'lefeuvre',
         password: '$2b$12$12ALM8OaQDpJfup0hFOTY.cSvbXkuPktnJUC01PHoOeJ6M5p72Z3O',
-        avatar: 'minilogoarcIssurTille1660053292389.webp',
-        background: 'Legion_TD_2_Screenshot_11-11-21_011660053292380.webp',
+        avatar: null,
+        background: null,
         role:'MODERATOR',
         post: {
             create: [

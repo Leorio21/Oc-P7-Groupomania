@@ -23,20 +23,22 @@ const limiterPost = rateLimit({
 
 const router = express.Router();
 
-router.get('/', auth, limiter, postCtrl.getAllPost);
+router.use(auth)
 
-router.post('/', auth, limiterPost, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.createPost);
+router.get('/', limiter, postCtrl.getAllPost);
 
-router.put('/:id', auth, limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost);
+router.post('/', limiterPost, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.createPost);
 
-router.delete('/:id', auth, limiter,postCtrl.deletePost);
+router.put('/:id', limiter, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).single('photo'), postCtrl.modifyPost);
 
-router.post('/:id/like', auth, limiter, postCtrl.likePost);
+router.delete('/:id', limiter,postCtrl.deletePost);
 
-router.post('/:id/comment', auth, limiter, postCtrl.createComment);
+router.post('/:id/like', limiter, postCtrl.likePost);
 
-router.put('/:id/comment/:comId',  auth, limiter,postCtrl.modifyComment);
+router.post('/:id/comment', limiter, postCtrl.createComment);
 
-router.delete('/:id/comment/:comId', auth, limiter, postCtrl.deleteComment);
+router.put('/:id/comment/:comId',  limiter,postCtrl.modifyComment);
+
+router.delete('/:id/comment/:comId', limiter, postCtrl.deleteComment);
 
 export default router;

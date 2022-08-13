@@ -1,0 +1,94 @@
+@use '../../sass/Utils/vars';
+
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: 100px auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.form_container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    transform-style: preserve-3d;
+    transition: all 600ms ease-in;
+}
+
+.animation {
+    transform: rotate3d(0, 1, 0, 180deg);
+}
+
+.cote {
+    &Droit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: rotateY(-90deg) translateZ(150px);
+    }
+    &Gauche {
+        transform: rotateY(90deg) translateZ(150px);
+    }
+}
+
+.form {
+    position: absolute;
+    top: 0;
+    box-shadow: 0 0 25px vars.$box-shadow-color;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 40px 50px 40px;
+    color: vars.$color-secondary;
+    background-color: vars.$color-tertiary;
+    border: 5px ridge vars.$color-secondary;
+    & label {
+        padding-top: 10px;
+        padding-bottom: 5px;
+    }
+    & input {
+        border-radius: 10px;
+        line-height: 20px;
+        padding-left: 10px;
+    }
+    & h2 {
+        width: 100%;
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    & button {
+        margin-top: 30px;
+        border-radius: 10px;
+        line-height: 20px;
+        background-color: vars.$color-tertiary;
+        color: vars.$color-secondary;
+        border: 2px inset vars.$color-secondary;
+        &:hover {
+            color: vars.$font-color-dark;
+            border: 2px inset vars.$color-dark;
+        }
+        &:focus {
+            color: vars.$font-color-dark;
+            border: 2px inset vars.$color-dark;
+        }
+    }
+}
+
+.form_login {
+    transform: translateZ(150px) ;
+}
+
+.form_signup {
+    transform: rotateY(180deg) translateZ(150px);
+}
+
+.navLink {
+    color: vars.$font-color-dark;
+    cursor: pointer;
+    &:hover {
+        color: vars.$color-primary;
+    }
+}
