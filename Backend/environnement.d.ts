@@ -1,3 +1,5 @@
+import { Role } from "@prisma/client";
+
 declare global {
     
     namespace NodeJS {
@@ -11,7 +13,7 @@ declare global {
         interface Request extends JwtPayload{
             auth: {
                 userId: number,
-                role: string
+                role: Role
             },
             files: {
                 [name: string]

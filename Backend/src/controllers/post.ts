@@ -7,10 +7,7 @@ const prisma = new PrismaClient()
 
 export const getAllPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId != req.auth.userId) {
-        return res.status(403).json({ message: 'Action non autorisée' })
-        }
-        const posts: Post[] = await prisma.post.findMany({
+        const posts = await prisma.post.findMany({
             include:{
                 author: {
                     select: {
@@ -54,9 +51,6 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
     let imageName: string | null = null;
     let newImage: boolean = false;
     try {
-        if (req.body.userId != req.auth.userId) {
-            return res.status(403).json({ message: 'Action non autorisée' })
-        }
         if (req.file) {
             imageName = (req.file.filename).split('.')[0] + '.webp'
             try {
@@ -75,7 +69,6 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
             },
         })
         return res.status(201).json({message: 'Post enregistré'})
-
     } catch (error) {
         if(req.file && newImage) {
             fs.unlink(`images/${imageName}`)
@@ -97,31 +90,20 @@ export const modifyPost = async (req: Request, res: Response, next: NextFunction
     let oldImage: string | null = null
     let newImage: boolean = false;
     try {
-        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
-            let authorUpdate: Role = 'USER';
-            const post: Post | null = await prisma.post.findUnique({
-                where: {
-                    id: +req.params.id 
-                },
-            });
-            if (!post) {
-                throw 'Post/Commentaire introuvable'
+        let authorUpdate: Role = 'USER';
+        const post = await prisma.post.findUnique({
+            where: {
+                id: +req.params.id 
+            },
+        });
+        if (!post) {
+            throw 'Post/Commentaire introuvable'
+        }
+        if(post.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            if (post.authorId != req.auth.userId) {
+                authorUpdate = req.auth.role
             }
             oldImage = post.image
-            if (post.authorId != req.auth.userId && (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR')) {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId
-                    },
-                });
-                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
-                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
-                }
-                validAdmin = true
-                authorUpdate = adminUser.role
-            }
             if (req.file) {
                 imageName = (req.file.filename).split('.')[0] + '.webp'
                 try {
@@ -134,24 +116,20 @@ export const modifyPost = async (req: Request, res: Response, next: NextFunction
             if((newImage && oldImage) || (imageName == null && oldImage)) {
                 await fs.unlink(`images/${oldImage}`);
             }
-            if(post.authorId == req.auth.userId || validAdmin) {
-                await prisma.post.updateMany({
-                    where: {
-                        id: +req.params.id
-                    },
-                    data: {
-                        title: req.body.title,
-                        content: req.body.content,
-                        image: imageName,
-                        updatedBy: authorUpdate
-                    }
-                })
-                return res.status(200).json({ message: 'Commentaire modifié' })
-            }
-            return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé`
+            await prisma.post.updateMany({
+                where: {
+                    id: +req.params.id
+                },
+                data: {
+                    title: req.body.title,
+                    content: req.body.content,
+                    image: imageName,
+                    updatedBy: authorUpdate
+                }
+            })
+            return res.status(200).json({ message: 'Commentaire modifié' })
         }
+        return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
         if(req.file && newImage) {
             fs.unlink(`images/${imageName}`)
@@ -166,43 +144,26 @@ export const modifyPost = async (req: Request, res: Response, next: NextFunction
 
 export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
-            const post: Post | null = await prisma.post.findUnique({
-                where: {
-                    id: +req.params.id 
-                },
-            });
-            if (!post) {
-                throw 'Post introuvable'
-            }
-            if (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId
-                    },
-                });
-                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
-                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
-                }
-                validAdmin = true
-            }
-            if(post.authorId == req.auth.userId || validAdmin) {
-                await prisma.post.delete({
-                    where: {
-                        id: +req.params.id
-                    }
-                })
-                if(post.image) {
-                    await fs.unlink(`images/${post.image}`);
-                }
-                return res.status(200).json({ message: 'Post supprimé' })
-            }
-            return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé`
+        const post = await prisma.post.findUnique({
+            where: {
+                id: +req.params.id 
+            },
+        });
+        if (!post) {
+            throw 'Post introuvable'
         }
+        if (post.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            await prisma.post.delete({
+                where: {
+                    id: +req.params.id
+                }
+            })
+            if(post.image) {
+                await fs.unlink(`images/${post.image}`);
+            }
+            return res.status(200).json({ message: 'Post supprimé' })
+        }
+        return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ message: error });
     }
@@ -210,17 +171,14 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
 
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId != req.auth.userId) {
-            return res.status(403).json({ message: `Action non autorisée` })
-        }
-        const post: Post | null = await prisma.post.findUnique({
+        const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id
             }})
             if (!post) {
                 return res.status(400).json({ message: 'Post introuvable' }) 
             }
-            const like: PostLike[] = await prisma.postLike.findMany({
+            const like = await prisma.postLike.findMany({
             where: {
                 postId: +req.params.id,
                 userId: +req.auth.userId
@@ -250,10 +208,7 @@ export const likePost = async (req: Request, res: Response, next: NextFunction) 
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId != req.auth.userId || !req.params.id) {
-            return res.status(403).json({ message: `Action non autorisée` })
-        }
-        const post: Post | null = await prisma.post.findUnique({
+        const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id
             }
@@ -277,16 +232,13 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 
 export const modifyComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
             let authorUpdate: Role = 'USER';
-            const post: Post | null = await prisma.post.findUnique({
+            const post = await prisma.post.findUnique({
                 where: {
                     id: +req.params.id 
                 },
             });
-            const comment: Comment | null = await prisma.comment.findUnique({
+            const comment = await prisma.comment.findUnique({
                 where: {
                     id: +req.params.comId
                 }
@@ -294,19 +246,10 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
             if (!post || !comment) {
                 throw 'Post/Commentaire introuvable'
             }
-            if (comment.authorId != req.auth.userId && (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR')) {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId
-                    },
-                });
-                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
-                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
+            if(comment.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+                if (comment.authorId != req.auth.userId) {
+                    authorUpdate = req.auth.role
                 }
-                validAdmin = true
-                authorUpdate = adminUser.role
-            }
-            if(comment.authorId == req.auth.userId || validAdmin) {
                 await prisma.comment.updateMany({
                     where: {
                         id: +req.params.comId
@@ -319,9 +262,6 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
                 return res.status(200).json({ message: 'Commentaire modifié' })
             }
             return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé`
-        }
     } catch (error) {
         return res.status(403).json({ message: error });
     }
@@ -329,45 +269,28 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
 
 export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
-            const post: Post | null = await prisma.post.findUnique({
-                where: {
-                    id: +req.params.id 
-                },
-            });
-            const comment: Comment | null = await prisma.comment.findUnique({
+        const post = await prisma.post.findUnique({
+            where: {
+                id: +req.params.id 
+            },
+        });
+        const comment = await prisma.comment.findUnique({
+            where: {
+                id: +req.params.comId
+            }
+        })
+        if (!post || !comment) {
+            throw 'Post/Commentaire introuvable'
+        }
+        if(comment.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+            await prisma.comment.delete({
                 where: {
                     id: +req.params.comId
                 }
             })
-            if (!post || !comment) {
-                throw 'Post/Commentaire introuvable'
-            }
-            if (req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId
-                    },
-                });
-                if (!adminUser || (adminUser.role != 'ADMIN' && adminUser.role != 'MODERATOR')) {
-                    throw 'Vous n\'êtes pas  modérateur ou administrateur'
-                }
-                validAdmin = true
-            }
-            if(comment.authorId == req.auth.userId || validAdmin) {
-                await prisma.comment.delete({
-                    where: {
-                        id: +req.params.comId
-                    }
-                })
-                return res.status(200).json({ message: 'Commentaire supprimé' })
-            }
-            return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé`
+            return res.status(200).json({ message: 'Commentaire supprimé' })
         }
+        return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ message: error });
     }

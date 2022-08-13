@@ -17,8 +17,7 @@ passwordSchema
 
 export default (req: Request, res: Response, next: NextFunction) => {
     if(passwordSchema.validate(req.body.password)) {
-        next();
-    } else {
-        return res.status(400).json({error: `Le mot de passe n'est pas assez sécurisé : ${passwordSchema.validate(req.body.password, { list: true })}`})
+        return next();
     }
+    return res.status(400).json({error: `Le mot de passe n'est pas assez sécurisé : ${passwordSchema.validate(req.body.password, { list: true })}`})
 }

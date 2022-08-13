@@ -10,8 +10,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers.authorization!.split(' ')[1];
         const decodedToken = jwt.verify(token, process.env.RANDOM_KEY_TOKEN) as jwt.JwtPayload;
         const userId = decodedToken.userId;
-        const role = decodedToken.role;
-        req.auth = {userId, role};
         if (req.body.userId && req.body.userId != userId) {
             throw `Requête non authentifiée`;
         } else {
@@ -23,7 +21,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
             if(!user) {
                 throw 'Utilisateur inconnu'
             }
-            next();
+            req.auth = {userId: user.id, role: user.role};
+            return next();
         }
     } catch (error) {
         return res.status(401).json({ error });

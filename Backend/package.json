@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
@@ -34,6 +37,7 @@
     "@types/node": "^18.6.4",
     "@types/sharp": "^0.30.4",
     "nodemon": "^2.0.19",
-    "prisma": "^4.2.1"
+    "prisma": "^4.2.1",
+    "ts-node": "^10.9.1"
   }
 }

@@ -3,9 +3,8 @@ import jwt from 'jsonwebtoken';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import {Request, Response, NextFunction } from 'express'
-import UserProfile from '../interface/UserProfile';
 
-import { PrismaClient, User, Post, PostLike } from '@prisma/client';
+import { PrismaClient, User,} from '@prisma/client';
 const prisma = new PrismaClient()
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,6 +17,9 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
+        if (req.body.password != req.body.confirmPassword) {
+            throw `Les mots de passe ne correspondent pas`
+        }
         const [lastName, firstName]: string[] = req.body.email.split('@')[0].split('.')
         const hash: string = await bcrypt.hash(req.body.password, 12);
         await prisma.user.create({
@@ -28,8 +30,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
                 password: hash
             },
         });
-        next();
-        //return res.status(201).json({ message: 'User enregistré !' });
+        return next();
     } catch (error) {
         return res.status(400).json({ message: error });
     }
@@ -37,7 +38,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user: User | null = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 email: req.body.email 
             },
@@ -52,8 +53,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         return res.status(200).json({
             token: jwt.sign(
                 {
-                    userId: user.id,
-                    role: user.role
+                    userId: user.id
                 },
                 process.env.RANDOM_KEY_TOKEN,
                 { expiresIn: '48h' }
@@ -66,84 +66,80 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const modify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
-            const user: User | null = await prisma.user.findUnique({
+        let adminUser: User | null;
+        let validAdmin: boolean = false;
+        const user = await prisma.user.findUnique({
+            where: {
+                id: +req.params.id 
+            },
+        });
+        if (!user) {
+            throw 'Utilisateur introuvable'
+        }
+        if (+req.params.id != req.auth.userId && req.auth.role == 'ADMIN') {
+            adminUser = await prisma.user.findUnique({
+                where: {
+                    id: +req.auth.userId 
+                },
+            });
+            if (!adminUser) {
+                throw 'Utilisateur introuvable'
+            }
+            validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
+        }
+        const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
+        if(validUser || validAdmin) {
+            let nameAvatar:string;
+            let nameBg: string;
+            if(req.body.newPassword) {
+                user.password = await bcrypt.hash(req.body.newPassword, 12);
+            }
+            if (req.files['avatar']) {
+                nameAvatar = (req.files['avatar'][0].filename).split('.')[0]
+                try {
+                    await sharp(`./images/${req.files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
+                    if(user.avatar != null) {
+                        await fs.unlink(`images/${user.avatar}`);
+                    }
+                    user.avatar = `${nameAvatar}.webp`
+                } catch {
+                    throw ('Erreur traitement image avatar')
+                }
+            }
+            if (req.files['bgImg']) {
+                nameBg = (req.files['bgImg'][0].filename).split('.')[0]
+                try {
+                    await sharp(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
+                    if(user.background != null) {
+                        await fs.unlink(`images/${user.background}`);
+                    }
+                    user.background = `${nameBg}.webp`
+                } catch {
+                    throw ('Erreur traitement image de fond')
+                }
+            }
+            if(validAdmin) {
+                user.firstName = req.body.firstName;
+                user.lastName = req.body.lastName;
+                user.email = req.body.email
+            }
+            await prisma.user.update({
                 where: {
                     id: +req.params.id 
                 },
+                data: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    password: user.password,
+                    avatar: user.avatar,
+                    background: user.background,
+                    role: user.role
+                }
             });
-            if (!user) {
-                throw 'Utilisateur introuvable'
-            }
-            if (req.auth.role == 'ADMIN') {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId 
-                    },
-                });
-                if (!adminUser) {
-                    throw 'Utilisateur introuvable'
-                }
-                validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
-            }
-            const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
-            if(validUser || validAdmin) {
-                let nameAvatar:string;
-                let nameBg: string;
-                if(req.body.newPassword) {
-                    user.password = await bcrypt.hash(req.body.newPassword, 12);
-                }
-                if (req.files['avatar']) {
-                    nameAvatar = (req.files['avatar'][0].filename).split('.')[0]
-                    try {
-                        await sharp(`./images/${req.files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
-                        if(user.avatar != null) {
-                            await fs.unlink(`images/${user.avatar}`);
-                        }
-                        user.avatar = `${nameAvatar}.webp`
-                    } catch {
-                        throw ('Erreur traitement image avatar')
-                    }
-                }
-                if (req.files['bgImg']) {
-                    nameBg = (req.files['bgImg'][0].filename).split('.')[0]
-                    try {
-                        await sharp(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
-                        if(user.background != null) {
-                            await fs.unlink(`images/${user.background}`);
-                        }
-                        user.background = `${nameBg}.webp`
-                    } catch {
-                        throw ('Erreur traitement image de fond')
-                    }
-                }
-                if(validAdmin) {
-                    user.firstName = req.body.firstName;
-                    user.lastName = req.body.lastName;
-                    user.email = req.body.email
-                }
-                await prisma.user.update({
-                    where: {
-                        id: +req.params.id 
-                    },
-                    data: {
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        email: user.email,
-                        password: user.password,
-                        avatar: user.avatar,
-                        background: user.background,
-                        role: user.role
-                    }
-                });
-                return res.status(201).json({ message: 'Utilisateur modifié !' });
-            }
-            return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé ${req.params.id} - ${req.body.userId} - ${req.auth.userId}`
+            return res.status(201).json({ message: 'Utilisateur modifié !' });
         }
+        return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ message: error });
     } finally {
@@ -158,41 +154,37 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if ((req.body.userId == req.auth.userId && +req.params.id == req.auth.userId) || req.auth.role == 'ADMIN') {
-            let adminUser: User | null;
-            let validAdmin: boolean = false;
-            const user: User | null = await prisma.user.findUnique({
+        let adminUser: User | null;
+        let validAdmin: boolean = false;
+        const user = await prisma.user.findUnique({
+            where: {
+                id: +req.params.id 
+            },
+        });
+        if (!user) {
+            throw 'Utilisateur introuvable'
+        }
+        if (req.auth.role == 'ADMIN') {
+            adminUser = await prisma.user.findUnique({
                 where: {
-                    id: +req.params.id 
+                    id: +req.auth.userId 
                 },
             });
-            if (!user) {
+            if (!adminUser || adminUser.role != 'ADMIN') {
                 throw 'Utilisateur introuvable'
             }
-            if (req.auth.role == 'ADMIN') {
-                adminUser = await prisma.user.findUnique({
-                    where: {
-                        id: +req.auth.userId 
-                    },
-                });
-                if (!adminUser || adminUser.role != 'ADMIN') {
-                    throw 'Utilisateur introuvable'
-                }
-                validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
-            }
-            const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
-            if(validUser || validAdmin) {
-                await prisma.user.delete({
-                    where: {
-                        id: +req.params.id
-                    },
-                })
-                return res.status(200).json({ message: 'Utilisateur supprimé' })
-            }
-            return res.status(403).json({message: 'action non autorisée'})
-        } else {
-            throw `Accès refusé`
+            validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
         }
+        const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
+        if(validUser || validAdmin) {
+            await prisma.user.delete({
+                where: {
+                    id: +req.params.id
+                },
+            })
+            return res.status(200).json({ message: 'Utilisateur supprimé' })
+        }
+        return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ message: error });
     }
@@ -200,9 +192,6 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
 export const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.userId != req.auth.userId) {
-            return res.status(403).json({message: 'Requête non authentifiée'})
-        }
         const user = await prisma.user.findUnique({
             where: {
                 id: +req.params.id
