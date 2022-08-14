@@ -6,6 +6,12 @@
     margin: 100px auto;
     justify-content: center;
     align-items: center;
+    & h2 {
+        width: 100%;
+        text-align: center;
+        font-size: 18px;
+        margin-top: 350px;
+    }
 }
 
 .form_container {
@@ -42,6 +48,7 @@
     flex-direction: column;
     padding: 10px 40px 50px 40px;
     color: vars.$color-secondary;
+    border-radius: 15px;
     background-color: vars.$color-tertiary;
     border: 5px ridge vars.$color-secondary;
     & label {
@@ -53,11 +60,8 @@
         line-height: 20px;
         padding-left: 10px;
     }
-    & h2 {
-        width: 100%;
+    & h3 {
         text-align: center;
-        font-size: 18px;
-        margin-bottom: 10px;
     }
     & button {
         margin-top: 30px;
@@ -85,8 +89,12 @@
     transform: rotateY(180deg) translateZ(150px);
 }
 
+h2 {
+    color: #FFF;
+}
+
 .navLink {
-    color: vars.$font-color-dark;
+    color: vars.$color-secondary;
     cursor: pointer;
     &:hover {
         color: vars.$color-primary;

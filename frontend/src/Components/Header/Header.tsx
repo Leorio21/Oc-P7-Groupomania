@@ -9,7 +9,7 @@ const Header = () => {
         <header className={classNames(cn.header)}>
             <img src={logo} alt='logo Groupomania' />
             <h1>Groupomania</h1>
-    </header>
+        </header>
     )
 }
 

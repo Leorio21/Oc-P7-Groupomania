@@ -40,13 +40,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const user = await prisma.user.findUnique({
             where: {
-                email: req.body.email 
+                email: req.body.emailLogin
             },
         });
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
-        const valid: boolean = await bcrypt.compare(req.body.password, user.password);
+        const valid: boolean = await bcrypt.compare(req.body.passwordLogin, user.password);
         if (!valid) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
