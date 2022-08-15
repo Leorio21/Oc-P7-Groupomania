@@ -1,5 +1,4 @@
 import { PrismaClient, Prisma } from '@prisma/client'
-import { createAdd } from 'typescript'
 
 const prisma = new PrismaClient()
 

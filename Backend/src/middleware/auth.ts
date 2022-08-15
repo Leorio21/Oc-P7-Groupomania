@@ -2,13 +2,13 @@ import jwt from 'jsonwebtoken';
 import {Request, Response, NextFunction } from 'express'
 
 
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient()
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+export default async (req: Request | any, res: Response, next: NextFunction) => {
     try {
         const token = req.headers.authorization!.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.RANDOM_KEY_TOKEN) as jwt.JwtPayload;
+        const decodedToken = jwt.verify(token, process.env.RANDOM_KEY_TOKEN!) as jwt.JwtPayload;
         const userId = decodedToken.userId;
         if (req.body.userId && req.body.userId != userId) {
             throw `Requête non authentifiée`;

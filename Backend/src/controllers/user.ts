@@ -40,13 +40,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const user = await prisma.user.findUnique({
             where: {
-                email: req.body.emailLogin
+                email: req.body.email
             },
         });
         if (!user) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
-        const valid: boolean = await bcrypt.compare(req.body.passwordLogin, user.password);
+        const valid: boolean = await bcrypt.compare(req.body.password, user.password);
         if (!valid) {
             throw "Nom d'utilisateur / Mot de passe incorrect";
         }
@@ -55,9 +55,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 {
                     userId: user.id
                 },
-                process.env.RANDOM_KEY_TOKEN,
+                process.env.RANDOM_KEY_TOKEN!,
                 { expiresIn: '48h' }
-            )
+                ),
+            userId: user.id,
+            role: user.role,
         });
     } catch (error) {
         return res.status(404).json({ message: error });

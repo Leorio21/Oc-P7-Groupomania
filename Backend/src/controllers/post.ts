@@ -1,11 +1,11 @@
 import fs from 'fs/promises';
 import { Request, Response, NextFunction } from 'express'
 
-import { PrismaClient, Post, Comment, User, Role, PostLike } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import sharp from 'sharp';
 const prisma = new PrismaClient()
 
-export const getAllPost = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllPost = async (_req: Request, res: Response, _next: NextFunction) => {
     try {
         const posts = await prisma.post.findMany({
             include:{
@@ -47,7 +47,7 @@ export const getAllPost = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const createPost = async (req: Request, res: Response, next: NextFunction) => {
+export const createPost = async (req: Request | any, res: Response, _next: NextFunction) => {
     let imageName: string | null = null;
     let newImage: boolean = false;
     try {
@@ -81,7 +81,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const modifyPost = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyPost = async (req: Request | any, res: Response, _next: NextFunction) => {
     let imageName: string | null = null;
     if(req.body.image != 'null') {
         console.log('null')
@@ -142,7 +142,7 @@ export const modifyPost = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
+export const deletePost = async (req: Request | any, res: Response, _next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -169,7 +169,7 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const likePost = async (req: Request, res: Response, next: NextFunction) => {
+export const likePost = async (req: Request | any, res: Response, _next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -206,7 +206,7 @@ export const likePost = async (req: Request, res: Response, next: NextFunction) 
 
 }
 
-export const createComment = async (req: Request, res: Response, next: NextFunction) => {
+export const createComment = async (req: Request | any, res: Response, next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -230,7 +230,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
     }
 }
 
-export const modifyComment = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyComment = async (req: Request | any, res: Response, next: NextFunction) => {
     try {
             let authorUpdate: Role = 'USER';
             const post = await prisma.post.findUnique({
@@ -267,7 +267,7 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
     }
 }
 
-export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteComment = async (req: Request | any, res: Response, next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {

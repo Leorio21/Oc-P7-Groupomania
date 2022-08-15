@@ -1,4 +1,5 @@
 import { Role } from "@prisma/client";
+import { JwtPayload } from 'jsonwebtoken'
 
 declare global {
     
@@ -18,6 +19,13 @@ declare global {
             files: {
                 [name: string]
             }
+        }
+    }
+
+    interface Request {
+        auth: {
+            userId: number,
+            role: Role
         }
     }
 }

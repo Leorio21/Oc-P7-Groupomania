@@ -23,7 +23,7 @@ const limiterPost = rateLimit({
 
 const router = express.Router();
 
-router.use(auth)
+router.use(auth);
 
 router.get('/', limiter, postCtrl.getAllPost);
 
