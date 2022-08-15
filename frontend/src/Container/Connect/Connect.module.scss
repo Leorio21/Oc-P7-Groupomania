@@ -3,7 +3,7 @@
 .container {
     display: flex;
     flex-direction: column;
-    margin: 100px auto;
+    margin: 20px auto;
     justify-content: center;
     align-items: center;
     & h2 {
@@ -99,4 +99,18 @@ h2 {
     &:hover {
         color: vars.$color-primary;
     }
+}
+
+.errorAuth {
+    width: 300px;
+    box-shadow: 0 0 25px vars.$box-shadow-color;
+    margin: 20px auto 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    color: vars.$color-primary;
+    border-radius: 15px;
+    border: 5px ridge vars.$color-primary;
 }

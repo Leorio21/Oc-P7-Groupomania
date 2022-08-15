@@ -1,0 +1,41 @@
+@use '../../sass/Utils/vars';
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba($color: vars.$color-dark, $alpha: 0.8);
+    z-index: 10;
+}
+
+.modal-button {
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    font-size: 40px;
+    color: vars.$color-grey;
+}
+
+.modal-card {
+    position: absolute;
+    min-width: 300px;
+    top: 50%;
+    left: 50%;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    border: 5px ridge vars.$color-primary;
+    color: vars.$color-primary;
+    box-shadow: 0 0 25px vars.$box-shadow-color;
+    border-radius: 15px;
+    padding: 50px;
+    background-color: vars.$color-dark;
+}
