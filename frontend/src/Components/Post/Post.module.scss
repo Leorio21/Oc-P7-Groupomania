@@ -1,0 +1,38 @@
+@use '../../sass/Utils/vars';
+
+.post {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 300px;
+    width: 50%;
+    max-width: 500px;
+    border: 5px ridge vars.$color-primary;
+    border-radius: 15px;
+    box-shadow: 0 0 25px vars.$box-shadow-color;
+    margin: 15px;
+}
+
+.title {
+    padding: 10px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: vars.$color-secondary;
+    width: 100%;
+    color: vars.$color-dark;
+}
+
+.content {
+    & .text {
+        padding: 10px;
+    }
+}
+
+.footer {
+    padding: 10px;
+    background-color: vars.$color-tertiary;
+    width:100%;
+    border-radius: 0px 0px 10px 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

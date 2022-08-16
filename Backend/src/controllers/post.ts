@@ -1,13 +1,35 @@
 import fs from 'fs/promises';
 import { Request, Response, NextFunction } from 'express'
 
-import { PrismaClient, Role } from '@prisma/client';
+import { Post, PostLike, PrismaClient, Role } from '@prisma/client';
 import sharp from 'sharp';
 const prisma = new PrismaClient()
 
+type Posts = (
+    Post & {
+    author: {
+        id: number,
+        firstName: string,
+        lastName: string,
+    },
+    like: (PostLike & {
+        user: {
+            firstName: string,
+            lastName: string,
+        };
+    })[],
+    comment: (Comment & {
+        author: {
+            firstName: string,
+            lastName: string,
+        },
+    })[]
+})[]
+
+
 export const getAllPost = async (_req: Request, res: Response, _next: NextFunction) => {
     try {
-        const posts = await prisma.post.findMany({
+        const posts:Posts = await prisma.post.findMany({
             include:{
                 author: {
                     select: {
