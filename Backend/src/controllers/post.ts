@@ -29,7 +29,7 @@ type Posts = (
 
 export const getAllPost = async (_req: Request, res: Response, _next: NextFunction) => {
     try {
-        const posts:Posts = await prisma.post.findMany({
+        const posts = await prisma.post.findMany({
             include:{
                 author: {
                     select: {

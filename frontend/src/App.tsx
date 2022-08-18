@@ -2,7 +2,7 @@ import {Routes, Route } from 'react-router-dom';
 
 import Header from './Components/Header/Header'
 import Connect from './Container/Connect/Connect';
-import Posts from './Container/Posts/Posts';
+import Home from './Container/Home/Home';
 
 import './App.module.scss'
 
@@ -14,7 +14,7 @@ function App() {
     <Routes>
       <Route path='/' element={<Connect />} />
       <Route path='/profile' element={''} />
-      <Route path='/posts' element={<Posts />} />
+      <Route path='/posts' element={<Home />} />
     </Routes>
     </>
   )

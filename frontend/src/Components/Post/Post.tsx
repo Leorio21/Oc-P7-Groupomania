@@ -2,11 +2,14 @@ import { OnePost } from "../../../../backend/interface/Post";
 import classNames from 'classnames'
 import cn from './Post.module.scss'
 
+import Like from '../Like/Like'
+
 interface PostProps {
-    post: OnePost
+    post: OnePost,
+    userId: number
 }
 
-const Post = ({post}: PostProps) => {
+const Post = ({post, userId}: PostProps) => {
 
     const date = new Date(post.createdAt)
     const day = date.getDate();
@@ -15,7 +18,7 @@ const Post = ({post}: PostProps) => {
     const hour = date.getHours();
     const minutes = date.getMinutes();
 
-    let modifyAuthor = ' - (modifié'
+    let modifyAuthor: string = '(modifié'
 
     switch (post.updatedBy) {
         case 'ADMIN':
@@ -28,19 +31,24 @@ const Post = ({post}: PostProps) => {
             modifyAuthor += ')';
             break;
     }
-
+    
     return (
         <article className={classNames(cn.post)}>
-            <div className={classNames(cn.title)}>{post.title}</div>
+            <div className={classNames(cn.header)}>
+                <span className={classNames(cn.title)}>{post.title}</span>
+                <span>{post.author.firstName + ' ' + post.author.lastName}</span>
+                <span>{hour}:{minutes<10 && 0}{minutes} - {day}/{month<10 && 0}{month}/{year}</span>
+            </div>
             <div className={classNames(cn.content)}>
                 {post.image && <img src={post.image} alt={'image \'illustration'} />}
                 <div className={classNames(cn.text)}>
                     {post.content}
                 </div>
+                {post.updatedBy && modifyAuthor}
             </div>
             <div className={classNames(cn.footer)}>
-                <div className={classNames(cn.author)}>{post.author.firstName + ' ' + post.author.lastName}{post.updatedBy && modifyAuthor}</div>
-                <div className={classNames(cn.createdDate)}>{hour}:{minutes<10 && 0}{minutes} - {day}/{month<10 && 0}{month}/{year}</div>
+                <Like nbLike={post.like.length} userLike={post.like.find(like => like.userId == userId) ? true : false} />
+                <div className={classNames(cn.nbComm)}>{post.comment.length} Commentaires</div>
             </div>
         </article>
     )

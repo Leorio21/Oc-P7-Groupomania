@@ -17,7 +17,7 @@ declare global {
                 role: Role
             },
             files: {
-                [name: string]
+                [name: string]: string
             }
         }
     }

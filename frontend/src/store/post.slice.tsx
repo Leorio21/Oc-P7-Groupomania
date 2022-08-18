@@ -1,5 +1,6 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { PostsList } from '../../../backend/interface/Post'
+import axios from "axios";
+import { PostsList, OnePost } from '../../../backend/interface/Post'
 
 const postSlice = createSlice({
     name: 'post',
