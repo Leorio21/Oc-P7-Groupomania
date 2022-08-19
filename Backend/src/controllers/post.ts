@@ -35,7 +35,8 @@ export const getAllPost = async (_req: Request, res: Response, _next: NextFuncti
                     select: {
                         id: true,
                         firstName: true,
-                        lastName: true
+                        lastName: true,
+                        avatar: true
                     }
                 },
                 like: {

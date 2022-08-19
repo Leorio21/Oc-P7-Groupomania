@@ -9,7 +9,7 @@ import cn from './Home.module.scss'
 
 import Post from "../../Components/Post/Post";
 import { addPosts } from "../../store/post.slice";
-import { OnePost } from "../../../../backend/interface/Post";
+import { OnePost } from '../../interface/Post';
 
 
 

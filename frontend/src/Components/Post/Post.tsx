@@ -1,4 +1,5 @@
-import { OnePost } from "../../../../backend/interface/Post";
+import { OnePost } from '../../interface/Post';
+import { UserCircleIcon } from '@heroicons/react/solid';
 import classNames from 'classnames'
 import cn from './Post.module.scss'
 
@@ -37,6 +38,7 @@ const Post = ({post, userId}: PostProps) => {
             <div className={classNames(cn.header)}>
                 <span className={classNames(cn.title)}>{post.title}</span>
                 <span>{post.author.firstName + ' ' + post.author.lastName}</span>
+                <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={''} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                 <span>{hour}:{minutes<10 && 0}{minutes} - {day}/{month<10 && 0}{month}/{year}</span>
             </div>
             <div className={classNames(cn.content)}>
@@ -48,7 +50,7 @@ const Post = ({post, userId}: PostProps) => {
             </div>
             <div className={classNames(cn.footer)}>
                 <Like nbLike={post.like.length} userLike={post.like.find(like => like.userId == userId) ? true : false} />
-                <div className={classNames(cn.nbComm)}>{post.comment.length} Commentaires</div>
+                <div className={classNames(cn.nbComm)}>{post.comment.length} Commentaire{post.comment.length > 1 && 's'}</div>
             </div>
         </article>
     )
