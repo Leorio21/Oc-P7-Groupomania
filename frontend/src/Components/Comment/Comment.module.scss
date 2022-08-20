@@ -1,0 +1,23 @@
+@use '../../sass/Utils/vars';
+
+.comment-container {
+    width: 80%;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid vars.$color-secondary;
+}
+
+.title {
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    color: vars.$font-color-dark;
+    border-radius: 13px 13px 0px 0px;
+    background-color: vars.$color-secondary;
+}
+
+.content {
+    padding: 10px;
+    background-color: vars.$color-dark;
+    border-radius: 0px 0px 13px 13px;
+}

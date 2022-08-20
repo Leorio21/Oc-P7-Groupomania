@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import cn from './Connect.module.scss'
 import { Navigate } from 'react-router-dom'
 
@@ -30,7 +30,8 @@ const Connect = () => {
         setModalToggle(!modalToggle);
     }
 
-    const loginHandler = async () => {
+    const loginHandler = async (event: FormEvent) => {
+        event.preventDefault()
         const data: dataLogin = {
             email: emailLogin,
             password: passwordLogin
@@ -45,19 +46,20 @@ const Connect = () => {
             } else if (error.response.data) {
                 setErrorText(error.response.data)
             }
-            console.log('modal')
             setModalToggle(!modalToggle)
         }
     }
 
-    const signupHandler = async () => {
-        const data: dataSignup = {
-            email: email,
-            password: password,
-            confirmPassword: confirmPassword
+    const signupHandler = async (event: FormEvent) => {
+        event.preventDefault()
+        const myForm: HTMLFormElement = document.querySelector('#formSignUp')!
+        const data = new FormData(myForm)
+        const option = {
+            headers: { "Content-Type": "multipart/form-data" },
+            data: data
         }
         try {
-            const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', data)
+            const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', option)
             localStorage.setItem('userData', JSON.stringify(userData.data));
             location.reload();
         } catch (error: any) {
@@ -66,7 +68,6 @@ const Connect = () => {
             } else if (error.response.data) {
                 setErrorText(error.response.data)
             }
-            console.log('modal')
             setModalToggle(!modalToggle)
         }
     }
@@ -86,16 +87,16 @@ const Connect = () => {
             <div className = {classNames(cn.container)} id='form_container'>
                 <div className={toggleForm ? classNames(cn.form_container, cn.animation) : classNames(cn.form_container)}>
                     <div className={classNames(cn.form, cn.coteDroit)}></div>
-                    <form className = {classNames(cn.form, cn.form_login)}>
+                    <form className = {classNames(cn.form, cn.form_login)} onSubmit={loginHandler} id='formLogin'>
                         <h3>Connexion</h3>
                         <label htmlFor='emailLogin'>Adresse mail :</label>
                         <input tabIndex={toggleForm ? -1 : 0} type='text' id='emailLogin' name='emailLogin' value={emailLogin} onChange={(event) => setEmailLogin(event.target.value)} />
                         <label htmlFor='passwordLogin'>Mot de passe :</label>
                         <input tabIndex={toggleForm ? -1 : 0} type='password' id='passwordLogin' name='passwordLogin' value={passwordLogin} onChange={(event) => setPasswordLogin(event.target.value)} />
-                        <button tabIndex={toggleForm ? -1 : 0} type='button' onClick={loginHandler}>Se connecter</button>
+                        <button tabIndex={toggleForm ? -1 : 0} type='submit' onClick={loginHandler}>Se connecter</button>
                     </form>
                     <div className={classNames(cn.form, cn.coteGauche)}></div>
-                    <form className = {classNames(cn.form, cn.form_signup)}>
+                    <form className = {classNames(cn.form, cn.form_signup)} id='formSingUp'>
                         <h3>Inscription</h3>
                         <label htmlFor='email'>Adresse mail :</label>
                         <input tabIndex={toggleForm ? 0 : -1} type='text' id='email' name='email' value={email} onChange={(event) => setEmail(event.target.value)} />

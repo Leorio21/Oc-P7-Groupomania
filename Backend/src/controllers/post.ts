@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import { Request, Response, NextFunction } from 'express'
 
-import { Post, PostLike, PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import sharp from 'sharp';
 const prisma = new PrismaClient()
 
@@ -14,7 +14,7 @@ export const getAllPost = async (_req: Request, res: Response, _next: NextFuncti
                         id: true,
                         firstName: true,
                         lastName: true,
-                        avatar: true
+                        avatar: true,
                     }
                 },
                 like: {
@@ -32,7 +32,8 @@ export const getAllPost = async (_req: Request, res: Response, _next: NextFuncti
                         author: {
                             select: {
                                 firstName: true,
-                                lastName: true
+                                lastName: true,
+                                avatar: true,
                             }
                         }
                     }
