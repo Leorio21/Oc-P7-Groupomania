@@ -67,6 +67,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const modify = async (req: Request, res: Response, next: NextFunction) => {
+    const files = req.files as  {[fieldname: string]: Express.Multer.File[]};
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -96,10 +97,10 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
             if(req.body.newPassword) {
                 user.password = await bcrypt.hash(req.body.newPassword, 12);
             }
-            if (req.files['avatar']) {
-                nameAvatar = (req.files['avatar'][0].filename).split('.')[0]
+            if (files['avatar']) {
+                nameAvatar = (files['avatar'][0].filename).split('.')[0]
                 try {
-                    await sharp(`./images/${req.files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
+                    await sharp(`./images/${files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
                     if(user.avatar != null) {
                         await fs.unlink(`images/${user.avatar}`);
                     }
@@ -108,10 +109,10 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                     throw ('Erreur traitement image avatar')
                 }
             }
-            if (req.files['bgImg']) {
-                nameBg = (req.files['bgImg'][0].filename).split('.')[0]
+            if (files['bgImg']) {
+                nameBg = (files['bgImg'][0].filename).split('.')[0]
                 try {
-                    await sharp(`./images/${req.files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
+                    await sharp(`./images/${files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
                     if(user.background != null) {
                         await fs.unlink(`images/${user.background}`);
                     }
@@ -145,11 +146,11 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
     } catch (error) {
         return res.status(403).json({ message: error });
     } finally {
-        if (req.files['avatar']) {
-            await fs.unlink(`images/${req.files['avatar'][0].filename}`);
+        if (files['avatar']) {
+            await fs.unlink(`images/${files!['avatar'][0].filename}`);
         }
-        if (req.files['bgImg']) {
-            await fs.unlink(`images/${req.files['bgImg'][0].filename}`);
+        if (files!['bgImg']) {
+            await fs.unlink(`images/${files!['bgImg'][0].filename}`);
         }
     }
 }

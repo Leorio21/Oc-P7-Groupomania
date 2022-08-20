@@ -6,7 +6,7 @@ export type PostsList = (
         id: number,
         firstName: string,
         lastName: string,
-        avatar: string,
+        avatar: string | null,
     },
     like: (PostLike & {
         user: {

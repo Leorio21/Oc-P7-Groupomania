@@ -5,28 +5,6 @@ import { Post, PostLike, PrismaClient, Role } from '@prisma/client';
 import sharp from 'sharp';
 const prisma = new PrismaClient()
 
-type Posts = (
-    Post & {
-    author: {
-        id: number,
-        firstName: string,
-        lastName: string,
-    },
-    like: (PostLike & {
-        user: {
-            firstName: string,
-            lastName: string,
-        };
-    })[],
-    comment: (Comment & {
-        author: {
-            firstName: string,
-            lastName: string,
-        },
-    })[]
-})[]
-
-
 export const getAllPost = async (_req: Request, res: Response, _next: NextFunction) => {
     try {
         const posts = await prisma.post.findMany({
@@ -70,7 +48,7 @@ export const getAllPost = async (_req: Request, res: Response, _next: NextFuncti
     }
 }
 
-export const createPost = async (req: Request | any, res: Response, _next: NextFunction) => {
+export const createPost = async (req: Request, res: Response, _next: NextFunction) => {
     let imageName: string | null = null;
     let newImage: boolean = false;
     try {
@@ -104,7 +82,7 @@ export const createPost = async (req: Request | any, res: Response, _next: NextF
     }
 }
 
-export const modifyPost = async (req: Request | any, res: Response, _next: NextFunction) => {
+export const modifyPost = async (req: Request, res: Response, _next: NextFunction) => {
     let imageName: string | null = null;
     if(req.body.image != 'null') {
         console.log('null')
@@ -165,7 +143,7 @@ export const modifyPost = async (req: Request | any, res: Response, _next: NextF
     }
 }
 
-export const deletePost = async (req: Request | any, res: Response, _next: NextFunction) => {
+export const deletePost = async (req: Request, res: Response, _next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -192,7 +170,7 @@ export const deletePost = async (req: Request | any, res: Response, _next: NextF
     }
 }
 
-export const likePost = async (req: Request | any, res: Response, _next: NextFunction) => {
+export const likePost = async (req: Request, res: Response, _next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -229,7 +207,7 @@ export const likePost = async (req: Request | any, res: Response, _next: NextFun
 
 }
 
-export const createComment = async (req: Request | any, res: Response, next: NextFunction) => {
+export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
@@ -253,7 +231,7 @@ export const createComment = async (req: Request | any, res: Response, next: Nex
     }
 }
 
-export const modifyComment = async (req: Request | any, res: Response, next: NextFunction) => {
+export const modifyComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
             let authorUpdate: Role = 'USER';
             const post = await prisma.post.findUnique({
@@ -290,7 +268,7 @@ export const modifyComment = async (req: Request | any, res: Response, next: Nex
     }
 }
 
-export const deleteComment = async (req: Request | any, res: Response, next: NextFunction) => {
+export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const post = await prisma.post.findUnique({
             where: {

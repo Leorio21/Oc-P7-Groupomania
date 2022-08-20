@@ -1,5 +1,9 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime';
+
 import { OnePost } from '../../interface/Post';
 import { UserCircleIcon } from '@heroicons/react/solid';
+
 import classNames from 'classnames'
 import cn from './Post.module.scss'
 
@@ -12,12 +16,8 @@ interface PostProps {
 
 const Post = ({post, userId}: PostProps) => {
 
-    const date = new Date(post.createdAt)
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const hour = date.getHours();
-    const minutes = date.getMinutes();
+    dayjs().format();
+    dayjs.extend(relativeTime)
 
     let modifyAuthor: string = '(modifié'
 
@@ -38,8 +38,8 @@ const Post = ({post, userId}: PostProps) => {
             <div className={classNames(cn.header)}>
                 <span className={classNames(cn.title)}>{post.title}</span>
                 <span>{post.author.firstName + ' ' + post.author.lastName}</span>
-                <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={''} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
-                <span>{hour}:{minutes<10 && 0}{minutes} - {day}/{month<10 && 0}{month}/{year}</span>
+                <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={`images/${post.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                <span>{dayjs(post.createdAt).fromNow(true)}</span>
             </div>
             <div className={classNames(cn.content)}>
                 {post.image && <img src={post.image} alt={'image \'illustration'} />}
