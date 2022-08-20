@@ -1,4 +1,4 @@
-import { OneComment } from '../../interface/Post'
+import { OneComment } from '../../interface/Comment'
 import Comment from './Comment'
 
 import classNames from 'classnames'
@@ -12,7 +12,7 @@ const CommentList = ({arrayComment}: CommentListProps) => {
     return (
         <div className={classNames(cn['commentList-container'])}>
             {arrayComment.map((comment) => {
-                return <Comment comment={comment} />
+                return <Comment comment={comment} key={comment.id} />
             })}
         </div>
     )

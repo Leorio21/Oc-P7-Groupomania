@@ -158,11 +158,11 @@ const userData: Prisma.UserCreateInput[] = [
             create : [
                 {
                     content: 'test comm 5',
-                    postId: 2,
+                    postId: 6,
                 },
                 {
                     content: 'test comm 6',
-                    postId: 3,
+                    postId: 4,
                 },
             ]
         },
@@ -214,11 +214,11 @@ const userData: Prisma.UserCreateInput[] = [
             create : [
                 {
                     content: 'test comm 7',
-                    postId: 2,
+                    postId: 9,
                 },
                 {
                     content: 'test comm 8',
-                    postId: 3,
+                    postId: 10,
                 },
             ]
         },

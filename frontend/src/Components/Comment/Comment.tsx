@@ -1,4 +1,4 @@
-import { OneComment } from '../../interface/Post';
+import { OneComment } from '../../interface/Comment';
 
 import classNames from 'classnames';
 import cn from './Comment.module.scss'

@@ -1,8 +1,8 @@
 import {Routes, Route } from 'react-router-dom';
 
 import Header from './Components/Header/Header'
-import Connect from './Container/Connect/Connect';
-import Home from './Container/Home/Home';
+import Connect from './Pages/Connect/Connect';
+import Home from './Pages/Home/Home';
 
 import './App.module.scss'
 

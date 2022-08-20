@@ -8,15 +8,18 @@ import classNames from "classnames";
 import cn from './Home.module.scss'
 
 import Post from "../../Components/Post/Post";
-import { addPosts } from "../../store/post.slice";
+import { addPosts } from "../../store/index";
 import { OnePost } from '../../interface/Post';
 
+interface PostArray {
+    posts: OnePost[]
+}
 
 
 const Posts = () => {
 
     const dispatch = useDispatch();
-    const posts = useSelector((state:any) => state.post)
+    const posts = useSelector((state:PostArray) => state.posts)
 
     if(!localStorage.getItem('userData')) {
         return <Navigate to='/'/>
