@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useMemo } from 'react';
 
-import { OnePost } from '../../interface/Post';
+import { OnePost } from '../../interface/Index';
 import { UserCircleIcon } from '@heroicons/react/solid';
 
 import classNames from 'classnames'
@@ -20,19 +21,17 @@ const Post = ({post, userId}: PostProps) => {
     dayjs().format();
     dayjs.extend(relativeTime)
 
-    let modifyAuthor: string = '(modifié'
+    const modifyAuthor: string = useMemo(() => {
+        switch (post.updatedBy) {
+            case 'ADMIN':
+                return '(modifié par Admin)';
+            case 'MODERATOR':
+                return '(modifié par Modérateur)';
+        }
+            return '(modifié)';
+    }, [post.updatedBy])
 
-    switch (post.updatedBy) {
-        case 'ADMIN':
-            modifyAuthor += ' par Admin)';
-            break;
-        case 'MODERATOR':
-            modifyAuthor += ' par Modérateur)';
-            break;
-        default:
-            modifyAuthor += ')';
-            break;
-    }
+    
     
     return (
         <>

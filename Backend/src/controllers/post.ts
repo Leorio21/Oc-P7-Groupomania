@@ -183,14 +183,14 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
             const like = await prisma.postLike.findMany({
             where: {
                 postId: +req.params.id,
-                userId: +req.auth.userId
+                userId: req.auth.userId
             }
         })
         if (like[0]) {
             await prisma.postLike.deleteMany({
                 where: {
                     postId: +req.params.id,
-                    userId: +req.auth.userId
+                    userId: req.auth.userId
                 }
             })
             return res.status(201).json({message: 'Like supprimé'})
@@ -198,7 +198,7 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
         await prisma.postLike.create({
             data: {
                 postId: +req.params.id,
-                userId: +req.auth.userId
+                userId: req.auth.userId
             }
         })
         return res.status(201).json({message: 'Like enregistré'})

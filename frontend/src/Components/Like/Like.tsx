@@ -6,10 +6,11 @@ import cn from './Like.module.scss'
 
 interface LikeProps {
     nbLike: number,
-    userLike: boolean
+    userLike: boolean,
+    postId: number
 }
 
-const Like = ({nbLike, userLike}: LikeProps) => {
+const Like = ({nbLike, userLike, postId}: LikeProps) => {
 
     return (
         <div>

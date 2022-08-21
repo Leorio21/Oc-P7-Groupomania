@@ -1,4 +1,4 @@
-import { OneComment } from '../../interface/Comment'
+import { OneComment } from '../../interface/Index'
 import Comment from './Comment'
 
 import classNames from 'classnames'

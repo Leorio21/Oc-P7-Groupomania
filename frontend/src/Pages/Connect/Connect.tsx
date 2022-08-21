@@ -3,7 +3,7 @@ import { FormEvent, useState } from 'react';
 import cn from './Connect.module.scss'
 import { Navigate } from 'react-router-dom'
 
-import { dataLogin, dataSignup } from '../../interface/Form';
+import { dataLogin, dataSignup } from '../../interface/Index';
 import Modal from '../../Components/Modal/Modal';
 import axios from 'axios';
 
