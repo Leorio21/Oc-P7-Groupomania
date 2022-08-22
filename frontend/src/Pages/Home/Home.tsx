@@ -8,11 +8,6 @@ import cn from './Home.module.scss'
 import Post from "../../Components/Post/Post";
 import { OnePost, UserDataLs } from '../../interface/Index';
 
-interface StateContent {
-    posts: OnePost[]
-}
-
-
 const Posts = () => {
     
     

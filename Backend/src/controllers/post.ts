@@ -67,7 +67,7 @@ export const createPost = async (req: Request, res: Response, _next: NextFunctio
                 authorId: req.auth.userId,
                 title: req.body.title,
                 content: req.body.content,
-                image: imageName
+                image: `${req.protocol}://${req.get('host')}/images/${imageName}`
             },
         })
         return res.status(201).json({message: 'Post enregistré'})
@@ -116,7 +116,8 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 }
             }
             if((newImage && oldImage) || (imageName == null && oldImage)) {
-                await fs.unlink(`images/${oldImage}`);
+                const oldImageName = oldImage.split('/images/')[1];
+                await fs.unlink(`images/${oldImageName}`);
             }
             await prisma.post.updateMany({
                 where: {
@@ -125,7 +126,7 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 data: {
                     title: req.body.title,
                     content: req.body.content,
-                    image: imageName,
+                    image: `${req.protocol}://${req.get('host')}/images/${imageName}`,
                     updatedBy: authorUpdate
                 }
             })
@@ -161,7 +162,8 @@ export const deletePost = async (req: Request, res: Response, _next: NextFunctio
                 }
             })
             if(post.image) {
-                await fs.unlink(`images/${post.image}`);
+                const imageName = post.image.split('/images/')[1];
+                await fs.unlink(`images/${imageName}`);
             }
             return res.status(200).json({ message: 'Post supprimé' })
         }
@@ -180,12 +182,13 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
             if (!post) {
                 return res.status(400).json({ message: 'Post introuvable' }) 
             }
+
             const like = await prisma.postLike.findMany({
-            where: {
-                postId: +req.params.id,
-                userId: req.auth.userId
-            }
-        })
+                where: {
+                    postId: +req.params.id,
+                    userId: req.auth.userId
+                }
+            })
         if (like[0]) {
             await prisma.postLike.deleteMany({
                 where: {
