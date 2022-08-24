@@ -216,6 +216,7 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log(req.body.content)
         const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id
@@ -224,14 +225,17 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
         if(!post) {
             throw 'post non trouvé'
         }
-        await prisma.comment.create({
+        const comment = await prisma.comment.create({
             data: {
                 postId: +req.params.id,
                 authorId: req.auth.userId,
                 content: req.body.content,
             },
         })
-        return res.status(201).json({message: 'Commentaire enregistré'})
+        return res.status(201).json({
+            comment: comment,
+            message: 'Commentaire enregistré'
+        })
 
     } catch (error) {
         return res.status(400).json({ error })

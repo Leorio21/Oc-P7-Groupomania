@@ -94,7 +94,6 @@ const Connect = () => {
 
     return (
         <>
-            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
             <div className = {classNames(cn.container)} id='form_container'>
                 <div className={toggleForm ? classNames(cn.form_container, cn.animation) : classNames(cn.form_container)}>
                     <div className={classNames(cn.form, cn.coteDroit)}></div>
@@ -102,53 +101,58 @@ const Connect = () => {
                         <h3>Connexion</h3>
                         <Input
                             tabIndex={toggleForm ? -1 : 0}
-                            label='Adresse mail :'
-                            id='emailLogin'
                             type='text'
+                            id='emailLogin'
                             value={email}
                             onChangeHandler={changeEmailHandler}
+                            label='Adresse mail :'
+                            placeHolder='email: nom.prenom@groupomania.fr'
                         />
                         <Input
                             tabIndex={toggleForm ? -1 : 0}
-                            label='Mot de passe :'
-                            id='passwordLogin'
                             type='password'
+                            id='passwordLogin'
                             value={password}
                             onChangeHandler={changePasswordHandler}
+                            label='Mot de passe :'
+                            placeHolder='Mot de passe'
                         />
                         <Button 
                             tabIndex={toggleForm ? -1 : 0}
                             type='submit'
                             onClickHandler={loginHandler}
                             label='Se connecter'
-                        />
+                            />
                     </form>
                     <div className={classNames(cn.form, cn.coteGauche)}></div>
                     <form className = {classNames(cn.form, cn.form_signup)} id='formSingUp'>
                         <h3>Inscription</h3>
                         <Input
                             tabIndex={toggleForm ? 0 : -1}
-                            label='Adresse mail :'
-                            id='email'
                             type='text'
+                            id='email'
                             value={email}
                             onChangeHandler={changeEmailHandler}
-                        />
+                            label='Adresse mail :'
+                            placeHolder='email: nom.prenom@groupomania.fr'
+                            />
                         <Input
                             tabIndex={toggleForm ? 0 : -1}
-                            label='Mot de passe :'
-                            id='password'
                             type='password'
+                            id='password'
                             value={password}
                             onChangeHandler={changePasswordHandler}
+                            label='Mot de passe :'
+                            placeHolder='Mot de passe'
                         />
                         <Input
                             tabIndex={toggleForm ? 0 : -1}
-                            label='Mot de passe :'
-                            id='confirmPassword'
                             type='password'
-                            value={password}
+                            id='confirmPassword'
+                            value={confirmPassword}
                             onChangeHandler={changeConfirmPasswordHandler}
+                            label='Mot de passe :'
+                            placeHolder='Confirmer le mot de passe'
                         />
                         <Button 
                             tabIndex={toggleForm ? 0 : -1}
@@ -160,6 +164,7 @@ const Connect = () => {
                 </div>
                 <h2><span className={classNames(cn.navLink)} onKeyDownCapture ={clickAnimation} onClick={clickAnimation} id='signup' tabIndex={0}>Inscription</span> ----- <span className={classNames(cn.navLink)} onKeyDown={clickAnimation} onClick={clickAnimation} tabIndex={0} id='login'>Connexion</span></h2>
             </div>
+            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
         </>
     )
 }

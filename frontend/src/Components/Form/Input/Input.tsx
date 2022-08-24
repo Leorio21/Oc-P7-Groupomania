@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useState } from "react";
+import { useState } from "react";
 
 import classNames from "classnames";
 import cn from './Input.module.scss'
@@ -9,10 +9,11 @@ interface PropsType {
     id: string,
     value: string,
     onChangeHandler: Function,
-    label: string
+    label?: string,
+    placeHolder: string
 }
 
-const Input = ({tabIndex, type, id, value, onChangeHandler, label}: PropsType) => {
+const Input = ({tabIndex, type, id, onChangeHandler, value, label, placeHolder}: PropsType) => {
 
     const [inputValue, setInputValue] = useState(value)
 
@@ -23,8 +24,8 @@ const changeHandler = (event: any) => {
 
     return (
         <>
-            <label htmlFor={id} className={classNames(cn.label)}>{label}</label>
-            <input tabIndex={tabIndex} type={type} id={id} name={id} value={inputValue} onChange={changeHandler} className={classNames(cn.input)} />
+            {label && <label htmlFor={id} className={classNames(cn.label)}>{label}</label>}
+            <input tabIndex={tabIndex} type={type} id={id} name={id} value={inputValue} placeholder={placeHolder} onChange={changeHandler} className={classNames(cn.input)} />
         </>
     )
 }

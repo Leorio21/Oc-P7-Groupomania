@@ -1,18 +1,18 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/fr'
 import relativeTime from 'dayjs/plugin/relativeTime';
-
-import { useMemo, useState } from 'react';
-
-import { OnePost, OnePostLike } from '../../interface/Index';
+import axios from 'axios';
+import { FormEvent, useMemo, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
 
+import { OnePost, OnePostComment, OnePostLike } from '../../interface/Index';
 import classNames from 'classnames'
 import cn from './Post.module.scss'
 
 import Like from '../Like/Like'
 import CommentList from '../Comment/CommentList'
-import axios from 'axios';
+import Modal from '../Modal/Modal';
+import Input from '../Form/Input/Input';
 
 interface PostProps {
     post: OnePost,
@@ -21,16 +21,18 @@ interface PostProps {
 
 const Post = ({post, userId}: PostProps) => {
 
-    const [postData, setPostData] = useState(post)
-    const [postLike, setPostLike] = useState(postData.like)
-    const [userLikePost, setUserLikePost] = useState(postLike.find((like) => like.userId == userId) ? true : false)
-    const [postComment, setPostComment] = useState(post.comment)
+    const [postData, setPostData] = useState(post);
+    const [postLike, setPostLike] = useState(postData.like);
+    const [userLikePost, setUserLikePost] = useState(postLike.find((like) => like.userId == userId) ? true : false);
+    const [modalToggle, setModalToggle] = useState(false);
+    const [errorText, setErrorText] = useState('');
 
-    const onCommentHandler = () => {
-
+    const changeVisibilityModal = () => {
+        setModalToggle(!modalToggle);
     }
 
-    const onClickLikeHandler = async () => {
+    const onClickLikeHandler = async (event: FormEvent) => {
+        event.preventDefault()
         try {
             const userData = JSON.parse(localStorage.getItem('userData')!)
             const option = {
@@ -56,7 +58,8 @@ const Post = ({post, userId}: PostProps) => {
             }
             setUserLikePost(!userLikePost)
         } catch (error) {
-            console.log(error)
+            setErrorText(`Une erreur est survenue :\n${error}`)
+            changeVisibilityModal()
         }
     }
 
@@ -73,7 +76,6 @@ const Post = ({post, userId}: PostProps) => {
         }
             return '(modifié)';
     }, [postData.updatedBy])
-
     return (
         <>
             <article className={classNames(cn.post)}>
@@ -93,16 +95,16 @@ const Post = ({post, userId}: PostProps) => {
                 <div className={classNames(cn.footer)}>
                     <div className={classNames(cn.likeComment)}>
                         <Like nbLike={postLike.length} userLikePost={userLikePost} onClickLike={onClickLikeHandler}/>
-                        <div className={classNames(cn.nbComm)}>{postComment.length} Commentaire{postComment.length > 1 && 's'}</div>
+                        
                     </div>
-                    <CommentList arrayComment={post.comment} />
-                    <form onSubmit={onCommentHandler} id='formComment'>
-
-                    </form>
+                    <CommentList arrayComment={post.comment} postId={post.id} />
+                    
                 </div>
             </article>
+            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
         </>
     )
 }
 
 export default Post;
+//<div className={classNames(cn.nbComm)}>{postComment.length} Commentaire{postComment.length > 1 && 's'}</div>

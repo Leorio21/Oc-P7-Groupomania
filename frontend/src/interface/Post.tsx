@@ -22,9 +22,16 @@ export type OnePost =
         })[]
     }
 
-    export type OnePostLike = (PostLike & {
-        user: {
-            firstName: string,
-            lastName: string,
-        };
-    })
+export type OnePostLike = (PostLike & {
+    user: {
+        firstName: string,
+        lastName: string,
+    };
+})
+
+export type OnePostComment = (Comment & {
+    author: {
+        firstName: string,
+        lastName: string,
+    },
+})
