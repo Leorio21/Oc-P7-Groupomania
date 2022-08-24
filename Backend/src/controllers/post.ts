@@ -216,7 +216,6 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log(req.body.content)
         const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id
@@ -229,11 +228,18 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
             data: {
                 postId: +req.params.id,
                 authorId: req.auth.userId,
-                content: req.body.content,
+                content: req.body.content
             },
         })
         return res.status(201).json({
-            comment: comment,
+            comment: {
+                ...comment,
+                author: {
+                    firstName: req.auth.firstName,
+                    lastName: req.auth.lastName,
+                    avatar: req.auth.avatar
+                }
+            },
             message: 'Commentaire enregistré'
         })
 

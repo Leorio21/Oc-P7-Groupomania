@@ -15,17 +15,14 @@ interface PropsType {
 
 const Input = ({tabIndex, type, id, onChangeHandler, value, label, placeHolder}: PropsType) => {
 
-    const [inputValue, setInputValue] = useState(value)
-
 const changeHandler = (event: any) => {
-    setInputValue(event.target.value)
     onChangeHandler(event.target.value)
 }
 
     return (
         <>
             {label && <label htmlFor={id} className={classNames(cn.label)}>{label}</label>}
-            <input tabIndex={tabIndex} type={type} id={id} name={id} value={inputValue} placeholder={placeHolder} onChange={changeHandler} className={classNames(cn.input)} />
+            <input tabIndex={tabIndex} type={type} id={id} name={id} value={value} placeholder={placeHolder} onChange={changeHandler} className={classNames(cn.input)} />
         </>
     )
 }

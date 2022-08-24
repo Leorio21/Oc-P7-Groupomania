@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import classNames from "classnames";
 import cn from './PostsList.module.scss'
 
-import Post from "../../Components/Post/Post";
+import Post from "./Post";
 import { OnePost, UserDataLs, OptionAxios } from '../../interface/Index';
 
 const PostsList = () => {

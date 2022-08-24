@@ -18,6 +18,7 @@ export type OnePost =
             author: {
                 firstName: string,
                 lastName: string,
+                avatar: string | null,
             },
         })[]
     }
@@ -33,5 +34,6 @@ export type OnePostComment = (Comment & {
     author: {
         firstName: string,
         lastName: string,
+        avatar: string | null,
     },
 })

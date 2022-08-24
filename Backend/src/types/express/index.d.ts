@@ -8,6 +8,9 @@ declare global{
             auth: {
                 userId: User['id'],
                 role: User['role'],
+                firstName: User['firstName'],
+                lastName: User['lastName'],
+                avatar: User['avatar']
             }
         }
     }

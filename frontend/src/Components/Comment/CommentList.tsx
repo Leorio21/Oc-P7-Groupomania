@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useInsertionEffect, useState } from 'react'
-import { OneComment, OnePostComment } from '../../interface/Index'
+import { OnePostComment } from '../../interface/Index'
 import axios from 'axios'
 
 import classNames from 'classnames'
@@ -9,11 +9,12 @@ import Comment from './Comment'
 import Input from '../Form/Input/Input'
 import Modal from '../Modal/Modal'
 interface CommentListProps {
-    arrayComment: OneComment[],
+    arrayComment: OnePostComment[],
     postId: number,
+    changeCountComm: Function
 }
 
-const CommentList = ({arrayComment, postId}: CommentListProps) => {
+const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) => {
 
     const [comments, setComments] = useState(arrayComment);
     const [comment, setComment] = useState('');
@@ -42,17 +43,12 @@ const CommentList = ({arrayComment, postId}: CommentListProps) => {
             }
             const content = comment
             const bddComment = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/comment`, {content}, option)
-            const newComment: OnePostComment = {
-                ...bddComment.data.comment,
-                author: {
-                    firstName: 'toto',
-                    lastName: 'toto',
-                    avatar: 'test'
-                }
-            }
+            const newComment: OnePostComment = { ...bddComment.data.comment }
             const newCommentsArray = [...comments]
             newCommentsArray.push(newComment)
+            setComment('')
             setComments(newCommentsArray)
+            changeCountComm(newCommentsArray.length)
         } catch (error) {
             setErrorText(`Une erreur est survenue :\n${error}`)
             changeVisibilityModal()

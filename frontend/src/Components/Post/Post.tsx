@@ -24,11 +24,16 @@ const Post = ({post, userId}: PostProps) => {
     const [postData, setPostData] = useState(post);
     const [postLike, setPostLike] = useState(postData.like);
     const [userLikePost, setUserLikePost] = useState(postLike.find((like) => like.userId == userId) ? true : false);
+    const [countComm, setCountComm] = useState(post.comment.length)
     const [modalToggle, setModalToggle] = useState(false);
     const [errorText, setErrorText] = useState('');
 
     const changeVisibilityModal = () => {
         setModalToggle(!modalToggle);
+    }
+
+    const changeCountComm = (newCounterComm: number) => {
+        setCountComm(newCounterComm)
     }
 
     const onClickLikeHandler = async (event: FormEvent) => {
@@ -76,6 +81,7 @@ const Post = ({post, userId}: PostProps) => {
         }
             return '(modifié)';
     }, [postData.updatedBy])
+
     return (
         <>
             <article className={classNames(cn.post)}>
@@ -95,9 +101,9 @@ const Post = ({post, userId}: PostProps) => {
                 <div className={classNames(cn.footer)}>
                     <div className={classNames(cn.likeComment)}>
                         <Like nbLike={postLike.length} userLikePost={userLikePost} onClickLike={onClickLikeHandler}/>
-                        
+                        <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && 's'}</div>
                     </div>
-                    <CommentList arrayComment={post.comment} postId={post.id} />
+                    <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
                     
                 </div>
             </article>
@@ -107,4 +113,3 @@ const Post = ({post, userId}: PostProps) => {
 }
 
 export default Post;
-//<div className={classNames(cn.nbComm)}>{postComment.length} Commentaire{postComment.length > 1 && 's'}</div>

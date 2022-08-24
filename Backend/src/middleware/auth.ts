@@ -18,7 +18,13 @@ export default async (req: Request , res: Response, next: NextFunction) => {
         if(!user) {
             throw `Requête non authentifiée`;
         }
-        req.auth = {userId: user.id, role: user.role};
+        req.auth = {
+            userId: user.id,
+            role: user.role,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatar: user.avatar
+        };
         return next();
     } catch (error) {
         return res.status(401).json({ error });
