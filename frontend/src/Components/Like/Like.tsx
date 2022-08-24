@@ -1,22 +1,63 @@
 import { ThumbUpIcon } from '@heroicons/react/outline'
 import { ThumbUpIcon as ThumbUpIconSolid } from '@heroicons/react/solid'
-import classNames from 'classnames'
-import { MouseEventHandler } from 'react'
+import { FormEvent, useState } from 'react'
 
+import classNames from 'classnames'
 import cn from './Like.module.scss'
+import Modal from '../Modal/Modal'
+import axios from 'axios'
+import { OnePostLike, UserDataLs } from '../../interface/Index'
 
 interface LikeProps {
-    nbLike: number,
+    likeData: OnePostLike[],
     userLikePost: boolean,
-    onClickLike: MouseEventHandler
+    postId: number,
+    onClickLike: Function
 }
 
-const Like = ({nbLike, userLikePost, onClickLike}: LikeProps) => {
+const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
+
+    const [postLike, setPostLike] = useState(likeData);
+    const [modalToggle, setModalToggle] = useState(false);
+    const [errorText, setErrorText] = useState('');
+
+    const changeVisibilityModal = () => {
+        setModalToggle(!modalToggle);
+    }
+
+    const onClickLikeHandler = async (event: FormEvent) => {
+        event.preventDefault()
+        try {
+            const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${userData.token}`
+                }
+            }
+            const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
+            if (userLikePost) {
+                const newLikeArray = postLike.filter((like) => like.userId != userData.userId)
+                setPostLike(newLikeArray)
+            } else {
+                const newLike: OnePostLike = { ...bddLike.data.like }
+                const newLikeArray = [...postLike]
+                newLikeArray.push(newLike)
+                setPostLike(newLikeArray)
+            }
+            onClickLike()
+        } catch (error) {
+            setErrorText(`Une erreur est survenue :\n${error}`)
+            changeVisibilityModal()
+        }
+    }
 
     return (
-        <div>
-            <span className={classNames(cn.nbLike)}>{nbLike}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLike} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLike} className={classNames(cn.icon)}  tabIndex={0} />}
-        </div>
+        <>
+            <div>
+                <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} className={classNames(cn.icon)}  tabIndex={0} />}
+            </div>
+            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
+        </>
     )
 }
 
