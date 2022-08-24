@@ -4,7 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { useMemo, useState } from 'react';
 
-import { OnePost } from '../../interface/Index';
+import { OnePost, OnePostLike } from '../../interface/Index';
 import { UserCircleIcon } from '@heroicons/react/solid';
 
 import classNames from 'classnames'
@@ -19,20 +19,6 @@ interface PostProps {
     userId: number
 }
 
-const likeDislike = async (postId: number) => {
-    const userData = JSON.parse(localStorage.getItem('userData')!)
-    const option = {
-        headers: {
-            Authorization: `Bearer ${userData.token}`
-        }
-    }
-    try {
-        await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
-    } catch (error) {
-        console.log(error)
-    }
-}
-
 const Post = ({post, userId}: PostProps) => {
 
     const [postData, setPostData] = useState(post)
@@ -44,28 +30,34 @@ const Post = ({post, userId}: PostProps) => {
 
     }
 
-    const onClickLikeHandler = () => {
-        if (userLikePost) {
-            const likeIndexToRemove = postLike.findIndex((like) => like.userId == userId)
-            const newLikeArray = [...postLike]
-            newLikeArray.splice(likeIndexToRemove, 1)
-            setPostLike(newLikeArray)
-        } else {
-            const newLike = {
-                id: 1,
-                userId: userId,
-                postId: postData.id,
-                user: {
-                    firstName: postData.author.firstName,
-                    lastName: postData.author.lastName
+    const onClickLikeHandler = async () => {
+        try {
+            const userData = JSON.parse(localStorage.getItem('userData')!)
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${userData.token}`
                 }
             }
-            const newLikeArray = [...postLike]
-            newLikeArray.push(newLike)
-            setPostLike(newLikeArray)
+            const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postData.id}/like`, {}, option)
+            if (userLikePost) {
+                const newLikeArray = postLike.filter((like) => like.userId != userId)
+                setPostLike(newLikeArray)
+            } else {
+                const newLike: OnePostLike = {
+                    ...bddLike.data.like,
+                    user: {
+                        firstName: postData.author.firstName,
+                        lastName: postData.author.lastName
+                    }
+                }
+                const newLikeArray = [...postLike]
+                newLikeArray.push(newLike)
+                setPostLike(newLikeArray)
+            }
+            setUserLikePost(!userLikePost)
+        } catch (error) {
+            console.log(error)
         }
-        likeDislike(postData.id)
-        setUserLikePost(!userLikePost)
     }
 
     dayjs.locale('fr')

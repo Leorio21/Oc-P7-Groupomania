@@ -21,3 +21,10 @@ export type OnePost =
             },
         })[]
     }
+
+    export type OnePostLike = (PostLike & {
+        user: {
+            firstName: string,
+            lastName: string,
+        };
+    })

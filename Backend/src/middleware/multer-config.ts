@@ -10,10 +10,9 @@ export const fileStorage = multer.diskStorage({
             callback(null, 'images');
         },
         filename: (req: Request, file: Express.Multer.File, callback: FileNameCallback):void  => {
-            const name = file.originalname.split(' ').join('_');
-            const finalName = name.split('.')[0]
+            const name = file.originalname.split('.')[0].split(' ').join('_');
             const extension = MIME_TYPES.get(file.mimetype);
-            callback(null, finalName + Date.now() + '.' + extension);
+            callback(null, name + Date.now() + '.' + extension);
         }
 });
 

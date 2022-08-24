@@ -118,7 +118,7 @@ const Connect = () => {
                         />
                         <Button 
                             tabIndex={toggleForm ? -1 : 0}
-                            type='button'
+                            type='submit'
                             onClickHandler={loginHandler}
                             label='Se connecter'
                         />
@@ -152,7 +152,7 @@ const Connect = () => {
                         />
                         <Button 
                             tabIndex={toggleForm ? 0 : -1}
-                            type='button'
+                            type='submit'
                             onClickHandler={signupHandler}
                             label="S'inscrire"
                         />

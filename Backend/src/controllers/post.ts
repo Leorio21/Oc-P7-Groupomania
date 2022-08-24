@@ -198,13 +198,16 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
             })
             return res.status(201).json({message: 'Like supprimé'})
         }
-        await prisma.postLike.create({
+        const newLike = await prisma.postLike.create({
             data: {
                 postId: +req.params.id,
                 userId: req.auth.userId
             }
         })
-        return res.status(201).json({message: 'Like enregistré'})
+        return res.status(201).json({
+            like: newLike,
+            message: 'Like enregistré'
+        })
     } catch (error) {
         return res.status(400).json({ error })
     }
