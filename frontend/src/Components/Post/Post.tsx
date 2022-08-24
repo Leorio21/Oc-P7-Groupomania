@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
+import 'dayjs/locale/fr'
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useEffect, useMemo, useState } from 'react';
+
+import { useMemo, useState } from 'react';
 
 import { OnePost } from '../../interface/Index';
 import { UserCircleIcon } from '@heroicons/react/solid';
@@ -38,7 +40,11 @@ const Post = ({post, userId}: PostProps) => {
     const [userLikePost, setUserLikePost] = useState(postLike.find((like) => like.userId == userId) ? true : false)
     const [postComment, setPostComment] = useState(post.comment)
 
-    const onLikeClickHandler = () => {
+    const onCommentHandler = () => {
+
+    }
+
+    const onClickLikeHandler = () => {
         if (userLikePost) {
             const likeIndexToRemove = postLike.findIndex((like) => like.userId == userId)
             const newLikeArray = [...postLike]
@@ -62,6 +68,7 @@ const Post = ({post, userId}: PostProps) => {
         setUserLikePost(!userLikePost)
     }
 
+    dayjs.locale('fr')
     dayjs().format();
     dayjs.extend(relativeTime)
 
@@ -81,7 +88,7 @@ const Post = ({post, userId}: PostProps) => {
                 <div className={classNames(cn.header)}>
                     <span className={classNames(cn.title)}>{postData.title}</span>
                     <span>{post.author.firstName + ' ' + postData.author.lastName}</span>
-                    <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`http://localhost:3000/images/${postData.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                    <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                     <span>{dayjs(post.createdAt).fromNow(true)}</span>
                 </div>
                 <div className={classNames(cn.content)}>
@@ -93,10 +100,13 @@ const Post = ({post, userId}: PostProps) => {
                 </div>
                 <div className={classNames(cn.footer)}>
                     <div className={classNames(cn.likeComment)}>
-                        <Like nbLike={postLike.length} userLikePost={userLikePost} onClickFunction={onLikeClickHandler}/>
+                        <Like nbLike={postLike.length} userLikePost={userLikePost} onClickLike={onClickLikeHandler}/>
                         <div className={classNames(cn.nbComm)}>{postComment.length} Commentaire{postComment.length > 1 && 's'}</div>
                     </div>
                     <CommentList arrayComment={post.comment} />
+                    <form onSubmit={onCommentHandler} id='formComment'>
+
+                    </form>
                 </div>
             </article>
         </>

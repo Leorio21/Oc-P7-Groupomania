@@ -1,16 +1,19 @@
 import classNames from 'classnames'
 import { FormEvent, useState } from 'react';
 import cn from './Connect.module.scss'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-import { dataLogin, dataSignup } from '../../interface/Index';
+import { DataLogin, DataSignup } from '../../interface/Index';
 import Modal from '../../Components/Modal/Modal';
 import axios from 'axios';
+import Input from '../../Components/Form/Input/Input';
+import Button from '../../Components/Form/Button/Button';
 
 const Connect = () => {
+    let navigate = useNavigate();
 
     if (localStorage.getItem('userData')) {
-        return <Navigate to='/posts' />
+        navigate('/posts')
     }
 
     const [modalToggle, setModalToggle] = useState(false);
@@ -18,9 +21,6 @@ const Connect = () => {
     
     const [toggleForm, setToggleForm] = useState(false);
     const [activeForm, setActiveForm] = useState('login');
-    
-    const [ emailLogin, setEmailLogin ] = useState('');
-    const [ passwordLogin, setPasswordLogin ] = useState('');
     
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
@@ -30,16 +30,28 @@ const Connect = () => {
         setModalToggle(!modalToggle);
     }
 
+    const changeEmailHandler = (newEmail: string) => {
+        setEmail(newEmail)
+    }
+
+    const changePasswordHandler = (newPassword: string) => {
+        setPassword(newPassword)
+    }
+
+    const changeConfirmPasswordHandler = (newConfirmPassword: string) => {
+        setConfirmPassword(newConfirmPassword)
+    }
+
     const loginHandler = async (event: FormEvent) => {
         event.preventDefault()
-        const data: dataLogin = {
-            email: emailLogin,
-            password: passwordLogin
-        }
+        const data: DataLogin = {
+                email: email,
+                password: password
+            }
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/login', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
-            location.reload();
+            navigate('/posts')
         } catch (error: any) {
             if(error.response.data.message){
                 setErrorText(error.response.data.message)
@@ -52,16 +64,15 @@ const Connect = () => {
 
     const signupHandler = async (event: FormEvent) => {
         event.preventDefault()
-        const myForm: HTMLFormElement = document.querySelector('#formSignUp')!
-        const data = new FormData(myForm)
-        const option = {
-            headers: { "Content-Type": "multipart/form-data" },
-            data: data
-        }
+        const data: DataSignup = {
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword
+            }
         try {
-            const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', option)
+            const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
-            location.reload();
+            navigate('/posts')
         } catch (error: any) {
             if(error.response.data.message){
                 setErrorText(error.response.data.message)
@@ -89,22 +100,62 @@ const Connect = () => {
                     <div className={classNames(cn.form, cn.coteDroit)}></div>
                     <form className = {classNames(cn.form, cn.form_login)} onSubmit={loginHandler} id='formLogin'>
                         <h3>Connexion</h3>
-                        <label htmlFor='emailLogin'>Adresse mail :</label>
-                        <input tabIndex={toggleForm ? -1 : 0} type='text' id='emailLogin' name='emailLogin' value={emailLogin} onChange={(event) => setEmailLogin(event.target.value)} />
-                        <label htmlFor='passwordLogin'>Mot de passe :</label>
-                        <input tabIndex={toggleForm ? -1 : 0} type='password' id='passwordLogin' name='passwordLogin' value={passwordLogin} onChange={(event) => setPasswordLogin(event.target.value)} />
-                        <button tabIndex={toggleForm ? -1 : 0} type='submit' onClick={loginHandler}>Se connecter</button>
+                        <Input
+                            tabIndex={toggleForm ? -1 : 0}
+                            label='Adresse mail :'
+                            id='emailLogin'
+                            type='text'
+                            value={email}
+                            onChangeHandler={changeEmailHandler}
+                        />
+                        <Input
+                            tabIndex={toggleForm ? -1 : 0}
+                            label='Mot de passe :'
+                            id='passwordLogin'
+                            type='password'
+                            value={password}
+                            onChangeHandler={changePasswordHandler}
+                        />
+                        <Button 
+                            tabIndex={toggleForm ? -1 : 0}
+                            type='button'
+                            onClickHandler={loginHandler}
+                            label='Se connecter'
+                        />
                     </form>
                     <div className={classNames(cn.form, cn.coteGauche)}></div>
                     <form className = {classNames(cn.form, cn.form_signup)} id='formSingUp'>
                         <h3>Inscription</h3>
-                        <label htmlFor='email'>Adresse mail :</label>
-                        <input tabIndex={toggleForm ? 0 : -1} type='text' id='email' name='email' value={email} onChange={(event) => setEmail(event.target.value)} />
-                        <label htmlFor='password'>Mot de passe :</label>
-                        <input tabIndex={toggleForm ? 0 : -1} type='password'  id='password' name='password' value={password} onChange={(event) => setPassword(event.target.value)} />
-                        <label htmlFor='confirmPassword'>Confirmer le mot de passe :</label>
-                        <input tabIndex={toggleForm ? 0 : -1} type='password' id='confirmPassword' name='confirmPassword' value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
-                        <button tabIndex={toggleForm ? 0 : -1} type='button' onClick={signupHandler}>S'inscrire</button>
+                        <Input
+                            tabIndex={toggleForm ? 0 : -1}
+                            label='Adresse mail :'
+                            id='email'
+                            type='text'
+                            value={email}
+                            onChangeHandler={changeEmailHandler}
+                        />
+                        <Input
+                            tabIndex={toggleForm ? 0 : -1}
+                            label='Mot de passe :'
+                            id='password'
+                            type='password'
+                            value={password}
+                            onChangeHandler={changePasswordHandler}
+                        />
+                        <Input
+                            tabIndex={toggleForm ? 0 : -1}
+                            label='Mot de passe :'
+                            id='confirmPassword'
+                            type='password'
+                            value={password}
+                            onChangeHandler={changeConfirmPasswordHandler}
+                        />
+                        <Button 
+                            tabIndex={toggleForm ? 0 : -1}
+                            type='button'
+                            onClickHandler={signupHandler}
+                            label="S'inscrire"
+                        />
                     </form>
                 </div>
                 <h2><span className={classNames(cn.navLink)} onKeyDownCapture ={clickAnimation} onClick={clickAnimation} id='signup' tabIndex={0}>Inscription</span> ----- <span className={classNames(cn.navLink)} onKeyDown={clickAnimation} onClick={clickAnimation} tabIndex={0} id='login'>Connexion</span></h2>

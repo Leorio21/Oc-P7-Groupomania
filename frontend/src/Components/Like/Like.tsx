@@ -8,14 +8,14 @@ import cn from './Like.module.scss'
 interface LikeProps {
     nbLike: number,
     userLikePost: boolean,
-    onClickFunction: MouseEventHandler
+    onClickLike: MouseEventHandler
 }
 
-const Like = ({nbLike, userLikePost, onClickFunction}: LikeProps) => {
+const Like = ({nbLike, userLikePost, onClickLike}: LikeProps) => {
 
     return (
         <div>
-        <span className={classNames(cn.nbLike)}>{nbLike}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickFunction} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickFunction} className={classNames(cn.icon)}  tabIndex={0} />}
+            <span className={classNames(cn.nbLike)}>{nbLike}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLike} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLike} className={classNames(cn.icon)}  tabIndex={0} />}
         </div>
     )
 }

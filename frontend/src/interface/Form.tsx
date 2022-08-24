@@ -1,9 +1,9 @@
-export interface dataLogin {
+export interface DataLogin {
     email: string,
     password: string
 }
 
-export interface dataSignup {
+export interface DataSignup {
     email: string,
     password: string
     confirmPassword: string

@@ -37,7 +37,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body)
     try {
         const user = await prisma.user.findUnique({
             where: {
