@@ -25,8 +25,13 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
         setModalToggle(!modalToggle);
     }
 
-    const onClickLikeHandler = async (event: FormEvent) => {
-        event.preventDefault()
+    const onKeyDownHandler = (event: any) => {
+        if (event.keyCode == 13) {
+            onClickLikeHandler()
+        }
+    }
+
+    const onClickLikeHandler = async () => {
         try {
             const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
             const option = {
@@ -54,7 +59,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     return (
         <>
             <div>
-                <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} className={classNames(cn.icon)}  tabIndex={0} />}
+                <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
             </div>
             {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
         </>

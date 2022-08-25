@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import classNames from "classnames";
 import cn from './PostsList.module.scss'
@@ -9,11 +9,8 @@ import Post from "./Post";
 import { OnePost, UserDataLs, OptionAxios } from '../../interface/Index';
 
 const PostsList = () => {
-    
-    
-    if(!localStorage.getItem('userData')) {
-        return <Navigate to='/'/>
-    }
+
+    const navigate = useNavigate();
 
     const [userData, setUserData] = useState<UserDataLs>(JSON.parse(localStorage.getItem('userData')!))
     const [option, setOption] = useState<OptionAxios>({
@@ -33,6 +30,9 @@ const PostsList = () => {
         }
     
     useEffect(() => {
+        if (localStorage.getItem('userData')) {
+            navigate('/posts')
+        }
         fetchData(option)
     }, [])
 

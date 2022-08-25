@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import cn from './Connect.module.scss'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,11 +10,7 @@ import Input from '../../Components/Form/Input/Input';
 import Button from '../../Components/Form/Button/Button';
 
 const Connect = () => {
-    let navigate = useNavigate();
-
-    if (localStorage.getItem('userData')) {
-        navigate('/posts')
-    }
+    const navigate = useNavigate();
 
     const [modalToggle, setModalToggle] = useState(false);
     const [errorText, setErrorText] = useState('')
@@ -92,6 +88,12 @@ const Connect = () => {
         }
     }
 
+    useEffect(() => {
+        if (localStorage.getItem('userData')) {
+            navigate('/posts')
+        }
+    }, [])
+
     return (
         <>
             <div className = {classNames(cn.container)} id='form_container'>
@@ -106,7 +108,7 @@ const Connect = () => {
                             value={email}
                             onChangeHandler={changeEmailHandler}
                             label='Adresse mail :'
-                            placeHolder='email: nom.prenom@groupomania.fr'
+                            placeHolder='nom.prenom@groupomania.fr'
                         />
                         <Input
                             tabIndex={toggleForm ? -1 : 0}
@@ -134,7 +136,7 @@ const Connect = () => {
                             value={email}
                             onChangeHandler={changeEmailHandler}
                             label='Adresse mail :'
-                            placeHolder='email: nom.prenom@groupomania.fr'
+                            placeHolder='nom.prenom@groupomania.fr'
                             />
                         <Input
                             tabIndex={toggleForm ? 0 : -1}

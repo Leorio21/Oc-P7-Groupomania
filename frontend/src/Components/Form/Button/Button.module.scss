@@ -7,6 +7,7 @@
     background-color: vars.$color-tertiary;
     color: vars.$color-secondary;
     border: 2px inset vars.$color-secondary;
+    line-height: 30px;
     &:hover {
         color: vars.$font-color-dark;
         border: 2px inset vars.$color-dark;

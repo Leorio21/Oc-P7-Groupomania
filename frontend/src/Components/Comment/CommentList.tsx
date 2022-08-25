@@ -29,6 +29,12 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         setComment(comment)
     }
 
+    const onDeleteCommentHandler = (commentToDelete: number) => {
+        const newCommentsArray = comments.filter((comment) => comment.id != commentToDelete)
+        setComments(newCommentsArray)
+        changeCountComm(newCommentsArray.length)
+    }
+
     const onCommentSubmit = async (event: FormEvent) => {
         event.preventDefault()
         try {
@@ -59,7 +65,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         <>
             <div className={classNames(cn['commentList-container'])}>
                 {comments.map((comment) => {
-                    return <Comment comment={comment} key={comment.id} />
+                    return <Comment comment={comment} key={comment.id} postId={postId} onDeleteComment={onDeleteCommentHandler} />
                 })}
                 <form onSubmit={onCommentSubmit} id='formComment' className={classNames(cn.form_comment)}>
                     <Input
