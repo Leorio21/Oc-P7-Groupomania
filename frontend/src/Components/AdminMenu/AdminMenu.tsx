@@ -10,10 +10,11 @@ import cn from './AdminMenu.module.scss'
 interface AdminMenuProps {
     commentId?: number,
     postId: number,
+    onClickModify: Function,
     onDeleteComment: Function
 }
 
-const AdminMenu = ({commentId, postId, onDeleteComment}: AdminMenuProps) => {
+const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMenuProps) => {
 
     const [modalToggle, setModalToggle] = useState(false);
     const [errorText, setErrorText] = useState('');
@@ -35,12 +36,7 @@ const AdminMenu = ({commentId, postId, onDeleteComment}: AdminMenuProps) => {
     }
 
     const onModifyHandler = async () => {
-        const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
-        const option = {
-            headers: {
-                Authorization: `Bearer ${userData.token}`
-            }
-        }
+        onClickModify()
     }
 
     const onDeleteHandler = async () => {
@@ -54,8 +50,12 @@ const AdminMenu = ({commentId, postId, onDeleteComment}: AdminMenuProps) => {
             try {
                 await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${commentId}`, option)
                 onDeleteComment(commentId)
-            } catch (error) {
-                setErrorText(`Une erreur est survenue :\n${error}`)
+            } catch (error: any) {
+                if(error.response.data.message){
+                    setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
+                } else if (error.response.data) {
+                    setErrorText(`Une erreur est survenue :\n${error.response.data}`)
+                }
                 changeVisibilityModal()
             }
         } else if (postId) {

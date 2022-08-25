@@ -277,7 +277,9 @@ export const modifyComment = async (req: Request, res: Response, next: NextFunct
                         updatedBy: authorUpdate
                     }
                 })
-                return res.status(200).json({ message: 'Commentaire modifié' })
+                return res.status(200).json({
+                    updatedBy: authorUpdate,
+                    message: 'Commentaire modifié' })
             }
             return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {

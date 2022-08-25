@@ -30,6 +30,13 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         setComment(comment)
     }
 
+    const onModifyCommentHandler = (commentToModify: number, newContent: string) => {
+        const newCommentsArray = [...comments]
+        const indexOfCommentToModify = newCommentsArray.findIndex((comment) => comment.id == commentToModify)
+        newCommentsArray[indexOfCommentToModify].content = newContent
+        setComments(newCommentsArray)
+    }
+
     const onDeleteCommentHandler = (commentToDelete: number) => {
         const newCommentsArray = comments.filter((comment) => comment.id != commentToDelete)
         setComments(newCommentsArray)
@@ -56,8 +63,13 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
             setComment('')
             setComments(newCommentsArray)
             changeCountComm(newCommentsArray.length)
-        } catch (error) {
-            setErrorText(`Une erreur est survenue :\n${error}`)
+        } catch (error: any) {
+            console.log(error)
+            if(error.response.data.message){
+                setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
+            } else if (error.response.data) {
+                setErrorText(`Une erreur est survenue :\n${error.response.data}`)
+            }
             changeVisibilityModal()
         }
     }
@@ -66,7 +78,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         <>
             <div className={classNames(cn['commentList-container'])}>
                 {comments.map((comment) => {
-                    return <Comment comment={comment} key={comment.id} postId={postId} onDeleteComment={onDeleteCommentHandler} />
+                    return <Comment comment={comment} key={comment.id} postId={postId} onModifyComment={onModifyCommentHandler} onDeleteComment={onDeleteCommentHandler} />
                 })}
                 <form onSubmit={onCommentSubmit} id='formComment' className={classNames(cn.form_comment)}>
                     <TextArea

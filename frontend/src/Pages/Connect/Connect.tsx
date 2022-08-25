@@ -41,9 +41,9 @@ const Connect = () => {
     const loginHandler = async (event: FormEvent) => {
         event.preventDefault()
         const data: DataLogin = {
-                email: email,
-                password: password
-            }
+            email: email,
+            password: password
+        }
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/login', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
@@ -61,10 +61,10 @@ const Connect = () => {
     const signupHandler = async (event: FormEvent) => {
         event.preventDefault()
         const data: DataSignup = {
-                email: email,
-                password: password,
-                confirmPassword: confirmPassword
-            }
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword
+        }
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
@@ -127,7 +127,7 @@ const Connect = () => {
                             />
                     </form>
                     <div className={classNames(cn.form, cn.coteGauche)}></div>
-                    <form className = {classNames(cn.form, cn.form_signup)} id='formSingUp'>
+                    <form className = {classNames(cn.form, cn.form_signup)} encType="multipart/form-data" id='formSignUp' name='formSignUp'>
                         <h3>Inscription</h3>
                         <Input
                             tabIndex={toggleForm ? 0 : -1}

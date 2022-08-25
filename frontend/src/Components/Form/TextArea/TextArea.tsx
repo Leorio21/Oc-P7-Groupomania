@@ -9,10 +9,11 @@ interface TextAreaProps {
     placeHolder: string,
     value: string,
     onSubnmitComment: Function,
-    onChangeHandler: Function
+    onChangeHandler: Function,
+    editMode?: boolean
 }
 
-const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onChangeHandler}: TextAreaProps) => {
+const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onChangeHandler, editMode}: TextAreaProps) => {
 
     const changeHandler = (event: any) => {
         onChangeHandler(event.target.value)
@@ -21,8 +22,11 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onC
     const onKeyDownHandler = (event: any) => {
         const element = document.getElementById(id)! as HTMLTextAreaElement
         if (event.keyCode == 13 && !event.altKey) {
+            event.preventDefault()
             onSubnmitComment(event)
-            element.value=''
+            if (!editMode) {
+                element.value=''
+            }
         } else if (event.keyCode == 13 && event.altKey) {
             element.value += '\n'
         }
@@ -36,9 +40,18 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onC
     }
 
     return (
-        <>
-            <textarea tabIndex={tabIndex} name={name} id={id} placeholder={placeHolder} onKeyDown={onKeyDownHandler} rows={1} onInput={auto_grow} onChange={changeHandler} className={classNames(cn.textArea)} value={value}></textarea>
-        </>
+        <textarea
+            tabIndex={tabIndex}
+            name={name}
+            id={id}
+            onFocus={auto_grow}
+            placeholder={placeHolder}
+            onKeyDown={onKeyDownHandler}
+            onInput={auto_grow}
+            onChange={changeHandler}
+            className={classNames(cn.textArea)}
+            value={value}>
+        </textarea>
     )
 }
 
