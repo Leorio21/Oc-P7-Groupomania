@@ -8,6 +8,7 @@ import cn from './CommentList.module.scss'
 import Comment from './Comment'
 import Input from '../Form/Input/Input'
 import Modal from '../Modal/Modal'
+import TextArea from '../Form/TextArea/TextArea'
 interface CommentListProps {
     arrayComment: OnePostComment[],
     postId: number,
@@ -68,11 +69,12 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
                     return <Comment comment={comment} key={comment.id} postId={postId} onDeleteComment={onDeleteCommentHandler} />
                 })}
                 <form onSubmit={onCommentSubmit} id='formComment' className={classNames(cn.form_comment)}>
-                    <Input
+                    <TextArea
                         tabIndex={0}
-                        type='text'
-                        id='comment'
+                        id={'comment' + postId}
+                        name='commentArea'
                         value={comment}
+                        onSubnmitComment={onCommentSubmit}
                         onChangeHandler={onCommentHandler}
                         placeHolder='Ecrivez un commentaire ...'
                     />
