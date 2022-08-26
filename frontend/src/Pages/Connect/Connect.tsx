@@ -103,7 +103,7 @@ const Connect = () => {
         if (authContext!.connected) {
             navigate('/home')
         }
-    }, [])
+    }, [authContext!.connected])
 
     return (
         <>

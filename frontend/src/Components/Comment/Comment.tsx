@@ -39,8 +39,11 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         setContent(newContent)
     }
 
-    const onModifySubmit = async (event: any) => {
+    const onModifySubmit = async () => {
         try {
+            if (content == '') {
+                throw {response: {data: {message: 'Veuillez saisir du texte'}}}
+            }
             const option = {
                 headers: {
                     Authorization: `Bearer ${authContext!.token}`

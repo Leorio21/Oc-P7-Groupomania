@@ -48,8 +48,8 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
     const onCommentSubmit = async (event: FormEvent) => {
         event.preventDefault()
         try {
-            if(comment == '') {
-                throw 'Veuillez saisir du texte'
+            if (comment == '') {
+                throw {response: {data: {message: 'Veuillez saisir du texte'}}}
             }
             const option = {
                 headers: {
@@ -65,7 +65,6 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
             setComments(newCommentsArray)
             changeCountComm(newCommentsArray.length)
         } catch (error: any) {
-            console.log(error)
             if(error.response.data.message){
                 setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
             } else if (error.response.data) {
