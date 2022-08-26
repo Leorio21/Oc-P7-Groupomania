@@ -4,6 +4,7 @@ import classNames from "classnames";
 import cn from './Home.module.scss'
 
 import PostsList from "../../Components/Post/PostsList";
+import NavBar from "../../Components/NavBar/NavBar";
 
 
 const Home = () => {
@@ -16,6 +17,7 @@ const Home = () => {
 
     return (
         <>
+            <NavBar />
             <PostsList />
         </>
     )

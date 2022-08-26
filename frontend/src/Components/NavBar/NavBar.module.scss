@@ -1,0 +1,32 @@
+@use '../../sass/Utils/vars';
+
+.nav {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 10px;
+    border-top: 2px solid vars.$font-color-light;
+    border-bottom: 2px solid vars.$font-color-light;
+}
+
+.link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    &:hover {
+        color: vars.$color-primary;
+    }
+}
+
+.icon_container {
+    width: 30px;
+}
+
+.icon {
+    width: 100%;
+}
+
+.linkText {
+    padding: 0px 10px;
+}

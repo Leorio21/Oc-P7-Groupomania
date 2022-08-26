@@ -46,6 +46,7 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onC
             id={id}
             onFocus={auto_grow}
             placeholder={placeHolder}
+            rows={1}
             onKeyDown={onKeyDownHandler}
             onInput={auto_grow}
             onChange={changeHandler}

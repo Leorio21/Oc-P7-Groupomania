@@ -90,7 +90,7 @@ const Connect = () => {
 
     useEffect(() => {
         if (localStorage.getItem('userData')) {
-            navigate('/posts')
+            navigate('/home')
         }
     }, [])
 
