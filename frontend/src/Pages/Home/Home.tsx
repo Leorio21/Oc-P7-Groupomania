@@ -1,23 +1,24 @@
 import { Navigate } from "react-router-dom";
+import { useContext } from "react";
 
 import classNames from "classnames";
 import cn from './Home.module.scss'
 
+import { AuthContext } from "../../Context/AuthContext";
 import PostsList from "../../Components/Post/PostsList";
-import NavBar from "../../Components/NavBar/NavBar";
 
 
 const Home = () => {
     
+    const authContext = useContext(AuthContext)
     
-    if(!localStorage.getItem('userData')) {
+    if(!authContext!.connected) {
         return <Navigate to='/'/>
     }
     
 
     return (
         <>
-            <NavBar />
             <PostsList />
         </>
     )

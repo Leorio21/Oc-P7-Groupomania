@@ -2,8 +2,8 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 import axios from "axios";
 
 import classNames from "classnames";
-import { KeyboardEventHandler, useState } from "react";
-import { UserDataLs } from "../../interface/UserDataLs";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../Context/AuthContext";
 import Modal from "../Modal/Modal";
 import cn from './AdminMenu.module.scss'
 
@@ -15,6 +15,8 @@ interface AdminMenuProps {
 }
 
 const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMenuProps) => {
+
+    const authContext = useContext(AuthContext)
 
     const [modalToggle, setModalToggle] = useState(false);
     const [errorText, setErrorText] = useState('');
@@ -40,10 +42,9 @@ const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMen
     }
 
     const onDeleteHandler = async () => {
-        const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
         const option = {
             headers: {
-                Authorization: `Bearer ${userData.token}`
+                Authorization: `Bearer ${authContext!.token}`
             }
         }
         if (commentId) {

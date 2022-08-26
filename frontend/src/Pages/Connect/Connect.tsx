@@ -1,9 +1,11 @@
-import classNames from 'classnames'
-import { FormEvent, useEffect, useState } from 'react';
-import cn from './Connect.module.scss'
+import { FormEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
-
+import { AuthContext } from '../../Context/AuthContext';
 import { DataLogin, DataSignup } from '../../interface/Index';
+
+import classNames from 'classnames'
+import cn from './Connect.module.scss'
+
 import Modal from '../../Components/Modal/Modal';
 import axios from 'axios';
 import Input from '../../Components/Form/Input/Input';
@@ -11,9 +13,10 @@ import Button from '../../Components/Form/Button/Button';
 
 const Connect = () => {
     const navigate = useNavigate();
+    const authContext = useContext(AuthContext)
 
     const [modalToggle, setModalToggle] = useState(false);
-    const [errorText, setErrorText] = useState('')
+    const [errorText, setErrorText] = useState('');
     
     const [toggleForm, setToggleForm] = useState(false);
     const [activeForm, setActiveForm] = useState('login');
@@ -47,7 +50,11 @@ const Connect = () => {
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/login', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
-            navigate('/posts')
+            authContext!.setUserIdHandle(userData.data.userId)
+            authContext!.setTokenHandle(userData.data.token)
+            authContext!.setRoleHandle(userData.data.role)
+            authContext!.setConnectHandle(true)
+            navigate('/home')
         } catch (error: any) {
             if(error.response.data.message){
                 setErrorText(error.response.data.message)
@@ -68,7 +75,11 @@ const Connect = () => {
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
-            navigate('/posts')
+            authContext!.setUserIdHandle(userData.data.userId)
+            authContext!.setTokenHandle(userData.data.token)
+            authContext!.setRoleHandle(userData.data.role)
+            authContext!.setConnectHandle(true)
+            navigate('/home')
         } catch (error: any) {
             if(error.response.data.message){
                 setErrorText(error.response.data.message)
@@ -89,7 +100,7 @@ const Connect = () => {
     }
 
     useEffect(() => {
-        if (localStorage.getItem('userData')) {
+        if (authContext!.connected) {
             navigate('/home')
         }
     }, [])

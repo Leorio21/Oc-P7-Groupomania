@@ -1,12 +1,13 @@
 import { ThumbUpIcon } from '@heroicons/react/outline'
 import { ThumbUpIcon as ThumbUpIconSolid } from '@heroicons/react/solid'
-import { FormEvent, useState } from 'react'
+import { useContext, useState } from 'react'
 
 import classNames from 'classnames'
 import cn from './Like.module.scss'
 import Modal from '../Modal/Modal'
 import axios from 'axios'
 import { OnePostLike, UserDataLs } from '../../interface/Index'
+import { AuthContext } from '../../Context/AuthContext'
 
 interface LikeProps {
     likeData: OnePostLike[],
@@ -16,6 +17,8 @@ interface LikeProps {
 }
 
 const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
+
+    const authContext = useContext(AuthContext)
 
     const [postLike, setPostLike] = useState(likeData);
     const [modalToggle, setModalToggle] = useState(false);
@@ -33,15 +36,14 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
 
     const onClickLikeHandler = async () => {
         try {
-            const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
             const option = {
                 headers: {
-                    Authorization: `Bearer ${userData.token}`
+                    Authorization: `Bearer ${authContext!.token}`
                 }
             }
             const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
             if (userLikePost) {
-                const newLikeArray = postLike.filter((like) => like.userId != userData.userId)
+                const newLikeArray = postLike.filter((like) => like.userId != authContext!.userId)
                 setPostLike(newLikeArray)
             } else {
                 const newLike: OnePostLike = { ...bddLike.data.like }

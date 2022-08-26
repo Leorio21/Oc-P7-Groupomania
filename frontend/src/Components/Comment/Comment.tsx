@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
-import { OnePostComment, UserDataLs } from '../../interface/Index';
+import { OnePostComment } from '../../interface/Index';
 
 import classNames from 'classnames';
 import cn from './Comment.module.scss'
@@ -9,6 +9,7 @@ import AdminMenu from '../AdminMenu/AdminMenu';
 import TextArea from '../Form/TextArea/TextArea';
 import Modal from '../Modal/Modal';
 import axios from 'axios';
+import { AuthContext } from '../../Context/AuthContext';
 interface CommentProps {
     comment: OnePostComment,
     postId: number,
@@ -17,6 +18,8 @@ interface CommentProps {
 }
 
 const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentProps) => {
+
+    const authContext = useContext(AuthContext)
 
     const [updatedBy, setUpdatedBy] = useState(comment.updatedBy)
     const [editMode, setEditMode] = useState(false)
@@ -27,8 +30,6 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     const changeVisibilityModal = () => {
         setModalToggle(!modalToggle);
     }
-    
-    const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
 
     const onModifyHandler = () => {
         setEditMode(!editMode)
@@ -42,7 +43,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         try {
             const option = {
                 headers: {
-                    Authorization: `Bearer ${userData.token}`
+                    Authorization: `Bearer ${authContext!.token}`
                 }
             }
             const newComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, {content}, option)
@@ -79,7 +80,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                             {comment.author.firstName} {comment.author.lastName}
                         </div>
                         <div className={classNames(cn.menu)}>
-                            {(userData.userId == comment.authorId || userData.role == 'ADMIN' || userData.role == 'MODERATOR') && <AdminMenu commentId={comment.id} postId={postId} onClickModify={onModifyHandler} onDeleteComment={onDeleteComment}/>}
+                            {(authContext!.userId == comment.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu commentId={comment.id} postId={postId} onClickModify={onModifyHandler} onDeleteComment={onDeleteComment}/>}
                         </div>
                     </div>
                     {editMode ?

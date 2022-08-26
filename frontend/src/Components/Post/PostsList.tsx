@@ -1,20 +1,21 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../Context/AuthContext";
 
 import classNames from "classnames";
 import cn from './PostsList.module.scss'
 
 import Post from "./Post";
-import { OnePost, UserDataLs, OptionAxios } from '../../interface/Index';
+import { OnePost, OptionAxios } from '../../interface/Index';
 
 const PostsList = () => {
 
-    const [userData, setUserData] = useState<UserDataLs>(JSON.parse(localStorage.getItem('userData')!))
-    const [option, setOption] = useState<OptionAxios>({
+    const authContext = useContext(AuthContext)
+    const option: OptionAxios = {
         headers: {
-            Authorization: `Bearer ${userData.token}`
+            Authorization: `Bearer ${authContext!.token}`
         }
-    })
+    }
     const [posts, setPosts] = useState<OnePost[]>([])
     
     const fetchData = async (option: OptionAxios) => {
@@ -37,7 +38,7 @@ if(posts == []) {
     return (
         <div className={classNames(cn.mainContainer)}>
             {posts!.map((post:OnePost) => {
-                return <Post post={post} key={post.id} userId={userData.userId}/>
+                return <Post post={post} key={post.id} />
             })}
         </div>
     )

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useInsertionEffect, useState } from 'react'
+import { FormEvent, useContext, useEffect, useInsertionEffect, useState } from 'react'
 import { OnePostComment } from '../../interface/Index'
 import axios from 'axios'
 
@@ -6,9 +6,9 @@ import classNames from 'classnames'
 import cn from './CommentList.module.scss'
 
 import Comment from './Comment'
-import Input from '../Form/Input/Input'
 import Modal from '../Modal/Modal'
 import TextArea from '../Form/TextArea/TextArea'
+import { AuthContext } from '../../Context/AuthContext'
 interface CommentListProps {
     arrayComment: OnePostComment[],
     postId: number,
@@ -16,6 +16,8 @@ interface CommentListProps {
 }
 
 const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) => {
+
+    const authContext = useContext(AuthContext)
 
     const [comments, setComments] = useState(arrayComment);
     const [comment, setComment] = useState('');
@@ -49,10 +51,9 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
             if(comment == '') {
                 throw 'Veuillez saisir du texte'
             }
-            const userData = JSON.parse(localStorage.getItem('userData')!)
             const option = {
                 headers: {
-                    Authorization: `Bearer ${userData.token}`
+                    Authorization: `Bearer ${authContext!.token}`
                 }
             }
             const content = comment

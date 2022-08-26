@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/fr'
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
 
 import { OnePost } from '../../interface/Index';
@@ -10,15 +10,17 @@ import cn from './Post.module.scss'
 
 import Like from '../Like/Like'
 import CommentList from '../Comment/CommentList'
+import { AuthContext } from '../../Context/AuthContext';
 
 interface PostProps {
-    post: OnePost,
-    userId: number
+    post: OnePost
 }
 
-const Post = ({post, userId}: PostProps) => {
+const Post = ({post}: PostProps) => {
 
-    const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == userId) ? true : false);
+    const authContext = useContext(AuthContext)
+
+    const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext!.userId) ? true : false);
     const [countComm, setCountComm] = useState(post.comment.length)
 
     const changeCountComm = (newCounterComm: number) => {
