@@ -1,17 +1,11 @@
 @use './sass/Utils/vars';
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 
 *, ::before, ::after {
     box-sizing: border-box;
     margin: 0px;
     padding: 0px;
-    font-family: 'Times new roman', serif;
-}
-
-h1, h2, h3 {
-    font-family: 'Fredoka One', serif;
-    font-weight: normal;
+    font-family: 'Lato', sans-serif;
 }
 
 a {
