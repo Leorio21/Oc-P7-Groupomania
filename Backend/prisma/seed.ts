@@ -128,7 +128,7 @@ const userData: Prisma.UserCreateInput[] = [
         email: 'lefeuvre.catherine@groupomania.fr',
         firstName: 'catherine',
         lastName: 'lefeuvre',
-        password: '$2b$12$mw.fNyczDziI1NRMno8RUO8PcheaMRPftdyLG4UmCcy9FBQ6tjhQ',
+        password: '$2b$12$qJyddzg4QUS.NwnFbBcOt.HlAFwxKQZbQsDpRRT4VZ5B/nqH6alLW',
         avatar: null,
         background: null,
         role:'USER',

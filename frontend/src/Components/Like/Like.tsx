@@ -1,14 +1,26 @@
 import { ThumbUpIcon } from '@heroicons/react/outline'
 import { ThumbUpIcon as ThumbUpIconSolid } from '@heroicons/react/solid'
-import { useContext, useState } from 'react'
+import { useContext, useReducer, useState } from 'react'
 
 import classNames from 'classnames'
 import cn from './Like.module.scss'
 import Modal from '../Modal/Modal'
 import axios from 'axios'
-import { OnePostLike, UserDataLs } from '../../interface/Index'
+import { OnePostLike } from '../../interface/Index'
 import { AuthContext } from '../../Context/AuthContext'
 
+const initilTextError = ''
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+        case 'display':
+            state = action.payload!
+            return state
+        case 'hide':
+            state = ''
+            return state
+    }
+    return state;
+}
 interface LikeProps {
     likeData: OnePostLike[],
     userLikePost: boolean,
@@ -21,13 +33,8 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     const authContext = useContext(AuthContext)
 
     const [postLike, setPostLike] = useState(likeData);
-    const [modalToggle, setModalToggle] = useState(false);
-    const [errorText, setErrorText] = useState('');
-
-    const changeVisibilityModal = () => {
-        setModalToggle(!modalToggle);
-    }
-
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    
     const onKeyDownHandler = (event: any) => {
         if (event.keyCode == 13) {
             onClickLikeHandler()
@@ -53,8 +60,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             }
             onClickLike()
         } catch (error) {
-            setErrorText(`Une erreur est survenue :\n${error}`)
-            changeVisibilityModal()
+            dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error}`})
         }
     }
 
@@ -63,7 +69,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             <div>
                 <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
             </div>
-            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
+            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>
     )
 }

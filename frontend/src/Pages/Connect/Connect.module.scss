@@ -4,11 +4,6 @@
     display: flex;
     flex-direction: column;
     margin: 20px auto;
-    & h2 {
-        width: 100%;
-        text-align: center;
-        font-size: 18px;
-    }
 }
 
 .form_container {
@@ -62,13 +57,13 @@
     transform: rotateY(180deg) translateZ(150px);
 }
 
-h2 {
-    color: #FFF;
-}
-
 .navLink {
     color: vars.$color-secondary;
     cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
     &:hover {
         color: vars.$color-primary;
     }

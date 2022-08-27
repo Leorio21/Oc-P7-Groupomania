@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
 import { OnePostComment } from '../../interface/Index';
 
@@ -10,6 +10,19 @@ import TextArea from '../Form/TextArea/TextArea';
 import Modal from '../Modal/Modal';
 import axios from 'axios';
 import { AuthContext } from '../../Context/AuthContext';
+
+const initilTextError = ''
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+        case 'display':
+            state = action.payload!
+            return state
+        case 'hide':
+            state = ''
+            return state
+    }
+    return state;
+}
 interface CommentProps {
     comment: OnePostComment,
     postId: number,
@@ -24,12 +37,8 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     const [updatedBy, setUpdatedBy] = useState(comment.updatedBy)
     const [editMode, setEditMode] = useState(false)
     const [content, setContent] = useState(comment.content)
-    const [modalToggle, setModalToggle] = useState(false);
-    const [errorText, setErrorText] = useState('');
-
-    const changeVisibilityModal = () => {
-        setModalToggle(!modalToggle);
-    }
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    
 
     const onModifyHandler = () => {
         setEditMode(!editMode)
@@ -55,11 +64,10 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
             setEditMode(!editMode)
         } catch (error: any) {
             if(error.response.data.message){
-                setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
             } else if (error.response.data) {
-                setErrorText(`Une erreur est survenue :\n${error.response.data}`)
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
             }
-            changeVisibilityModal()
         }
     }
 
@@ -72,6 +80,14 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         }
             return '\n(modifié)';
     }, [updatedBy])
+    
+    useEffect(() => {
+        if(editMode) {
+            const element = document.getElementById('editCom' + postId)!
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
+    }, [editMode])
     
     return (
         <>
@@ -92,7 +108,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                         <div className={classNames(cn.content)}>{comment.content}{updatedBy && ('\n' + modifyAuthor)}</div>}
                 </div>
             </div>
-            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
+            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>
     )
 }

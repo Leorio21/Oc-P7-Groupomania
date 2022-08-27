@@ -7,7 +7,7 @@ import cn from './Button.module.scss'
 interface ButtonProps {
     tabIndex: number,
     type: 'button' | 'submit' | 'reset' | undefined,
-    onClickHandler: MouseEventHandler,
+    onClickHandler?: MouseEventHandler,
     label: string
 }
 

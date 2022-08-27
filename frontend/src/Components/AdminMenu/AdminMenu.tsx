@@ -2,10 +2,23 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 import axios from "axios";
 
 import classNames from "classnames";
-import { useContext, useState } from "react";
+import { useContext, useReducer } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import Modal from "../Modal/Modal";
 import cn from './AdminMenu.module.scss'
+
+const initilTextError = ''
+const reducerModal = (state: string, action: { type: string; payload: string; }) => {
+    switch(action.type) {
+        case 'display':
+            state = action.payload
+            return state
+        case 'hide':
+            state = ''
+            return state
+    }
+    return state;
+}
 
 interface AdminMenuProps {
     commentId?: number,
@@ -17,13 +30,8 @@ interface AdminMenuProps {
 const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMenuProps) => {
 
     const authContext = useContext(AuthContext)
-
-    const [modalToggle, setModalToggle] = useState(false);
-    const [errorText, setErrorText] = useState('');
-
-    const changeVisibilityModal = () => {
-        setModalToggle(!modalToggle);
-    }
+    
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     
     const onModifyKeyDownHandler = (event: any) => {
         if (event.keyCode == 13) {
@@ -53,11 +61,10 @@ const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMen
                 onDeleteComment(commentId)
             } catch (error: any) {
                 if(error.response.data.message){
-                    setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
                 } else if (error.response.data) {
-                    setErrorText(`Une erreur est survenue :\n${error.response.data}`)
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
                 }
-                changeVisibilityModal()
             }
         } else if (postId) {
             console.log('delete post')
@@ -68,7 +75,7 @@ const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMen
         <>
             <PencilIcon tabIndex={0} onKeyDown={onModifyKeyDownHandler} onClick={onModifyHandler} className={classNames(cn['menu-icone'])} />
             <TrashIcon tabIndex={0} onKeyDown={onDeleteKeyDownHandler} onClick={onDeleteHandler} className={classNames(cn['menu-icone'])} />
-            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
+            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide', payload: ''})}} />}
         </>
     )
 }

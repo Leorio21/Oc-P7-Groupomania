@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import React, { FormEvent } from "react";
 import cn from './TextArea.module.scss'
 
 interface TextAreaProps {
@@ -21,14 +20,20 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onC
 
     const onKeyDownHandler = (event: any) => {
         const element = document.getElementById(id)! as HTMLTextAreaElement
-        if (event.keyCode == 13 && !event.altKey) {
+        if (event.key == 'Enter' && !event.altKey) {
             event.preventDefault()
             onSubnmitComment(event)
             if (!editMode) {
                 element.value=''
             }
-        } else if (event.keyCode == 13 && event.altKey) {
-            element.value += '\n'
+        } else if (event.key == 'Enter' && event.altKey) {
+            const element = document.getElementById(id)! as HTMLTextAreaElement
+            const poscur = element.selectionEnd
+            const debut = element.value.substring(0, poscur);
+            const fin = element.value.substring(poscur, element.value.length);
+            element.value = debut + '\n' + fin
+            element.setSelectionRange(poscur + 1, poscur + 1)
+            changeHandler(event)
         }
         auto_grow()
     }

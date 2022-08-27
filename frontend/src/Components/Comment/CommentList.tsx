@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useEffect, useInsertionEffect, useState } from 'react'
+import { FormEvent, useContext, useReducer, useState } from 'react'
 import { OnePostComment } from '../../interface/Index'
 import axios from 'axios'
 
@@ -9,6 +9,20 @@ import Comment from './Comment'
 import Modal from '../Modal/Modal'
 import TextArea from '../Form/TextArea/TextArea'
 import { AuthContext } from '../../Context/AuthContext'
+
+
+const initilTextError = ''
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+        case 'display':
+            state = action.payload!
+            return state
+        case 'hide':
+            state = ''
+            return state
+    }
+    return state;
+}
 interface CommentListProps {
     arrayComment: OnePostComment[],
     postId: number,
@@ -21,12 +35,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
 
     const [comments, setComments] = useState(arrayComment);
     const [comment, setComment] = useState('');
-    const [modalToggle, setModalToggle] = useState(false);
-    const [errorText, setErrorText] = useState('');
-
-    const changeVisibilityModal = () => {
-        setModalToggle(!modalToggle);
-    }
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     
     const onCommentHandler = (comment: string) => {
         setComment(comment)
@@ -66,11 +75,10 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
             changeCountComm(newCommentsArray.length)
         } catch (error: any) {
             if(error.response.data.message){
-                setErrorText(`Une erreur est survenue :\n${error.response.data.message}`)
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
             } else if (error.response.data) {
-                setErrorText(`Une erreur est survenue :\n${error.response.data}`)
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
             }
-            changeVisibilityModal()
         }
     }
 
@@ -92,7 +100,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
                     />
                 </form>
             </div>
-            {modalToggle && <Modal text={errorText} onCloseModal={changeVisibilityModal} />}
+            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>
     )
 }
