@@ -1,4 +1,4 @@
-import {Routes, Route } from 'react-router-dom';
+import {Routes, Route, Outlet, Navigate } from 'react-router-dom';
 
 import Header from './Components/Header/Header'
 import Connect from './Pages/Connect/Connect';
@@ -14,14 +14,23 @@ function App() {
 
   const authContext = useContext(AuthContext)
 
+  const ProtectedRoute = ({connected}:{connected: boolean | undefined}) => {
+      if(!connected) {
+        return <Navigate to='/' replace />
+      }
+      return <Outlet />
+  }
+
   return (
     <>
       <Header />
       {authContext!.connected && <NavBar />}
       <Routes>
         <Route path='/' element={<Connect />} />
-        <Route path='/myprofile' element={''} />
-        <Route path='/home' element={<Home />} />
+        <Route element={<ProtectedRoute connected={authContext?.connected} />}>
+          <Route path='/myprofile' element={''} />
+          <Route path='/home' element={<Home />} />
+        </Route>
       </Routes>
     </>
   )

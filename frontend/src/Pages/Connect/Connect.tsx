@@ -1,11 +1,10 @@
-import { KeyboardEventHandler, useContext, useEffect, useReducer } from 'react';
+import { useContext, useEffect, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../Context/AuthContext';
 
 import classNames from 'classnames'
 import cn from './Connect.module.scss'
 
-import Modal from '../../Components/Modal/Modal';
 import FormLogin from '../../Components/Form/FormLogin';
 import FormSignUp from '../../Components/Form/FormSignUp';
 
@@ -14,26 +13,12 @@ const reducerForm = (state: string) => {
     return state == 'login' ? 'signup' : 'login';
 }
 
-const initilTextError = ''
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-        case 'display':
-            state = action.payload!
-            return state
-        case 'hide':
-            state = ''
-            return state
-    }
-    return state;
-}
-
 const Connect = () => {
     const navigate = useNavigate();
     const authContext = useContext(AuthContext)
 
     const [activeForm, toggleForm] = useReducer(reducerForm, initialForm);
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-
+    
     const onKeyDownHandler = (event: any) => {
         console.log(event)
         if (event.key == ' ' || event.key == 'Enter') {
@@ -69,7 +54,6 @@ const Connect = () => {
                     <span className={classNames(cn.navLink)} onKeyDown={onKeyDownHandler} onClick={toggleForm} tabIndex={0} id='login'>Déjà inscrit ? Connectez-vous</span>}
                 </div>
             </div>
-            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>
     )
 }
