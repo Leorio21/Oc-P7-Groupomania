@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Path, UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../../interface/Index";
 
 import classNames from "classnames";
 import cn from './Input.module.scss'
@@ -7,22 +8,20 @@ interface PropsType {
     tabIndex: number,
     type: string,
     id: string,
-    value: string,
-    onChangeHandler: Function,
-    label?: string,
-    placeHolder: string
+    name: Path<IFormValues>
+    label: string,
+    placeHolder: string,
+    register: UseFormRegister<IFormValues>,
+    required: boolean
 }
 
-const Input = ({tabIndex, type, id, onChangeHandler, value, label, placeHolder}: PropsType) => {
-
-const changeHandler = (event: any) => {
-    onChangeHandler(event.target.value)
-}
+const Input = ({tabIndex, type, id, label, name, placeHolder, register, required}: PropsType) => {
 
     return (
         <>
-            {label && <label htmlFor={id} className={classNames(cn.label)}>{label}</label>}
-            <input tabIndex={tabIndex} type={type} id={id} name={id} value={value} placeholder={placeHolder} onChange={changeHandler} className={classNames(cn.input)} />
+            <label htmlFor={id} className={classNames(cn.label)}>{label}
+                <input tabIndex={tabIndex} id={id} type={type} {...register(name, { required })} placeholder={placeHolder} className={classNames(cn.input)} />
+            </label>
         </>
     )
 }

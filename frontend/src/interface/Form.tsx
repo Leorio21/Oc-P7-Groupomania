@@ -1,10 +1,5 @@
-export interface DataLogin {
+export interface IFormValues {
     email: string,
-    password: string
-}
-
-export interface DataSignup {
-    email: string,
-    password: string
+    password: string,
     confirmPassword: string
 }
