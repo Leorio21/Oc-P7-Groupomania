@@ -8,6 +8,12 @@ interface AuthContextInterface {
     setTokenHandle: Function
     role: string
     setRoleHandle: Function
+    firstName: string
+    setFirstNameHandle: Function
+    lastName: string
+    setLastNameHandle: Function
+    avatar: string
+    setAvatarHandle: Function
     connected: boolean
     setConnectHandle: Function
 }
@@ -19,6 +25,9 @@ const AuthContextProvider = (props: any) => {
     const [userId, setUserId] = useState(-1)
     const [token, setToken] = useState('')
     const [role, setRole] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [avatar, setAvatar] = useState('')
     const [connected, setConnected] = useState(false)
 
     const setUserIdHandle = (newUserId: number) => {
@@ -31,6 +40,18 @@ const AuthContextProvider = (props: any) => {
 
     const setRoleHandle = (newRole: string) => {
         setRole(newRole)
+    }
+
+    const setFirstNameHandle = (newRole: string) => {
+        setFirstName(newRole)
+    }
+
+    const setLastNameHandle = (newRole: string) => {
+        setLastName(newRole)
+    }
+
+    const setAvatarHandle = (newRole: string) => {
+        setAvatar(newRole)
     }
 
     const setConnectHandle = (isConnected: boolean) => {
@@ -49,7 +70,14 @@ const AuthContextProvider = (props: any) => {
     }, [])
 
     return (
-        <AuthContext.Provider value={{userId, setUserIdHandle, token, setTokenHandle, role, setRoleHandle, connected, setConnectHandle}}>
+        <AuthContext.Provider value={{
+            userId, setUserIdHandle,
+            token, setTokenHandle,
+            role, setRoleHandle,
+            firstName, setFirstNameHandle,
+            lastName, setLastNameHandle,
+            avatar, setAvatarHandle,
+            connected, setConnectHandle}}>
             {props.children}
         </AuthContext.Provider>
     )

@@ -60,6 +60,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 ),
             userId: user.id,
             role: user.role,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatar: user.avatar
         });
     } catch (error) {
         return res.status(404).json({ message: error });

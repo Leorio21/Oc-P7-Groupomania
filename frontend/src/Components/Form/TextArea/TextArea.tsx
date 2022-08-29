@@ -12,7 +12,7 @@ interface TextAreaProps {
     value?: string,
     onSubmitComment: Function,
     editMode?: boolean,
-    required: boolean
+    required?: boolean
 }
 
 const TextArea = ({tabIndex, id, placeHolder, name, value, register, onSubmitComment, editMode, required }: TextAreaProps) => {
@@ -47,7 +47,7 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, register, onSubmitCom
             id={id}
             onFocus={auto_grow}
             placeholder={placeHolder}
-            {...register(name, { required })}
+            {...register(name, { required: 'Ce champ ne peut être vide' })}
             rows={1}
             onKeyDown={onKeyDownHandler}
             onInput={auto_grow}

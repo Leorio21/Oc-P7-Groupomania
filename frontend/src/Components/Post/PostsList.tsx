@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useContext, useEffect, useReducer, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
+import { useForm } from 'react-hook-form';
 
 import classNames from "classnames";
 import cn from './PostsList.module.scss'
 
 import Post from "./Post";
-import { OnePost, OptionAxios } from '../../interface/Index';
+import { IFormValues, OnePost, OptionAxios } from '../../interface/Index';
 import Modal from "../Modal/Modal";
 import FormPost from "../Form/FormPost";
 
@@ -27,27 +28,62 @@ const PostsList = () => {
 
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [posts, setPosts] = useState<OnePost[]>([])
     
     const option: OptionAxios = {
         headers: {
             Authorization: `Bearer ${authContext!.token}`
         }
     }
-    const [posts, setPosts] = useState<OnePost[]>([])
 
     const fetchData = async (option: OptionAxios) => {
-            try {
-                const getPosts = await axios.get('http://127.0.0.1:3000/api/post', option)
-                setPosts(getPosts.data)
-            } catch (error: any) {
-                console.log(error)
-                if(error.response.data.message){
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
-                } else if (error.response.data) {
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data}`})
-                }
+
+
+        try {
+            const getPosts = await axios.get('http://127.0.0.1:3000/api/post', option)
+            setPosts(getPosts.data)
+        } catch (error: any) {
+            console.log(error)
+            if(error.response.data.message){
+                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
+            } else if (error.response.data) {
+                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data}`})
             }
         }
+    }
+    
+    const onPostSubmit = async (data: IFormValues) => {
+        try {
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${authContext!.token}`
+                }
+            }
+            const bddPost = await axios.post(`http://127.0.0.1:3000/api/post/`, data, option)
+            const newPost: OnePost = {
+                ...bddPost.data.post,
+                like: [],
+                comment: [],
+                author: {
+                    firstName: authContext!.firstName,
+                    lastName: authContext!.lastName,
+                    avatar: authContext!.avatar
+                }
+            }
+            setPosts((prevState) => {
+                const newPostsArray = [...prevState]
+                newPostsArray.unshift(newPost)
+                return newPostsArray
+
+            })
+        } catch (error: any) {
+            if(error.response.data.message){
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
+            } else if (error.response.data) {
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
+            }
+        }
+    }
     
     useEffect(() => {
         fetchData(option)
@@ -59,10 +95,23 @@ if(posts == []) {
 } else {
     return (
         <>
-        <FormPost />
+            <FormPost
+                classes=''
+                tabIndex={0}
+                id='content'
+                name='content'
+                placeHolder='Publiez quelque chose ...'
+                onPostSubmit={onPostSubmit}
+                required
+            />
             <div className={classNames(cn.mainContainer)}>
                 {posts!.map((post:OnePost) => {
-                    return <Post post={post} key={post.id} />
+                    return (
+                        <Post
+                            post={post}
+                            key={post.id}
+                        />
+                    )
                 })}
             </div>
             {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}

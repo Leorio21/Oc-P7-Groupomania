@@ -55,9 +55,9 @@ const Post = ({post}: PostProps) => {
             <div className={classNames(cn.content)}>
                 {post.image && <img src={post.image!} alt={'image d\'illustration'} />}
                 <div className={classNames(cn.text)}>
-                    {post.content}
+                    {post.content}{post.updatedBy && `\n${modifyAuthor}`}
                 </div>
-                {post.updatedBy && modifyAuthor}
+                
             </div>
             <div className={classNames(cn.footer)}>
                 <div className={classNames(cn.likeComment)}>

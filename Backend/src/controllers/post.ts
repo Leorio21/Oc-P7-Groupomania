@@ -62,14 +62,17 @@ export const createPost = async (req: Request, res: Response, _next: NextFunctio
                 throw ('Erreur traiement image')
             }
         }
-        await prisma.post.create({
+        const newPost = await prisma.post.create({
             data: {
                 authorId: req.auth.userId,
                 content: req.body.content,
-                image: `${req.protocol}://${req.get('host')}/images/${imageName}`
+                image: imageName && `${req.protocol}://${req.get('host')}/images/${imageName}`
             },
         })
-        return res.status(201).json({message: 'Post enregistré'})
+        return res.status(201).json({
+            post: newPost,
+            message: 'Post enregistré'
+        })
     } catch (error) {
         if(req.file && newImage) {
             fs.unlink(`images/${imageName}`)
@@ -124,7 +127,7 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 },
                 data: {
                     content: req.body.content,
-                    image: `${req.protocol}://${req.get('host')}/images/${imageName}`,
+                    image: imageName && `${req.protocol}://${req.get('host')}/images/${imageName}`,
                     updatedBy: authorUpdate
                 }
             })

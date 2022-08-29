@@ -1,5 +1,4 @@
-import { useReducer } from "react";
-import { useForm } from "react-hook-form";
+import { Path, SubmitHandler, useForm } from "react-hook-form";
 import { IFormValues } from "../../interface/Index";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -7,40 +6,36 @@ import * as yup from "yup";
 import TextArea from "./TextArea/TextArea";
 
 const schemaPost = yup.object({
-    content: yup.string().required(),
+    content: yup.string().required('Ce champ ne peut être vide'),
 }).required();
 
-const initilTextError = ''
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-        case 'display':
-            state = action.payload!
-            return state
-        case 'hide':
-            state = ''
-            return state
-    }
-    return state;
+interface FormPostProps {
+    classes: string,
+    postId?: number,
+    tabIndex: number,
+    id: string,
+    name: Path<IFormValues>
+    placeHolder: string,
+    value?: string,
+    onPostSubmit: SubmitHandler<IFormValues>,
+    editMode?: boolean,
+    required?: boolean
 }
 
-const FormPost = () => {
-    
-    const onPostSubmit = (data: IFormValues) => {
-    
-    }
+const FormPost = ({classes, postId, tabIndex, id, name, placeHolder, onPostSubmit, editMode, required}: FormPostProps) => {
 
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaPost)});
 
     return (
         <form className = {'t'} onSubmit={handleSubmit(onPostSubmit)}>
             <TextArea
                 tabIndex={0}
-                id='content'
-                name='content'
-                placeHolder='Publiez quelque chose ...'
+                id={id}
+                name={name}
+                placeHolder={placeHolder}
                 register={register}
-                handleSubmit={handleSubmit}
+                onSubmitComment={handleSubmit(onPostSubmit)}
+                required
             />
         </form>
     )

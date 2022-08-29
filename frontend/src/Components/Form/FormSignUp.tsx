@@ -48,6 +48,9 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
             localStorage.setItem('userData', JSON.stringify(userData.data));
             authContext!.setUserIdHandle(userData.data.userId)
             authContext!.setTokenHandle(userData.data.token)
+            authContext!.setFirstNameHandle(userData.data.firstName)
+            authContext!.setLastNameHandle(userData.data.lastName)
+            authContext!.setAvatarHandle(userData.data.avatar)
             authContext!.setRoleHandle(userData.data.role)
             authContext!.setConnectHandle(true)
         } catch (error: any) {
