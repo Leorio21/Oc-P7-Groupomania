@@ -5,6 +5,8 @@ import multer from 'multer';
 import { fileStorage, fileLimits, multerFileFilter} from '../middleware/multer-config';
 
 import * as postCtrl from '../controllers/post'
+import * as commentCtrl from '../controllers/comment'
+import * as likeCtrl from '../controllers/like'
 
 
 const limiter = rateLimit({
@@ -33,12 +35,12 @@ router.put('/:id', limiter, multer({storage: fileStorage, limits: fileLimits, fi
 
 router.delete('/:id', limiter,postCtrl.deletePost);
 
-router.post('/:id/like', limiter, postCtrl.likePost);
+router.post('/:id/like', limiter, likeCtrl.likePost);
 
-router.post('/:id/comment', limiter, postCtrl.createComment);
+router.post('/:id/comment', limiter, commentCtrl.createComment);
 
-router.put('/:id/comment/:comId',  limiter,postCtrl.modifyComment);
+router.put('/:id/comment/:comId',  limiter,commentCtrl.modifyComment);
 
-router.delete('/:id/comment/:comId', limiter, postCtrl.deleteComment);
+router.delete('/:id/comment/:comId', limiter, commentCtrl.deleteComment);
 
 export default router;

@@ -63,6 +63,9 @@ const AuthContextProvider = (props: any) => {
             const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
 
             setUserId(userData.userId)
+            setFirstName(userData.firstName)
+            setLastName(userData.lastName)
+            setAvatar(userData.avatar)
             setToken(userData.token)
             setRole(userData.role)
             setConnected(true)
