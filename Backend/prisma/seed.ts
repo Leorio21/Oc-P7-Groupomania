@@ -23,19 +23,16 @@ const userData: Prisma.UserCreateInput[] = [
         post: {
             create: [
                 {
-                    title: 'test 1',
                     content: 'content test 1',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 2',
                     content: 'content test 2',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 3',
                     content: 'content test 3',
                     image: null,
                     updatedBy: null,
@@ -79,19 +76,16 @@ const userData: Prisma.UserCreateInput[] = [
         post: {
             create: [
                 {
-                    title: 'test 4',
                     content: 'content test 4',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 5',
                     content: 'content test 5',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 6',
                     content: 'content test 6',
                     image: null,
                     updatedBy: null,
@@ -135,19 +129,16 @@ const userData: Prisma.UserCreateInput[] = [
         post: {
             create: [
                 {
-                    title: 'test 7',
                     content: 'content test 7',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 8',
                     content: 'content test 8',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 9',
                     content: 'content test 9',
                     image: null,
                     updatedBy: null,
@@ -191,19 +182,16 @@ const userData: Prisma.UserCreateInput[] = [
         post: {
             create: [
                 {
-                    title: 'test 10',
                     content: 'content test 10',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 11',
                     content: 'content test 11',
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    title: 'test 12',
                     content: 'content test 12',
                     image: null,
                     updatedBy: null,

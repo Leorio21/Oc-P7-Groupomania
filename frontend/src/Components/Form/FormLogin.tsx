@@ -1,7 +1,7 @@
 
 import { useReducer } from 'react';
 import { IFormValues } from '../../interface/Index';
-import Input from '../../Components/Form/Input/Input';
+import LabeledInput from './LabeledInput/LabeldInput';
 import Button from '../../Components/Form/Button/Button';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -63,7 +63,7 @@ const FormLogin = ({classes, activeForm}: FomrLoginProps) => {
         <>
             <form className = {classes} onSubmit={handleSubmit(onLoginSubmit)}>
                 <h2>Connexion</h2>
-                <Input
+                <LabeledInput
                 tabIndex={activeForm == 'login' ? 0 : -1}
                 type='text'
                 id='emailLogin'
@@ -74,7 +74,7 @@ const FormLogin = ({classes, activeForm}: FomrLoginProps) => {
                 required
                 />
                 <p>{errors.email?.message && 'Veuillez saisir votre email'}</p>
-                <Input
+                <LabeledInput
                 tabIndex={activeForm == 'login' ? 0 : -1}
                 type='password'
                 id='passwordLogin'

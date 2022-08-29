@@ -65,7 +65,6 @@ export const createPost = async (req: Request, res: Response, _next: NextFunctio
         await prisma.post.create({
             data: {
                 authorId: req.auth.userId,
-                title: req.body.title,
                 content: req.body.content,
                 image: `${req.protocol}://${req.get('host')}/images/${imageName}`
             },
@@ -124,7 +123,6 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                     id: +req.params.id
                 },
                 data: {
-                    title: req.body.title,
                     content: req.body.content,
                     image: `${req.protocol}://${req.get('host')}/images/${imageName}`,
                     updatedBy: authorUpdate

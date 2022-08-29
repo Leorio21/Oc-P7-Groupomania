@@ -1,14 +1,14 @@
-
 import { useReducer } from 'react';
 import { IFormValues } from '../../interface/Index';
-import Input from '../../Components/Form/Input/Input';
-import Button from '../../Components/Form/Button/Button';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import axios from 'axios';
 import { useContext } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
+
+import Button from '../../Components/Form/Button/Button';
+import LabeledInput from './LabeledInput/LabeldInput';
 import Modal from '../Modal/Modal';
 
 const schemaSignUp = yup.object({
@@ -51,11 +51,10 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
             authContext!.setRoleHandle(userData.data.role)
             authContext!.setConnectHandle(true)
         } catch (error: any) {
-            console.log(error)
             if(error.response.data.message){
-                dispatchModal({type: 'display', payload: error.response.data.message})
+                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
             } else if (error.response.data) {
-                dispatchModal({type: 'display', payload: error.response.data})
+                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data}`})
             }
         } 
     }
@@ -64,7 +63,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
         <>
             <form className = {classes} onSubmit={handleSubmit(onSignUpSubmit)}>
                 <h2>Inscription</h2>
-                <Input
+                <LabeledInput
                 tabIndex={activeForm == 'signup' ? 0 : -1}
                 type='text'
                 id='emailSignUp'
@@ -75,7 +74,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 required
                 />
                 <p>{errors.email?.message && 'Veuillez saisir votre email'}</p>
-                <Input
+                <LabeledInput
                 tabIndex={activeForm == 'signup' ? 0 : -1}
                 type='password'
                 id='passwordSignUp'
@@ -86,7 +85,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 required
                 />
                 <p>{errors.password?.message && 'Veuillez saisir votre mot de passe'}</p>
-                <Input
+                <LabeledInput
                 tabIndex={activeForm == 'signup' ? 0 : -1}
                 type='password'
                 id='confirmPassword'

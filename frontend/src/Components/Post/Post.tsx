@@ -48,7 +48,6 @@ const Post = ({post}: PostProps) => {
     return (
         <article className={classNames(cn.post)}>
             <div className={classNames(cn.header)}>
-                <span className={classNames(cn.title)}>{post.title}</span>
                 <span>{post.author.firstName + ' ' + post.author.lastName}</span>
                 <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={`${post.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                 <span>{dayjs(post.createdAt).fromNow(true)}</span>

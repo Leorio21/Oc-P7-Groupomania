@@ -24,7 +24,6 @@ model User {
 model Post {
     id          Int         @db.Int @id @default(autoincrement())
     authorId    Int         @db.Int
-    title       String      @db.VarChar(255)
     content     String      @db.Text
     image       String?     @db.VarChar(255)
     createdAt   DateTime    @default(now())
