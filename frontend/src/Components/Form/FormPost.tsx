@@ -4,7 +4,7 @@ import { IFormValues } from "../../interface/Index";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
-import Input from "./Input/Input";
+import TextArea from "./TextArea/TextArea";
 
 const schemaPost = yup.object({
     content: yup.string().required(),
@@ -23,25 +23,24 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
     return state;
 }
 
-const onPostSubmit = (data: IFormValues) => {
-
-}
-
 const FormPost = () => {
+    
+    const onPostSubmit = (data: IFormValues) => {
+    
+    }
 
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaPost)});
 
     return (
-        <form className = {} onSubmit={handleSubmit(onPostSubmit)}>
-            <Input
+        <form className = {'t'} onSubmit={handleSubmit(onPostSubmit)}>
+            <TextArea
                 tabIndex={0}
-                type='text'
                 id='content'
                 name='content'
                 placeHolder='Publiez quelque chose ...'
                 register={register}
-                required
+                handleSubmit={handleSubmit}
             />
         </form>
     )

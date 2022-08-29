@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
-import { OnePostComment } from '../../interface/Index';
+import { IFormValues, OnePostComment } from '../../interface/Index';
 
 import classNames from 'classnames';
 import cn from './Comment.module.scss'
@@ -10,6 +10,7 @@ import TextArea from '../Form/TextArea/TextArea';
 import Modal from '../Modal/Modal';
 import axios from 'axios';
 import { AuthContext } from '../../Context/AuthContext';
+import FormComment from '../Form/FormComment';
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -36,7 +37,6 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
 
     const [updatedBy, setUpdatedBy] = useState(comment.updatedBy)
     const [editMode, setEditMode] = useState(false)
-    const [content, setContent] = useState(comment.content)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     
 
@@ -44,23 +44,16 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         setEditMode(!editMode)
     }
 
-    const onChangeContent = (newContent: string) => {
-        setContent(newContent)
-    }
-
-    const onModifySubmit = async () => {
+    const onModifyCommentHandler = async (data: IFormValues) => {
         try {
-            if (content == '') {
-                throw {response: {data: {message: 'Veuillez saisir du texte'}}}
-            }
             const option = {
                 headers: {
                     Authorization: `Bearer ${authContext!.token}`
                 }
             }
-            const newComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, {content}, option)
+            const newComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, data, option)
             setUpdatedBy(newComment.data.updatedBy)
-            onModifyComment(comment.id, content)
+            onModifyComment(comment.id, data.content)
             setEditMode(!editMode)
         } catch (error: any) {
             if(error.response.data.message){
@@ -83,7 +76,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     
     useEffect(() => {
         if(editMode) {
-            const element = document.getElementById('editCom' + postId)!
+            const element = document.getElementById(`editCom${postId}`)!
             element.style.height = "5px";
             element.style.height = (element.scrollHeight) + "px";
         }
@@ -103,7 +96,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                         </div>
                     </div>
                     {editMode ?
-                        <TextArea tabIndex={0} id={'editCom' + postId} name={'commentArea'} placeHolder={''} value={content} onSubnmitComment={onModifySubmit} onChangeHandler={onChangeContent} editMode />
+                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} value={comment.content} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onSubmitComment={onModifyCommentHandler} editMode/>
                         :
                         <div className={classNames(cn.content)}>{comment.content}{updatedBy && ('\n' + modifyAuthor)}</div>}
                 </div>

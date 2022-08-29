@@ -1,39 +1,36 @@
 import classNames from "classnames";
+import { Path, SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../../interface/Index";
 import cn from './TextArea.module.scss'
 
 interface TextAreaProps {
     tabIndex: number,
     id: string,
-    name: string,
+    name: Path<IFormValues>
     placeHolder: string,
-    value: string,
-    onSubnmitComment: Function,
-    onChangeHandler: Function,
-    editMode?: boolean
+    register: UseFormRegister<IFormValues>,
+    value?: string,
+    onSubmitComment: Function,
+    editMode?: boolean,
+    required: boolean
 }
 
-const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onChangeHandler, editMode}: TextAreaProps) => {
-
-    const changeHandler = (event: any) => {
-        onChangeHandler(event.target.value)
-    }
+const TextArea = ({tabIndex, id, placeHolder, name, value, register, onSubmitComment, editMode, required }: TextAreaProps) => {
 
     const onKeyDownHandler = (event: any) => {
-        const element = document.getElementById(id)! as HTMLTextAreaElement
+        const txtAreaEl = document.getElementById(id)! as HTMLTextAreaElement
         if (event.key == 'Enter' && !event.altKey) {
             event.preventDefault()
-            onSubnmitComment(event)
+            onSubmitComment()
             if (!editMode) {
-                element.value=''
+                txtAreaEl.value=''
             }
-        } else if (event.key == 'Enter' && event.altKey) {
-            const element = document.getElementById(id)! as HTMLTextAreaElement
-            const poscur = element.selectionEnd
-            const debut = element.value.substring(0, poscur);
-            const fin = element.value.substring(poscur, element.value.length);
-            element.value = debut + '\n' + fin
-            element.setSelectionRange(poscur + 1, poscur + 1)
-            changeHandler(event)
+        } else  if (event.key == 'Enter' && event.altKey) {
+            const poscur = txtAreaEl.selectionEnd
+            const debut = txtAreaEl.value.substring(0, poscur);
+            const fin = txtAreaEl.value.substring(poscur, txtAreaEl.value.length);
+            txtAreaEl.value = debut + '\n' + fin
+            txtAreaEl.setSelectionRange(poscur + 1, poscur + 1)
         }
         auto_grow()
     }
@@ -47,16 +44,15 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, onSubnmitComment, onC
     return (
         <textarea
             tabIndex={tabIndex}
-            name={name}
             id={id}
             onFocus={auto_grow}
             placeholder={placeHolder}
+            {...register(name, { required })}
             rows={1}
             onKeyDown={onKeyDownHandler}
             onInput={auto_grow}
-            onChange={changeHandler}
             className={classNames(cn.textArea)}
-            value={value}>
+            defaultValue={value}>
         </textarea>
     )
 }

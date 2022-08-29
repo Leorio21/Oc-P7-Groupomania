@@ -29,12 +29,12 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
     return state;
 }
 
-interface FomrLoginProps {
+interface FormLoginProps {
     classes: string,
     activeForm: string,
 }
 
-const FormLogin = ({classes, activeForm}: FomrLoginProps) => {
+const FormLogin = ({classes, activeForm}: FormLoginProps) => {
 
     const authContext = useContext(AuthContext)
 

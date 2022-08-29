@@ -65,7 +65,6 @@ const Post = ({post}: PostProps) => {
                     <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && 's'}</div>
                 </div>
                 <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
-                
             </div>
         </article>
     )

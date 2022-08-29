@@ -1,5 +1,5 @@
 import { FormEvent, useContext, useReducer, useState } from 'react'
-import { OnePostComment } from '../../interface/Index'
+import { IFormValues, OnePostComment } from '../../interface/Index'
 import axios from 'axios'
 
 import classNames from 'classnames'
@@ -9,6 +9,7 @@ import Comment from './Comment'
 import Modal from '../Modal/Modal'
 import TextArea from '../Form/TextArea/TextArea'
 import { AuthContext } from '../../Context/AuthContext'
+import FormComment from '../Form/FormComment'
 
 
 const initilTextError = ''
@@ -34,45 +35,41 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
     const authContext = useContext(AuthContext)
 
     const [comments, setComments] = useState(arrayComment);
-    const [comment, setComment] = useState('');
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    
-    const onCommentHandler = (comment: string) => {
-        setComment(comment)
-    }
 
     const onModifyCommentHandler = (commentToModify: number, newContent: string) => {
-        const newCommentsArray = [...comments]
-        const indexOfCommentToModify = newCommentsArray.findIndex((comment) => comment.id == commentToModify)
-        newCommentsArray[indexOfCommentToModify].content = newContent
-        setComments(newCommentsArray)
+        setComments((prevState) => {
+            const newCommentsArray = [...prevState]
+            const indexOfCommentToModify = newCommentsArray.findIndex((comment) => comment.id == commentToModify)
+            newCommentsArray[indexOfCommentToModify].content = newContent
+            return newCommentsArray
+        })
     }
 
     const onDeleteCommentHandler = (commentToDelete: number) => {
-        const newCommentsArray = comments.filter((comment) => comment.id != commentToDelete)
-        setComments(newCommentsArray)
-        changeCountComm(newCommentsArray.length)
+        setComments((prevState) => {
+            const newCommentsArray = prevState.filter((comment) => comment.id != commentToDelete)
+            changeCountComm(newCommentsArray.length)
+            return newCommentsArray
+        })
     }
 
-    const onCommentSubmit = async (event: FormEvent) => {
-        event.preventDefault()
+    const onCommentSubmit = async (data: IFormValues) => {
         try {
-            if (comment == '') {
-                throw {response: {data: {message: 'Veuillez saisir du texte'}}}
-            }
             const option = {
                 headers: {
                     Authorization: `Bearer ${authContext!.token}`
                 }
             }
-            const content = comment
-            const bddComment = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/comment`, {content}, option)
+            const bddComment = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/comment`, data, option)
             const newComment: OnePostComment = { ...bddComment.data.comment }
-            const newCommentsArray = [...comments]
-            newCommentsArray.push(newComment)
-            setComment('')
-            setComments(newCommentsArray)
-            changeCountComm(newCommentsArray.length)
+            setComments((prevState) => {
+                const newCommentsArray = [...prevState]
+                newCommentsArray.push(newComment)
+                changeCountComm(newCommentsArray.length)
+                return newCommentsArray
+
+            })
         } catch (error: any) {
             if(error.response.data.message){
                 dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
@@ -88,17 +85,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
                 {comments.map((comment) => {
                     return <Comment comment={comment} key={comment.id} postId={postId} onModifyComment={onModifyCommentHandler} onDeleteComment={onDeleteCommentHandler} />
                 })}
-                <form onSubmit={onCommentSubmit} id='formComment' className={classNames(cn.form_comment)}>
-                    <TextArea
-                        tabIndex={0}
-                        id={'comment' + postId}
-                        name='commentArea'
-                        value={comment}
-                        onSubnmitComment={onCommentSubmit}
-                        onChangeHandler={onCommentHandler}
-                        placeHolder='Ecrivez un commentaire ...'
-                    />
-                </form>
+                <FormComment classes={classNames(cn.form_comment)} tabIndex={0} id={`comm${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onSubmitComment={onCommentSubmit} />
             </div>
             {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>

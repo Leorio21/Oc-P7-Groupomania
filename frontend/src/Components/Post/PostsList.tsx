@@ -8,6 +8,7 @@ import cn from './PostsList.module.scss'
 import Post from "./Post";
 import { OnePost, OptionAxios } from '../../interface/Index';
 import Modal from "../Modal/Modal";
+import FormPost from "../Form/FormPost";
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -33,7 +34,7 @@ const PostsList = () => {
         }
     }
     const [posts, setPosts] = useState<OnePost[]>([])
-    
+
     const fetchData = async (option: OptionAxios) => {
             try {
                 const getPosts = await axios.get('http://127.0.0.1:3000/api/post', option)
@@ -42,7 +43,6 @@ const PostsList = () => {
                 console.log(error)
                 if(error.response.data.message){
                     dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
-                    console.log('test')
                 } else if (error.response.data) {
                     dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data}`})
                 }
@@ -59,6 +59,7 @@ if(posts == []) {
 } else {
     return (
         <>
+        <FormPost />
             <div className={classNames(cn.mainContainer)}>
                 {posts!.map((post:OnePost) => {
                     return <Post post={post} key={post.id} />
