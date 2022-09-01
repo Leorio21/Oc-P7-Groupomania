@@ -47,6 +47,23 @@
     & h2 {
         text-align: center;
     }
+    & button {
+        margin-top: 30px;
+        border-radius: 10px;
+        line-height: 20px;
+        background-color: vars.$color-tertiary;
+        color: vars.$color-secondary;
+        border: 2px inset vars.$color-secondary;
+        line-height: 30px;
+        &:hover {
+            color: vars.$font-color-dark;
+            border: 2px inset vars.$color-dark;
+        }
+        &:focus {
+            color: vars.$font-color-dark;
+            border: 2px inset vars.$color-dark;
+        }
+    }
 }
 
 .form_login {

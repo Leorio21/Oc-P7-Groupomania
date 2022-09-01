@@ -50,13 +50,14 @@ export const getAllPost = async (_req: Request, res: Response, _next: NextFuncti
 }
 
 export const createPost = async (req: Request, res: Response, _next: NextFunction) => {
+    const files = req.files as  {[fieldname: string]: Express.Multer.File[]};
     let imageName: string | null = null;
     let newImage: boolean = false;
     try {
-        if (req.file) {
-            imageName = (req.file.filename).split('.')[0] + '.webp'
+        if (files['photo']) {
+            imageName = (files['photo'][0].filename).split('.')[0] + '.webp'
             try {
-                await sharp(`./images/${req.file.filename}`).toFile(`images/${imageName}`)
+                await sharp(`./images/${files['photo'][0].filename}`).toFile(`images/${imageName}`)
                 newImage = true;
             } catch {
                 throw ('Erreur traiement image')
@@ -74,13 +75,13 @@ export const createPost = async (req: Request, res: Response, _next: NextFunctio
             message: 'Post enregistré'
         })
     } catch (error) {
-        if(req.file && newImage) {
+        if(files['photo'] && newImage) {
             fs.unlink(`images/${imageName}`)
         }
         return res.status(400).json({ error })
     } finally {
-        if (req.file) {
-            await fs.unlink(`images/${req.file.filename}`);
+        if (files['photo']) {
+            await fs.unlink(`images/${files['photo'][0].filename}`);
         }
     }
 }

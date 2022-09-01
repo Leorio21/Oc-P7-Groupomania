@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useReducer, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
-import { useForm } from 'react-hook-form';
 
 import classNames from "classnames";
 import cn from './PostsList.module.scss'
@@ -37,13 +36,10 @@ const PostsList = () => {
     }
 
     const fetchData = async (option: OptionAxios) => {
-
-
         try {
             const getPosts = await axios.get('http://127.0.0.1:3000/api/post', option)
             setPosts(getPosts.data)
         } catch (error: any) {
-            console.log(error)
             if(error.response.data.message){
                 dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
             } else if (error.response.data) {
@@ -52,37 +48,13 @@ const PostsList = () => {
         }
     }
     
-    const onPostSubmit = async (data: IFormValues) => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext!.token}`
-                }
-            }
-            const bddPost = await axios.post(`http://127.0.0.1:3000/api/post/`, data, option)
-            const newPost: OnePost = {
-                ...bddPost.data.post,
-                like: [],
-                comment: [],
-                author: {
-                    firstName: authContext!.firstName,
-                    lastName: authContext!.lastName,
-                    avatar: authContext!.avatar
-                }
-            }
+    const onPostSubmit = (newPost: OnePost) => {
             setPosts((prevState) => {
                 const newPostsArray = [...prevState]
                 newPostsArray.unshift(newPost)
                 return newPostsArray
-
             })
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
-            }
-        }
+        
     }
     
     useEffect(() => {
@@ -95,16 +67,17 @@ if(posts == []) {
 } else {
     return (
         <>
-            <FormPost
-                classes=''
-                tabIndex={0}
-                id='content'
-                name='content'
-                placeHolder='Publiez quelque chose ...'
-                onPostSubmit={onPostSubmit}
-                required
-            />
             <div className={classNames(cn.mainContainer)}>
+                <FormPost
+                    classes={classNames(cn.form_container)}
+                    classesIcon={classNames(cn.iconPicture)}
+                    tabIndex={0}
+                    id='content'
+                    name='content'
+                    placeHolder='Publiez quelque chose ...'
+                    onPostSubmit={onPostSubmit}
+                    required
+                />
                 {posts!.map((post:OnePost) => {
                     return (
                         <Post

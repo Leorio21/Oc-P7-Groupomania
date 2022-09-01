@@ -28,17 +28,22 @@ model Post {
     image       String?     @db.VarChar(255)
     createdAt   DateTime    @default(now())
     updatedBy   Role?
-    author      User        @relation(fields: [authorId], references: [id])
+    author      User        @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     like        PostLike[]
     comment     Comment[]
+
+    @@index([authorId], name: "authorPost")
 }
 
 model PostLike {
     id          Int         @db.Int @id @default(autoincrement())
     postId      Int         @db.Int
     userId      Int         @db.Int
-    post        Post        @relation(fields: [postId], references: [id])
-    user        User        @relation(fields: [userId], references: [id])
+    post        Post        @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    user        User        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+    @@index([postId], name: "postLike")
+    @@index([userId], name: "userLike")
 }
 
 model Comment {
@@ -48,8 +53,11 @@ model Comment {
     content     String      @db.Text
     createdAt   DateTime    @default(now())
     updatedBy   Role?
-    post        Post        @relation(fields: [postId], references: [id])
-    author      User        @relation(fields: [authorId], references: [id])
+    post        Post        @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    author      User        @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    
+    @@index([postId], name: "postComment")
+    @@index([authorId], name: "authorComment")
 
 }
 

@@ -36,7 +36,6 @@ const FormComment = ({classes, tabIndex, id, name, placeHolder, value, onSubmitC
                 register={register}
                 value={value}
                 onSubmitComment={handleSubmit(onSubmitComment)}
-                required
             />
             <p>{errors.content?.message}</p>
         </form>

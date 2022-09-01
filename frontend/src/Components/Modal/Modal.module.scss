@@ -30,12 +30,11 @@
     left: 50%;
     z-index: 20;
     transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
     border: 5px ridge vars.$color-primary;
     color: vars.$color-primary;
     box-shadow: 0 0 25px vars.$box-shadow-color;
     border-radius: 15px;
     padding: 50px;
     background-color: vars.$color-dark;
+    white-space: pre-wrap;
 }

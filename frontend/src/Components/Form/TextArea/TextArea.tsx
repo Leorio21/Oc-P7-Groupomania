@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { ChangeEventHandler } from "react";
 import { Path, SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { IFormValues } from "../../../interface/Index";
 import cn from './TextArea.module.scss'
@@ -12,25 +13,24 @@ interface TextAreaProps {
     value?: string,
     onSubmitComment: Function,
     editMode?: boolean,
-    required?: boolean
+    postForm?: boolean,
 }
 
-const TextArea = ({tabIndex, id, placeHolder, name, value, register, onSubmitComment, editMode, required }: TextAreaProps) => {
+const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitComment, editMode, postForm }: TextAreaProps) => {
 
     const onKeyDownHandler = (event: any) => {
-        const txtAreaEl = document.getElementById(id)! as HTMLTextAreaElement
-        if (event.key == 'Enter' && !event.altKey) {
-            event.preventDefault()
-            onSubmitComment()
-            if (!editMode) {
-                txtAreaEl.value=''
+        if (!postForm) {
+            const txtAreaEl = document.getElementById(id)! as HTMLTextAreaElement
+            if (event.key == 'Enter' && !event.altKey) {
+                event.preventDefault()
+                onSubmitComment()
+            } else  if (event.key == 'Enter' && event.altKey) {
+                const poscur = txtAreaEl.selectionEnd
+                const debut = txtAreaEl.value.substring(0, poscur);
+                const fin = txtAreaEl.value.substring(poscur, txtAreaEl.value.length);
+                txtAreaEl.value = debut + '\n' + fin
+                txtAreaEl.setSelectionRange(poscur + 1, poscur + 1)
             }
-        } else  if (event.key == 'Enter' && event.altKey) {
-            const poscur = txtAreaEl.selectionEnd
-            const debut = txtAreaEl.value.substring(0, poscur);
-            const fin = txtAreaEl.value.substring(poscur, txtAreaEl.value.length);
-            txtAreaEl.value = debut + '\n' + fin
-            txtAreaEl.setSelectionRange(poscur + 1, poscur + 1)
         }
         auto_grow()
     }
@@ -47,7 +47,7 @@ const TextArea = ({tabIndex, id, placeHolder, name, value, register, onSubmitCom
             id={id}
             onFocus={auto_grow}
             placeholder={placeHolder}
-            {...register(name, { required: 'Ce champ ne peut être vide' })}
+            {...register(name)}
             rows={1}
             onKeyDown={onKeyDownHandler}
             onInput={auto_grow}
