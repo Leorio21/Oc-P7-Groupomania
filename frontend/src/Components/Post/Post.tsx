@@ -54,10 +54,12 @@ const Post = ({post}: PostProps) => {
             </div>
             <div className={classNames(cn.content)}>
                 {post.image && <img src={post.image!} alt={'image d\'illustration'} />}
-                <div className={classNames(cn.text)}>
-                    {post.content}{post.updatedBy && `\n${modifyAuthor}`}
-                </div>
-                
+                {post.content && 
+                    <div className={classNames(cn.text)}>
+                        {post.content}
+                    </div>
+                }
+                {post.updatedBy && `\n${modifyAuthor}`}
             </div>
             <div className={classNames(cn.footer)}>
                 <div className={classNames(cn.likeComment)}>

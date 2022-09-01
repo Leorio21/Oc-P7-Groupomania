@@ -21,13 +21,12 @@ const reducerModal = (state: string, action: { type: string; payload: string; })
 }
 
 interface AdminMenuProps {
-    commentId?: number,
-    postId: number,
-    onClickModify: Function,
-    onDeleteComment: Function
+    id: number,
+    onModifyClick: Function,
+    onDeleteClick: Function
 }
 
-const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMenuProps) => {
+const AdminMenu = ({ id, onModifyClick, onDeleteClick}: AdminMenuProps) => {
 
     const authContext = useContext(AuthContext)
     
@@ -45,30 +44,12 @@ const AdminMenu = ({commentId, postId, onClickModify, onDeleteComment}: AdminMen
         }
     }
 
-    const onModifyHandler = async () => {
-        onClickModify()
+    const onModifyHandler = () => {
+        onModifyClick()
     }
 
-    const onDeleteHandler = async () => {
-        const option = {
-            headers: {
-                Authorization: `Bearer ${authContext!.token}`
-            }
-        }
-        if (commentId) {
-            try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${commentId}`, option)
-                onDeleteComment(commentId)
-            } catch (error: any) {
-                if(error.response.data.message){
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response.data) {
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
-                }
-            }
-        } else if (postId) {
-            console.log('delete post')
-        }
+    const onDeleteHandler = () => {
+        onDeleteClick(id)
     }
 
     return (

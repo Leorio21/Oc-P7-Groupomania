@@ -5,7 +5,7 @@ import { AuthContext } from "../../Context/AuthContext";
 import axios from "axios";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 
 
 import PicturePreview from "./PicturePreview/PicturePreview";
@@ -16,9 +16,9 @@ import Button from "./Button/Button";
 import HorizontalContainer from "./HorizontalContainer/HorizontalContainer";
 
 const schemaPost = yup.object({
-    content: yup.string().nullable(),
-    photo: yup.mixed().nullable()
-}).required;
+    content: yup.string(),
+    photo: yup.mixed()
+}).required();
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -51,7 +51,7 @@ const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder
 
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const { register, handleSubmit, getValues, resetField, watch, formState: { isSubmitSuccessful, errors } } = useForm<IFormValues>({defaultValues: { content: '', photo: undefined }})//{resolver: yupResolver(schemaPost)});
+    const { register, handleSubmit, getValues, resetField, watch, formState: { isSubmitSuccessful, errors } } = useForm<IFormValues>({defaultValues: { content: '', photo: undefined }, resolver: yupResolver(schemaPost)});
     const [ pictureUrl, setPictureUrl ] = useState('')
 
     const onSubmitHandler = async (data: IFormValues) => {
@@ -82,6 +82,7 @@ const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder
             setPictureUrl('')
             resetField('photo')
             resetField('content')
+            auto_grow()
         } catch (error: any) {
             if(error.response.data.message){
                 dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
@@ -95,6 +96,12 @@ const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder
         setPictureUrl('')
         resetField('photo')
     }
+
+    const auto_grow = useCallback(() => {
+        const element = document.getElementById(id)!
+        element.style.height = "5px";
+        element.style.height = (element.scrollHeight) + "px";
+    }, [])
 
     useEffect(() => {
         if(getValues('photo')) {

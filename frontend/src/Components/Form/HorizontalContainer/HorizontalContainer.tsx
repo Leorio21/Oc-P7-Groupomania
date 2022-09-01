@@ -1,9 +1,8 @@
 import classNames from "classnames";
-import { ReactElement } from "react";
+import { PropsWithChildren } from "react";
 import cn from './HorizontalContainer.module.scss'
 
-interface HorizontalContainerProps {
-    children: ReactElement[]
+interface HorizontalContainerProps extends PropsWithChildren {
 }
 
 const HorizontalContainer = ({children}: HorizontalContainerProps) => {

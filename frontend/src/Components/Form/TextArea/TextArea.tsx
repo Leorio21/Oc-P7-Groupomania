@@ -1,7 +1,7 @@
-import classNames from "classnames";
-import { ChangeEventHandler } from "react";
-import { Path, SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { Path, UseFormRegister } from "react-hook-form";
 import { IFormValues } from "../../../interface/Index";
+
+import classNames from "classnames";
 import cn from './TextArea.module.scss'
 
 interface TextAreaProps {
@@ -24,6 +24,9 @@ const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitCo
             if (event.key == 'Enter' && !event.altKey) {
                 event.preventDefault()
                 onSubmitComment()
+                if (!editMode) {
+                    txtAreaEl.value = ''
+                }
             } else  if (event.key == 'Enter' && event.altKey) {
                 const poscur = txtAreaEl.selectionEnd
                 const debut = txtAreaEl.value.substring(0, poscur);

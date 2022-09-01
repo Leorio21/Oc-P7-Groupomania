@@ -1,12 +1,12 @@
 import { useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
-import { IFormValues, OnePostComment } from '../../interface/Index';
+import { OnePostComment } from '../../interface/Index';
+import { Role } from '../../../../backend/node_modules/@prisma/client'
 
 import classNames from 'classnames';
 import cn from './Comment.module.scss'
 
 import AdminMenu from '../AdminMenu/AdminMenu';
-import TextArea from '../Form/TextArea/TextArea';
 import Modal from '../Modal/Modal';
 import axios from 'axios';
 import { AuthContext } from '../../Context/AuthContext';
@@ -44,24 +44,28 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         setEditMode(!editMode)
     }
 
-    const onModifyCommentHandler = async (data: IFormValues) => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext!.token}`
-                }
-            }
-            const newComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, data, option)
-            setUpdatedBy(newComment.data.updatedBy)
-            onModifyComment(comment.id, data.content)
-            setEditMode(!editMode)
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
+    const onModifyCommentHandler = (commentId: number, updatedBy: Role, content: string) => {
+        setUpdatedBy(updatedBy)
+        onModifyComment(commentId, content)
+        setEditMode(!editMode)
+    }
+
+    const onDeleteHandler = async (commentId: number) => {
+        const option = {
+            headers: {
+                Authorization: `Bearer ${authContext!.token}`
             }
         }
+            try {
+                await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${commentId}`, option)
+                onDeleteComment(commentId)
+            } catch (error: any) {
+                if(error.response.data.message){
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response.data) {
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            }
     }
 
     const modifyAuthor: string = useMemo(() => {
@@ -92,11 +96,11 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                             {comment.author.firstName} {comment.author.lastName}
                         </div>
                         <div className={classNames(cn.menu)}>
-                            {(authContext!.userId == comment.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu commentId={comment.id} postId={postId} onClickModify={onModifyHandler} onDeleteComment={onDeleteComment}/>}
+                            {(authContext!.userId == comment.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={comment.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                         </div>
                     </div>
                     {editMode ?
-                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} value={comment.content} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onSubmitComment={onModifyCommentHandler} editMode/>
+                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} comment={comment} postId={postId} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onSubmitForm={onModifyCommentHandler} editMode />
                         :
                         <div className={classNames(cn.content)}>{comment.content}{updatedBy && ('\n' + modifyAuthor)}</div>}
                 </div>
