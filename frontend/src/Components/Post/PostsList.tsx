@@ -56,6 +56,13 @@ const PostsList = () => {
             })
         
     }
+
+    const onPostDelete = (postToDelete: number) => {
+        setPosts((prevState) => {
+            const newPostArray = prevState.filter((post) => post.id != postToDelete)
+            return newPostArray
+        })
+    }
     
     useEffect(() => {
         fetchData(option)
@@ -82,6 +89,7 @@ if(posts == []) {
                     return (
                         <Post
                             post={post}
+                            onDeletePost={onPostDelete}
                             key={post.id}
                         />
                     )

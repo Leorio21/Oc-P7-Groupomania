@@ -1,27 +1,44 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/fr'
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useContext, useMemo, useState } from 'react';
+import { AuthContext } from '../../Context/AuthContext';
+import { useContext, useMemo, useReducer, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
-
 import { OnePost } from '../../interface/Index';
+import axios from 'axios';
+
 import classNames from 'classnames'
 import cn from './Post.module.scss'
 
 import Like from '../Like/Like'
 import CommentList from '../Comment/CommentList'
-import { AuthContext } from '../../Context/AuthContext';
+import AdminMenu from '../AdminMenu/AdminMenu';
+import Modal from '../Modal/Modal';
 
+const initilTextError = ''
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+        case 'display':
+            state = action.payload!
+            return state
+        case 'hide':
+            state = ''
+            return state
+    }
+    return state;
+}
 interface PostProps {
-    post: OnePost
+    post: OnePost,
+    onDeletePost: Function
 }
 
-const Post = ({post}: PostProps) => {
+const Post = ({post, onDeletePost}: PostProps) => {
 
     const authContext = useContext(AuthContext)
 
     const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext!.userId) ? true : false);
     const [countComm, setCountComm] = useState(post.comment.length)
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const changeCountComm = (newCounterComm: number) => {
         setCountComm(newCounterComm)
@@ -29,6 +46,28 @@ const Post = ({post}: PostProps) => {
 
     const changeLikePost = () => {
         setUserLikePost(!userLikePost)
+    }
+
+    const onModifyHandler = () => {
+
+    }
+    
+    const onDeleteHandler = async () => {
+        const option = {
+            headers: {
+                Authorization: `Bearer ${authContext!.token}`
+            }
+        }
+            try {
+                await axios.delete(`http://127.0.0.1:3000/api/post/${post.id}`, option)
+                onDeletePost(post.id)
+            } catch (error: any) {
+                if(error.response.data.message){
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response.data) {
+                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            }
     }
 
     dayjs.locale('fr')
@@ -46,29 +85,39 @@ const Post = ({post}: PostProps) => {
     }, [post.updatedBy])
 
     return (
-        <article className={classNames(cn.post)}>
-            <div className={classNames(cn.header)}>
-                <span>{post.author.firstName + ' ' + post.author.lastName}</span>
-                <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={`${post.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
-                <span>{dayjs(post.createdAt).fromNow(true)}</span>
-            </div>
-            <div className={classNames(cn.content)}>
-                {post.image && <img src={post.image!} alt={'image d\'illustration'} />}
-                {post.content && 
-                    <div className={classNames(cn.text)}>
-                        {post.content}
+        <>
+            <article className={classNames(cn.post)}>
+                <div className={classNames(cn.header)}>
+                    <div className={classNames(cn.header_title)}>
+                        <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={`${post.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                        <div className={classNames(cn.author)}>
+                            <span>{post.author.firstName + ' ' + post.author.lastName}</span>
+                            <span>{dayjs(post.createdAt).fromNow(true)}</span>
+                        </div>
                     </div>
-                }
-                {post.updatedBy && `\n${modifyAuthor}`}
-            </div>
-            <div className={classNames(cn.footer)}>
-                <div className={classNames(cn.likeComment)}>
-                    <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost}/>
-                    <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && 's'}</div>
+                    <div className={classNames(cn.menu)}>
+                        {(authContext!.userId == post.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={post.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
+                    </div>
                 </div>
-                <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
-            </div>
-        </article>
+                <div className={classNames(cn.content)}>
+                    {post.image && <img src={post.image!} alt={'image d\'illustration'} />}
+                    {post.content && 
+                        <div className={classNames(cn.text)}>
+                            {post.content}
+                        </div>
+                    }
+                    {post.updatedBy && `\n${modifyAuthor}`}
+                </div>
+                <div className={classNames(cn.footer)}>
+                    <div className={classNames(cn.likeComment)}>
+                        <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost}/>
+                        <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && 's'}</div>
+                    </div>
+                    <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
+                </div>
+            </article>
+            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
+        </>
     )
 }
 
