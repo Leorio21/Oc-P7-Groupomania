@@ -6,7 +6,7 @@ import classNames from "classnames";
 import cn from './PostsList.module.scss'
 
 import Post from "./Post";
-import { IFormValues, OnePost, OptionAxios } from '../../interface/Index';
+import { OnePost, OptionAxios } from '../../interface/Index';
 import Modal from "../Modal/Modal";
 import FormPost from "../Form/FormPost";
 
@@ -54,7 +54,6 @@ const PostsList = () => {
                 newPostsArray.unshift(newPost)
                 return newPostsArray
             })
-        
     }
 
     const onPostDelete = (postToDelete: number) => {
@@ -68,24 +67,21 @@ const PostsList = () => {
         fetchData(option)
     }, [])
 
-    
-if(posts == []) {
-    return (<></>)
-} else {
+
     return (
         <>
             <div className={classNames(cn.mainContainer)}>
                 <FormPost
                     classes={classNames(cn.form_container)}
                     classesIcon={classNames(cn.iconPicture)}
+                    buttonLabel='Publier'
                     tabIndex={0}
                     id='content'
                     name='content'
                     placeHolder='Publiez quelque chose ...'
                     onPostSubmit={onPostSubmit}
-                    required
                 />
-                {posts!.map((post:OnePost) => {
+                {posts && posts!.map((post:OnePost) => {
                     return (
                         <Post
                             post={post}
@@ -98,7 +94,6 @@ if(posts == []) {
             {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
         </>
     )
-        }
 }
 
 export default PostsList;

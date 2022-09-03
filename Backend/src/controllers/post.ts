@@ -87,12 +87,9 @@ export const createPost = async (req: Request, res: Response, _next: NextFunctio
 }
 
 export const modifyPost = async (req: Request, res: Response, _next: NextFunction) => {
-    let imageName: string | null = null;
-    if(req.body.image != 'null') {
-        console.log('null')
-        imageName = req.body.image
-    }
-    let oldImage: string | null = null
+    const files = req.files as  {[fieldname: string]: Express.Multer.File[]};
+    let imageName: string = '';
+    let oldImage: string | null = ''
     let newImage: boolean = false;
     try {
         let authorUpdate: Role = 'USER';
@@ -109,18 +106,19 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 authorUpdate = req.auth.role
             }
             oldImage = post.image
-            if (req.file) {
-                imageName = (req.file.filename).split('.')[0] + '.webp'
+            if (files['photo']) {
+                imageName = (files['photo'][0].filename).split('.')[0] + '.webp'
                 try {
-                    await sharp(`./images/${req.file.filename}`).toFile(`images/${imageName}`)
+                    await sharp(`./images/${files['photo'][0].filename}`).toFile(`images/${imageName}`)
                     newImage = true;
                 } catch {
                     throw ('Erreur traiement image')
                 }
             }
-            if((newImage && oldImage) || (imageName == null && oldImage)) {
-                const oldImageName = oldImage.split('/images/')[1];
+            if((newImage && oldImage) || (imageName == '' && oldImage != '' && oldImage != null )) {
+                const oldImageName = oldImage!.split('/images/')[1];
                 await fs.unlink(`images/${oldImageName}`);
+                post.image = ''
             }
             await prisma.post.updateMany({
                 where: {
@@ -128,21 +126,27 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 },
                 data: {
                     content: req.body.content,
-                    image: imageName && `${req.protocol}://${req.get('host')}/images/${imageName}`,
+                    image: newImage ? `${req.protocol}://${req.get('host')}/images/${imageName}` : post.image,
                     updatedBy: authorUpdate
                 }
             })
-            return res.status(200).json({ message: 'Commentaire modifié' })
+            return res.status(200).json({
+                post: {
+                    content: req.body.content,
+                    image: newImage ? `${req.protocol}://${req.get('host')}/images/${imageName}` : post.image,
+                    updatedBy: authorUpdate
+                },
+                message: 'Commentaire modifié' })
         }
         return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
-        if(req.file && newImage) {
+        if(files['photo'] && newImage) {
             fs.unlink(`images/${imageName}`)
         }
         return res.status(400).json({ error })
     } finally {
-        if (req.file) {
-            await fs.unlink(`images/${req.file.filename}`);
+        if (files['photo']) {
+            await fs.unlink(`images/${files['photo'][0].filename}`);
         }
     }
 }

@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/fr'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { AuthContext } from '../../Context/AuthContext';
-import { useContext, useMemo, useReducer, useState } from 'react';
+import { useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { UserCircleIcon } from '@heroicons/react/solid';
 import { OnePost } from '../../interface/Index';
 import axios from 'axios';
@@ -14,6 +14,7 @@ import Like from '../Like/Like'
 import CommentList from '../Comment/CommentList'
 import AdminMenu from '../AdminMenu/AdminMenu';
 import Modal from '../Modal/Modal';
+import FormPost from '../Form/FormPost';
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -36,8 +37,10 @@ const Post = ({post, onDeletePost}: PostProps) => {
 
     const authContext = useContext(AuthContext)
 
+    const [postData, setPostData] = useState(post)
     const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext!.userId) ? true : false);
     const [countComm, setCountComm] = useState(post.comment.length)
+    const [editMode, setEditMode] = useState(false);
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const changeCountComm = (newCounterComm: number) => {
@@ -49,9 +52,20 @@ const Post = ({post, onDeletePost}: PostProps) => {
     }
 
     const onModifyHandler = () => {
-
+        setEditMode(!editMode)
     }
     
+    const onPostSubmitHandler = (modifyPost: OnePost) => {
+        setPostData((prevState) => {
+            const newPost = prevState
+            newPost.content = modifyPost.content
+            newPost.image = modifyPost.image
+            newPost.updatedBy = modifyPost.updatedBy
+            return newPost
+        })
+        setEditMode(!editMode)
+    }
+
     const onDeleteHandler = async () => {
         const option = {
             headers: {
@@ -84,30 +98,53 @@ const Post = ({post, onDeletePost}: PostProps) => {
             return '(modifié)';
     }, [post.updatedBy])
 
+    useEffect(() => {
+        if(editMode) {
+            const element = document.getElementById(`content${postData.id}`)!
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
+    }, [editMode])
+
     return (
         <>
             <article className={classNames(cn.post)}>
                 <div className={classNames(cn.header)}>
                     <div className={classNames(cn.header_title)}>
-                        <div className={classNames(cn.avatar)}>{post.author.avatar ? <img src={`${post.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
-                        <div className={classNames(cn.author)}>
-                            <span>{post.author.firstName + ' ' + post.author.lastName}</span>
-                            <span>{dayjs(post.createdAt).fromNow(true)}</span>
+                        <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                        <div className={classNames(cn.author_container)}>
+                            <span className={classNames(cn.author)}>{postData.author.firstName + ' ' + postData.author.lastName}</span>
+                            <span>Il y a {dayjs(postData.createdAt).fromNow(true)}</span>
                         </div>
                     </div>
                     <div className={classNames(cn.menu)}>
-                        {(authContext!.userId == post.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={post.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
+                        {(authContext!.userId == postData.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={postData.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                     </div>
                 </div>
-                <div className={classNames(cn.content)}>
-                    {post.image && <img src={post.image!} alt={'image d\'illustration'} />}
-                    {post.content && 
-                        <div className={classNames(cn.text)}>
-                            {post.content}
-                        </div>
-                    }
-                    {post.updatedBy && `\n${modifyAuthor}`}
-                </div>
+                {editMode ? 
+                    <FormPost
+                        classes={classNames(cn.form_container)}
+                        classesIcon={classNames(cn.iconPicture)}
+                        buttonLabel='Enregistrer'
+                        tabIndex={0}
+                        id={`content${postData.id}`}
+                        name='content'
+                        placeHolder='Publiez quelque chose ...'
+                        onPostSubmit={onPostSubmitHandler}
+                        post={postData}
+                        editMode={editMode}
+                    />
+                    :
+                    <div className={classNames(cn.content)}>
+                        {postData.image && <img src={postData.image!} alt={'image d\'illustration'} />}
+                        {postData.content && 
+                            <div className={classNames(cn.text)}>
+                                {postData.content}
+                            </div>
+                        }
+                        {postData.updatedBy && `\n${modifyAuthor}`}
+                    </div>
+                }
                 <div className={classNames(cn.footer)}>
                     <div className={classNames(cn.likeComment)}>
                         <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost}/>

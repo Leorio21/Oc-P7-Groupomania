@@ -90,7 +90,6 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
         }
     }
 
-
     return (
         <>
             <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>

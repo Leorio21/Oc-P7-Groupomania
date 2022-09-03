@@ -52,7 +52,6 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
             authContext!.setRoleHandle(userData.data.role)
             authContext!.setConnectHandle(true)
         } catch (error: any) {
-            console.log(error)
             if(error.response.data.message){
                 dispatchModal({type: 'display', payload: error.response.data.message})
             } else if (error.response.data) {

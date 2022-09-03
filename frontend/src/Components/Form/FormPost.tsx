@@ -36,31 +36,41 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 interface FormPostProps {
     classes: string,
     classesIcon: string,
-    postId?: number,
+    buttonLabel: string,
     tabIndex: number,
     id: string,
     name: Path<IFormValues>
     placeHolder: string,
-    value?: string,
+    post?: OnePost,
     onPostSubmit: Function,
     editMode?: boolean,
-    required?: boolean
 }
 
-const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder, onPostSubmit, editMode, required}: FormPostProps) => {
+const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, placeHolder, onPostSubmit, editMode}: FormPostProps) => {
 
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const { register, handleSubmit, getValues, resetField, watch, formState: { isSubmitSuccessful, errors } } = useForm<IFormValues>({defaultValues: { content: '', photo: undefined }, resolver: yupResolver(schemaPost)});
-    const [ pictureUrl, setPictureUrl ] = useState('')
+    const { register, handleSubmit, getValues, resetField, watch, formState: { isSubmitSuccessful, errors } } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)});
+    const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image)
 
-    const onSubmitHandler = async (data: IFormValues) => {
-        const myFormData = new FormData();
-        myFormData.append('content', data.content)
-        if (data.photo) {
-            myFormData.append('photo', data.photo[0])
+    const onSubmitHandler = (data: IFormValues) => {
+        if (post) {
+            modifyPost(data)
+        } else {
+            createPost(data)
         }
+    }
+
+    const createPost = async (data: IFormValues) => {
         try {
+            if(!data.content && (!data.photo || data.photo.length == 0)) {
+                throw 'Impossible de publier un message vide'
+            }
+            const myFormData = new FormData();
+            myFormData.append('content', data.content)
+            if (data.photo) {
+                myFormData.append('photo', data.photo[0])
+            }
             const option = {
                 headers: {
                     'Content-Type':'multipart/form-data',
@@ -79,12 +89,59 @@ const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder
                 }
             }
             onPostSubmit(newPost)
-            setPictureUrl('')
-            resetField('photo')
+            resetPicture()
             resetField('content')
             auto_grow()
         } catch (error: any) {
-            if(error.response.data.message){
+            if (!error.response) {
+                dispatchModal({type: 'display', payload: `${error}`})
+            } else if(error.response.data.message){
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
+            } else if (error.response.data) {
+                dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
+            }
+        }
+    }
+
+    const modifyPost = async (data: IFormValues) => {
+        try {
+            if(data.content == '' && (!data.photo || data.photo.length == 0)) {
+                throw 'Impossible de publier un message vide'
+            }
+            const myFormData = new FormData();
+            myFormData.append('content', data.content)
+            if (pictureUrl) {
+                const image = pictureUrl
+                myFormData.append('image', image)
+            }
+            if (data.photo) {
+                myFormData.append('photo', data.photo[0])
+            }
+            const option = {
+                headers: {
+                    'Content-Type':'multipart/form-data',
+                    Authorization: `Bearer ${authContext!.token}`
+                }
+            }
+            const bddPost = await axios.put(`http://127.0.0.1:3000/api/post/${post!.id}`, myFormData, option)
+            const newPost: OnePost = {
+                ...bddPost.data.post,
+                like: [],
+                comment: [],
+                author: {
+                    firstName: authContext!.firstName,
+                    lastName: authContext!.lastName,
+                    avatar: authContext!.avatar
+                }
+            }
+            onPostSubmit(newPost)
+            resetPicture()
+            resetField('content')
+            auto_grow()
+        } catch (error: any) {
+            if (!error.response) {
+                dispatchModal({type: 'display', payload: `${error}`})
+            } else if(error.response.data.message){
                 dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
             } else if (error.response.data) {
                 dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
@@ -114,19 +171,21 @@ const FormPost = ({classes, postId, classesIcon, tabIndex, id, name, placeHolder
     return (
         <>
             <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
-                {pictureUrl != '' && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} /> }
+                {pictureUrl != '' && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} />}
                 <TextArea
                     tabIndex={tabIndex}
                     id={id}
                     name={name}
                     placeHolder={placeHolder}
                     register={register}
+                    value={post?.content}
                     onSubmitComment={handleSubmit(onSubmitHandler)}
                     postForm
+                    editMode={editMode}
                 />
                 <HorizontalContainer>
-                    <Button tabIndex={0} type={'submit'} label={'Publier'} />
-                    <FileInput id='picture' name='photo' accept={'image/jpeg, image/png, image/gif, image/webp'} multiple={false} register={register}>
+                    <Button tabIndex={0} type={'submit'} label={buttonLabel} />
+                    <FileInput id={`picture${post?.id}`} name='photo' accept={'image/jpeg, image/png, image/gif, image/webp'} multiple={false} register={register}>
                         <PhotographIcon className={classesIcon} />Photo
                     </FileInput>
                 </HorizontalContainer>
