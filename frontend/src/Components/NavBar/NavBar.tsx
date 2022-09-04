@@ -11,6 +11,7 @@ import { AuthContext } from '../../Context/AuthContext'
 const NavBar = () => {
 
     const authContext = useContext(AuthContext)
+    const myProfile = `/myprofile/${authContext!.userId}`
 
     const onLogOutHandler = () => {
         localStorage.removeItem('userData')
@@ -23,7 +24,7 @@ const NavBar = () => {
 
     return (
         <nav className={classNames(cn.nav)}>
-            <Link to="/myprofile" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserCircleIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Mon Profil</span></Link>
+            <Link to={myProfile} className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserCircleIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Mon Profil</span></Link>
             <Link to="/home" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><HomeIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Accueil</span></Link>
             <Link to="/" className={classNames(cn.link)} onClick={onLogOutHandler}><span className={classNames(cn.icon_container)}><LogoutIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Déconnexion</span></Link>
         </nav>

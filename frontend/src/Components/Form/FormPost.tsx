@@ -113,6 +113,8 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             if (pictureUrl) {
                 const image = pictureUrl
                 myFormData.append('image', image)
+            } else {
+                myFormData.append('image', '')
             }
             if (data.photo) {
                 myFormData.append('photo', data.photo[0])

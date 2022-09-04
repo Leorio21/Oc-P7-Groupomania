@@ -210,6 +210,14 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
                 background: true,
                 post : {
                     include: {
+                            author: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    avatar: true,
+                                }
+                            },
                         like: {
                             include: {
                                 user: {

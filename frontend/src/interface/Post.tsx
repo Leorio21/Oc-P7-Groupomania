@@ -37,3 +37,32 @@ export type OnePostComment = (Comment & {
         avatar: string | null,
     },
 })
+
+export type OneUser = {
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatar: string | null;
+    background: string | null;
+    post: (Post & {
+        author: {
+            id: number,
+            firstName: string,
+            lastName: string,
+            avatar: string | null,
+        },
+        like: (PostLike & {
+            user: {
+                firstName: string;
+                lastName: string;
+            };
+        })[];
+        comment: (Comment & {
+            author: {
+                firstName: string,
+                lastName: string,
+                avatar: string | null,
+            },
+        })[]
+    })[];
+}

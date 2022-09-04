@@ -6,5 +6,5 @@ export interface UserDataLs {
     lastName: string,
     avatar: string,
     token: string,
-    role: Role
+    role: Role,
 }

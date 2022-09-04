@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { UserDataLs } from "../interface/UserDataLs";
+import { UserDataLs } from "../interface/UserData";
 
 interface AuthContextInterface {
     userId: number

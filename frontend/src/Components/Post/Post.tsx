@@ -142,7 +142,7 @@ const Post = ({post, onDeletePost}: PostProps) => {
                                 {postData.content}
                             </div>
                         }
-                        {postData.updatedBy && `\n${modifyAuthor}`}
+                        {postData.updatedBy && <div className={classNames(cn.modifyBy)}>{modifyAuthor}</div>}
                     </div>
                 }
                 <div className={classNames(cn.footer)}>

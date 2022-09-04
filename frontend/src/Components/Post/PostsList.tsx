@@ -23,7 +23,11 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
     return state;
 }
 
-const PostsList = () => {
+interface PostListProps {
+    postUser?: OnePost[]
+}
+
+const PostsList = ({postUser}:  PostListProps) => {
 
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
@@ -64,7 +68,11 @@ const PostsList = () => {
     }
     
     useEffect(() => {
-        fetchData(option)
+        if (postUser) {
+            setPosts(postUser)
+        } else {
+            fetchData(option)
+        }
     }, [])
 
 

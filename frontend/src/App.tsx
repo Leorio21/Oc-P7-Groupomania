@@ -5,10 +5,12 @@ import Connect from './Pages/Connect/Connect';
 import Home from './Pages/Home/Home';
 
 import { AuthContext } from './Context/AuthContext';
+import { useContext } from 'react';
 
 import './App.module.scss'
-import { useContext } from 'react';
+
 import NavBar from './Components/NavBar/NavBar';
+import Profile from './Pages/Profile/Profile';
 
 function App() {
 
@@ -28,7 +30,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Connect />} />
         <Route element={<ProtectedRoute connected={authContext?.connected} />}>
-          <Route path='/myprofile' element={''} />
+          <Route path='/myprofile/:userId' element={<Profile />} />
           <Route path='/home' element={<Home />} />
         </Route>
       </Routes>
