@@ -62,3 +62,15 @@
     width: 60px;
     visibility: hidden;
 }
+
+.nav__link {
+    color: vars.$color-dark;
+    text-decoration: none;
+    &:visited {
+        color: vars.$color-dark;
+    }
+    &:hover {
+        color: vars.$color-primary;
+        text-decoration: underline;
+    }
+}

@@ -79,7 +79,7 @@ const PostsList = ({postUser}:  PostListProps) => {
     return (
         <>
             <div className={classNames(cn.mainContainer)}>
-                <FormPost
+                {!postUser && <FormPost
                     classes={classNames(cn.form_container)}
                     classesIcon={classNames(cn.iconPicture)}
                     buttonLabel='Publier'
@@ -88,7 +88,7 @@ const PostsList = ({postUser}:  PostListProps) => {
                     name='content'
                     placeHolder='Publiez quelque chose ...'
                     onPostSubmit={onPostSubmit}
-                />
+                />}
                 {posts && posts!.map((post:OnePost) => {
                     return (
                         <Post

@@ -1,26 +1,20 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { UserDataLs } from "../interface/UserData";
 
 interface AuthContextInterface {
     userId: number
-    setUserIdHandle: Function
     token: string
-    setTokenHandle: Function
     role: string
-    setRoleHandle: Function
     firstName: string
-    setFirstNameHandle: Function
     lastName: string
-    setLastNameHandle: Function
     avatar: string
-    setAvatarHandle: Function
     connected: boolean
     setConnectHandle: Function
 }
 
 export const AuthContext = createContext<AuthContextInterface | null>(null);
 
-const AuthContextProvider = (props: any) => {
+const AuthContextProvider = ({children}: PropsWithChildren) => {
     
     const [userId, setUserId] = useState(-1)
     const [token, setToken] = useState('')
@@ -30,33 +24,20 @@ const AuthContextProvider = (props: any) => {
     const [avatar, setAvatar] = useState('')
     const [connected, setConnected] = useState(false)
 
-    const setUserIdHandle = (newUserId: number) => {
-        setUserId(newUserId)
-    }
-
-    const setTokenHandle = (newToken: string) => {
-        setToken(newToken)
-    }
-
-    const setRoleHandle = (newRole: string) => {
-        setRole(newRole)
-    }
-
-    const setFirstNameHandle = (newRole: string) => {
-        setFirstName(newRole)
-    }
-
-    const setLastNameHandle = (newRole: string) => {
-        setLastName(newRole)
-    }
-
-    const setAvatarHandle = (newRole: string) => {
-        setAvatar(newRole)
-    }
-
     const setConnectHandle = (isConnected: boolean) => {
         setConnected(isConnected)
     }
+
+    const contextValues = useMemo(() => {
+        return {
+            userId,
+            token,
+            role,
+            firstName,
+            lastName,
+            avatar,
+            connected, setConnectHandle}
+    }, [userId, token, role, firstName, lastName, avatar, connected])
 
     useEffect(() => {
         if(localStorage.getItem('userData')) {
@@ -69,19 +50,19 @@ const AuthContextProvider = (props: any) => {
             setToken(userData.token)
             setRole(userData.role)
             setConnected(true)
+        } else {
+            setUserId(-1)
+            setFirstName('')
+            setLastName('')
+            setAvatar('')
+            setToken('')
+            setRole('')
         }
-    }, [])
+    }, [connected])
 
     return (
-        <AuthContext.Provider value={{
-            userId, setUserIdHandle,
-            token, setTokenHandle,
-            role, setRoleHandle,
-            firstName, setFirstNameHandle,
-            lastName, setLastNameHandle,
-            avatar, setAvatarHandle,
-            connected, setConnectHandle}}>
-            {props.children}
+        <AuthContext.Provider value={contextValues}>
+            {children}
         </AuthContext.Provider>
     )
 }

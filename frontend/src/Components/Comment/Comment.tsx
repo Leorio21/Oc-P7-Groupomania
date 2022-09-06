@@ -11,6 +11,7 @@ import Modal from '../Modal/Modal';
 import axios from 'axios';
 import { AuthContext } from '../../Context/AuthContext';
 import FormComment from '../Form/FormComment';
+import { Link } from 'react-router-dom';
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -92,9 +93,11 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                 <div className={classNames(cn.avatar)}>{comment.author.avatar ? <img src={`${comment.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                 <div className={classNames(cn['comment-container'])}>
                     <div className={classNames(cn.title)}>
-                        <div className={classNames(cn.author)}>
-                            {comment.author.firstName} {comment.author.lastName}
-                        </div>
+                        <Link to={`/profile/${comment.authorId}`} className={classNames(cn.nav__link)}>
+                            <div className={classNames(cn.author)}>
+                                {comment.author.firstName} {comment.author.lastName}
+                            </div>
+                        </Link>
                         <div className={classNames(cn.menu)}>
                             {(authContext!.userId == comment.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={comment.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                         </div>

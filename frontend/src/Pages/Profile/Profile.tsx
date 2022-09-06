@@ -52,7 +52,7 @@ const Profile = () => {
 
     useEffect(() => {
         recupUserData()
-    }, [])
+    }, [params.userId])
     
     return (
         <>{userData &&

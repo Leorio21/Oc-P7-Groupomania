@@ -16,9 +16,6 @@ const NavBar = () => {
     const onLogOutHandler = () => {
         localStorage.removeItem('userData')
 
-        authContext!.setUserIdHandle(null)
-        authContext!.setTokenHandle(null)
-        authContext!.setRoleHandle(null)
         authContext!.setConnectHandle(false)
     }
 

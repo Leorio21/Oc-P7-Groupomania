@@ -15,10 +15,11 @@ import CommentList from '../Comment/CommentList'
 import AdminMenu from '../AdminMenu/AdminMenu';
 import Modal from '../Modal/Modal';
 import FormPost from '../Form/FormPost';
+import { Link } from 'react-router-dom';
 
 const initilTextError = ''
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
+    switch (action.type) {
         case 'display':
             state = action.payload!
             return state
@@ -33,7 +34,11 @@ interface PostProps {
     onDeletePost: Function
 }
 
-const Post = ({post, onDeletePost}: PostProps) => {
+dayjs.locale('fr')
+dayjs().format();
+dayjs.extend(relativeTime)
+
+const Post = ({ post, onDeletePost }: PostProps) => {
 
     const authContext = useContext(AuthContext)
 
@@ -41,6 +46,7 @@ const Post = ({post, onDeletePost}: PostProps) => {
     const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext!.userId) ? true : false);
     const [countComm, setCountComm] = useState(post.comment.length)
     const [editMode, setEditMode] = useState(false);
+    const [postedAt, setPostedAt] = useState(dayjs(postData.createdAt).fromNow(true));
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const changeCountComm = (newCounterComm: number) => {
@@ -54,7 +60,7 @@ const Post = ({post, onDeletePost}: PostProps) => {
     const onModifyHandler = () => {
         setEditMode(!editMode)
     }
-    
+
     const onPostSubmitHandler = (modifyPost: OnePost) => {
         setPostData((prevState) => {
             const newPost = prevState
@@ -72,21 +78,17 @@ const Post = ({post, onDeletePost}: PostProps) => {
                 Authorization: `Bearer ${authContext!.token}`
             }
         }
-            try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${post.id}`, option)
-                onDeletePost(post.id)
-            } catch (error: any) {
-                if(error.response.data.message){
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response.data) {
-                    dispatchModal({type: 'display', payload: `Une erreur est survenue :\n${error.response.data}`})
-                }
+        try {
+            await axios.delete(`http://127.0.0.1:3000/api/post/${post.id}`, option)
+            onDeletePost(post.id)
+        } catch (error: any) {
+            if (error.response.data.message) {
+                dispatchModal({ type: 'display', payload: `Une erreur est survenue :\n${error.response.data.message}` })
+            } else if (error.response.data) {
+                dispatchModal({ type: 'display', payload: `Une erreur est survenue :\n${error.response.data}` })
             }
+        }
     }
-
-    dayjs.locale('fr')
-    dayjs().format();
-    dayjs.extend(relativeTime)
 
     const modifyAuthor: string = useMemo(() => {
         switch (post.updatedBy) {
@@ -95,16 +97,26 @@ const Post = ({post, onDeletePost}: PostProps) => {
             case 'MODERATOR':
                 return '(modifié par Modérateur)';
         }
-            return '(modifié)';
+        return '(modifié)';
     }, [post.updatedBy])
 
     useEffect(() => {
-        if(editMode) {
+        if (editMode) {
             const element = document.getElementById(`content${postData.id}`)!
             element.style.height = "5px";
             element.style.height = (element.scrollHeight) + "px";
         }
     }, [editMode])
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            setPostedAt(dayjs(postData.createdAt).fromNow(true));
+        }, 6000);
+
+        return () => {
+            window.clearInterval(intervalId);
+        }
+    }, []);
 
     return (
         <>
@@ -113,15 +125,15 @@ const Post = ({post, onDeletePost}: PostProps) => {
                     <div className={classNames(cn.header_title)}>
                         <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={'Image de l\'utilisateur'} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                         <div className={classNames(cn.author_container)}>
-                            <span className={classNames(cn.author)}>{postData.author.firstName + ' ' + postData.author.lastName}</span>
-                            <span>Il y a {dayjs(postData.createdAt).fromNow(true)}</span>
+                        <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + ' ' + postData.author.lastName}</span></Link>
+                            <span>Il y a {postedAt}</span>
                         </div>
                     </div>
                     <div className={classNames(cn.menu)}>
-                        {(authContext!.userId == postData.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={postData.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
+                        {(authContext!.userId == postData.authorId || authContext!.role == 'ADMIN' || authContext!.role == 'MODERATOR') && <AdminMenu id={postData.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler} />}
                     </div>
                 </div>
-                {editMode ? 
+                {editMode ?
                     <FormPost
                         classes={classNames(cn.form_container)}
                         classesIcon={classNames(cn.iconPicture)}
@@ -137,7 +149,7 @@ const Post = ({post, onDeletePost}: PostProps) => {
                     :
                     <div className={classNames(cn.content)}>
                         {postData.image && <img src={postData.image!} alt={'image d\'illustration'} />}
-                        {postData.content && 
+                        {postData.content &&
                             <div className={classNames(cn.text)}>
                                 {postData.content}
                             </div>
@@ -147,13 +159,13 @@ const Post = ({post, onDeletePost}: PostProps) => {
                 }
                 <div className={classNames(cn.footer)}>
                     <div className={classNames(cn.likeComment)}>
-                        <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost}/>
+                        <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost} />
                         <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && 's'}</div>
                     </div>
                     <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
                 </div>
             </article>
-            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
+            {textError != '' && <Modal text={textError} onCloseModal={() => { dispatchModal({ type: 'hide' }) }} />}
         </>
     )
 }

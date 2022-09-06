@@ -106,7 +106,6 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 authorUpdate = req.auth.role
             }
             oldImage = post.image
-            console.log('oldImage : ' + oldImage)
             if (files['photo']) {
                 imageName = (files['photo'][0].filename).split('.')[0] + '.webp'
                 try {
@@ -117,12 +116,10 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 }
             }
             if((newImage && oldImage) || (imageName == '' && oldImage != '' && oldImage != null )) {
-                console.log('suppression ancienne photo')
                 const oldImageName = oldImage!.split('/images/')[1];
                 await fs.unlink(`images/${oldImageName}`);
                 post.image = ''
             }
-            console.log('valeur post image : ' + post.image)
             await prisma.post.updateMany({
                 where: {
                     id: +req.params.id

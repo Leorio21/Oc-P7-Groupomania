@@ -1,5 +1,5 @@
-import { useReducer } from 'react';
-import { IFormValues } from '../../interface/Index';
+import { useEffect, useReducer } from 'react';
+import { IFormValues, passwordVerif } from '../../interface/Index';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -10,6 +10,8 @@ import { AuthContext } from '../../Context/AuthContext';
 import Button from '../../Components/Form/Button/Button';
 import LabeledInput from './LabeledInput/LabeldInput';
 import Modal from '../Modal/Modal';
+
+import PasswordCheck from '../PasswordCheck/PasswordCheck';
 
 const schemaSignUp = yup.object({
     email: yup.string().required(),
@@ -30,6 +32,42 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
     return state;
 }
 
+const initVerifPassword: passwordVerif = {
+    min: false,
+    maj: false,
+    number: false,
+    symbol: false,
+    length: false,
+    change: false,
+}
+const reducerPassword = (state: passwordVerif, password: string) => {
+    state.min = false
+    state.maj = false
+    state.number = false
+    state.symbol = false
+    state.length = false
+    state.change = false
+    if (password.match(/[a-z]/)) {
+        console.log('min')
+        state.min = true
+    }
+    if (password.match(/[A-Z]/)) {
+        console.log('maj')
+        state.maj = true
+    }
+    if (password.match(/[0-9].*[0-9]/)) {
+        state.number = true
+    }
+    if (password.match(/[\W]/)) {
+        state.symbol = true
+    }
+    if (password.match(/^.{8,20}$/)) {
+        state.length = true
+    }
+    state.change = !state.change
+    return state
+}
+
 interface FomrSignUpProps {
     classes: string,
     activeForm: string,
@@ -40,18 +78,12 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
     const authContext = useContext(AuthContext)
 
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaSignUp)});
+    const { register, handleSubmit, watch, getValues, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaSignUp)});
 
     const onSignUpSubmit = async (data: IFormValues) => {
         try {
             const userData = await axios.post('http://127.0.0.1:3000/api/auth/signup', data)
             localStorage.setItem('userData', JSON.stringify(userData.data));
-            authContext!.setUserIdHandle(userData.data.userId)
-            authContext!.setTokenHandle(userData.data.token)
-            authContext!.setFirstNameHandle(userData.data.firstName)
-            authContext!.setLastNameHandle(userData.data.lastName)
-            authContext!.setAvatarHandle(userData.data.avatar)
-            authContext!.setRoleHandle(userData.data.role)
             authContext!.setConnectHandle(true)
         } catch (error: any) {
             if(error.response.data.message){
@@ -62,6 +94,9 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
         } 
     }
     
+    useEffect(() => {
+    }, [watch('password')])
+
     return (
         <>
             <form className = {classes} onSubmit={handleSubmit(onSignUpSubmit)}>
@@ -87,6 +122,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 register={register}
                 required
                 />
+                <PasswordCheck password={getValues('password')}/>
                 <p>{errors.password?.message && 'Veuillez saisir votre mot de passe'}</p>
                 <LabeledInput
                 tabIndex={activeForm == 'signup' ? 0 : -1}

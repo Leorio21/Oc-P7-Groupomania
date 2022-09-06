@@ -41,6 +41,18 @@
     }
 }
 
+.nav__link {
+    color: vars.$color-dark;
+    text-decoration: none;
+    &:visited {
+        color: vars.$color-dark;
+    }
+    &:hover {
+        color: vars.$color-primary;
+        text-decoration: underline;
+    }
+}
+
 .avatar {
     display: flex;
     justify-content: center;
