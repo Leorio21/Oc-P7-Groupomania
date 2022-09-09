@@ -3,11 +3,11 @@ import { CheckIcon, XIcon } from '@heroicons/react/solid';
 import classNames from "classnames";
 import cn from './PasswordCheck.module.scss'
 
-interface passwordCheckProps {
+interface PasswordCheckProps {
     password: string | null
 }
 
-const passwordCheck = ({password}: passwordCheckProps) => {
+const passwordCheck = ({password}: PasswordCheckProps) => {
 
     return (
         <div className={classNames(cn.container)}>

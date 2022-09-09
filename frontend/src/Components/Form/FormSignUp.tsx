@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react';
-import { IFormValues, passwordVerif } from '../../interface/Index';
+import { IFormValues } from '../../interface/Index';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -11,7 +11,8 @@ import Button from '../../Components/Form/Button/Button';
 import LabeledInput from './LabeledInput/LabeldInput';
 import Modal from '../Modal/Modal';
 
-import PasswordCheck from '../PasswordCheck/PasswordCheck';
+import PasswordCheck from './PasswordCheck/PasswordCheck';
+import PasswordConfirm from './PasswordConfirm/PasswordConfirm';
 
 const schemaSignUp = yup.object({
     email: yup.string().required(),
@@ -30,42 +31,6 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
             return state
     }
     return state;
-}
-
-const initVerifPassword: passwordVerif = {
-    min: false,
-    maj: false,
-    number: false,
-    symbol: false,
-    length: false,
-    change: false,
-}
-const reducerPassword = (state: passwordVerif, password: string) => {
-    state.min = false
-    state.maj = false
-    state.number = false
-    state.symbol = false
-    state.length = false
-    state.change = false
-    if (password.match(/[a-z]/)) {
-        console.log('min')
-        state.min = true
-    }
-    if (password.match(/[A-Z]/)) {
-        console.log('maj')
-        state.maj = true
-    }
-    if (password.match(/[0-9].*[0-9]/)) {
-        state.number = true
-    }
-    if (password.match(/[\W]/)) {
-        state.symbol = true
-    }
-    if (password.match(/^.{8,20}$/)) {
-        state.length = true
-    }
-    state.change = !state.change
-    return state
 }
 
 interface FomrSignUpProps {
@@ -95,7 +60,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
     }
     
     useEffect(() => {
-    }, [watch('password')])
+    }, [watch('password'), watch('confirmPassword')])
 
     return (
         <>
@@ -134,11 +99,12 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 register={register}
                 required
                 />
+                <PasswordConfirm password={getValues('password')} passwordConfirm={getValues('confirmPassword')} />
                 <p>{errors.confirmPassword?.message && 'Veuillez confirmer votre mot de passe'}</p>
                 <Button 
                     tabIndex={activeForm == 'signup' ? 0 : -1}
                     type='submit'
-                    label='Se connecter'
+                    label="S'inscrire"
                     />
             </form>
             {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
