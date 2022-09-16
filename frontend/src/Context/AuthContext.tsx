@@ -1,5 +1,5 @@
-import { createContext, PropsWithChildren, useEffect, useMemo, useState } from "react";
-import { UserDataLs } from "../interface/UserData";
+import React, { createContext, PropsWithChildren, useEffect, useMemo, useState } from "react"
+import { UserDataLs } from "../interface/UserData"
 
 interface AuthContextInterface {
     userId: number
@@ -12,16 +12,16 @@ interface AuthContextInterface {
     setConnectHandle: Function
 }
 
-export const AuthContext = createContext<AuthContextInterface | null>(null);
+export const AuthContext = createContext<AuthContextInterface | null>(null)
 
 const AuthContextProvider = ({children}: PropsWithChildren) => {
     
     const [userId, setUserId] = useState(-1)
-    const [token, setToken] = useState('')
-    const [role, setRole] = useState('')
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [avatar, setAvatar] = useState('')
+    const [token, setToken] = useState("")
+    const [role, setRole] = useState("")
+    const [firstName, setFirstName] = useState("")
+    const [lastName, setLastName] = useState("")
+    const [avatar, setAvatar] = useState("")
     const [connected, setConnected] = useState(false)
 
     const setConnectHandle = (isConnected: boolean) => {
@@ -40,8 +40,8 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
     }, [userId, token, role, firstName, lastName, avatar, connected])
 
     useEffect(() => {
-        if(localStorage.getItem('userData')) {
-            const userData: UserDataLs = JSON.parse(localStorage.getItem('userData')!)
+        if(localStorage.getItem("userData")) {
+            const userData: UserDataLs = JSON.parse(localStorage.getItem("userData") ?? "")
 
             setUserId(userData.userId)
             setFirstName(userData.firstName)
@@ -52,11 +52,11 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             setConnected(true)
         } else {
             setUserId(-1)
-            setFirstName('')
-            setLastName('')
-            setAvatar('')
-            setToken('')
-            setRole('')
+            setFirstName("")
+            setLastName("")
+            setAvatar("")
+            setToken("")
+            setRole("")
         }
     }, [connected])
 
@@ -67,4 +67,4 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
     )
 }
 
-export default AuthContextProvider;
+export default AuthContextProvider

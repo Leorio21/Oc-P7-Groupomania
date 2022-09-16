@@ -20,7 +20,7 @@ router.post('/signup', limiter, emailValidator, passwordValidator, userCtrl.sign
 
 router.post('/login', userCtrl.login);
 
-router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).fields([{name: 'avatar', maxCount: 1}, {name: 'bgImg', maxCount: 1}]), userCtrl.modify);
+router.put('/:id', auth, multer({storage: fileStorage, limits: fileLimits, fileFilter: multerFileFilter}).fields([{name: 'avatar', maxCount: 1}, {name: 'bgPicture', maxCount: 1}]), userCtrl.modify);
 
 router.delete('/:id', auth, userCtrl.deleteUser);
 

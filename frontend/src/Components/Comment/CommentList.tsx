@@ -1,25 +1,25 @@
-import { useReducer, useState } from 'react'
-import { OnePostComment } from '../../interface/Index'
+import React, { useReducer, useState } from "react"
+import { OnePostComment } from "../../interface/Index"
 
-import classNames from 'classnames'
-import cn from './CommentList.module.scss'
+import classNames from "classnames"
+import cn from "./CommentList.module.scss"
 
-import Comment from './Comment'
-import Modal from '../Modal/Modal'
-import FormComment from '../Form/FormComment'
+import Comment from "./Comment"
+import Modal from "../Modal/Modal"
+import FormComment from "../Form/FormComment"
 
 
-const initilTextError = ''
+const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case 'display':
-            state = action.payload!
+        case "display":
+            state = action.payload ?? "Texte non défini"
             return state
-        case 'hide':
-            state = ''
+        case "hide":
+            state = ""
             return state
     }
-    return state;
+    return state
 }
 interface CommentListProps {
     arrayComment: OnePostComment[],
@@ -29,8 +29,8 @@ interface CommentListProps {
 
 const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) => {
 
-    const [comments, setComments] = useState(arrayComment);
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [comments, setComments] = useState(arrayComment)
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
 
     const onModifyCommentHandler = (commentToModify: number, newContent: string) => {
         setComments((prevState) => {
@@ -61,7 +61,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
 
     return (
         <>
-            <div className={classNames(cn['commentList-container'])}>
+            <div className={classNames(cn["commentList-container"])}>
                 {comments.map((comment) => {
                     return (
                         <Comment
@@ -83,9 +83,9 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
                     onSubmitForm={onCommentSubmit}
                 />
             </div>
-            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
         </>
     )
 }
 
-export default CommentList;
+export default CommentList

@@ -1,8 +1,9 @@
-import { Path, UseFormRegister } from "react-hook-form";
-import { IFormValues } from "../../../interface/Index";
+import React from "react"
+import { Path, UseFormRegister } from "react-hook-form"
+import { IFormValues } from "../../../interface/Index"
 
-import classNames from "classnames";
-import cn from './TextArea.module.scss'
+import classNames from "classnames"
+import cn from "./TextArea.module.scss"
 
 interface TextAreaProps {
     tabIndex: number,
@@ -21,17 +22,17 @@ const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitCo
     const onKeyDownHandler = (event: any) => {
         if (!postForm) {
             const txtAreaEl = document.getElementById(id)! as HTMLTextAreaElement
-            if (event.key == 'Enter' && !event.altKey) {
+            if (event.key === "Enter" && !event.altKey) {
                 event.preventDefault()
                 onSubmitComment()
                 if (!editMode) {
-                    txtAreaEl.value = ''
+                    txtAreaEl.value = ""
                 }
-            } else  if (event.key == 'Enter' && event.altKey) {
+            } else  if (event.key === "Enter" && event.altKey) {
                 const poscur = txtAreaEl.selectionEnd
-                const debut = txtAreaEl.value.substring(0, poscur);
-                const fin = txtAreaEl.value.substring(poscur, txtAreaEl.value.length);
-                txtAreaEl.value = debut + '\n' + fin
+                const debut = txtAreaEl.value.substring(0, poscur)
+                const fin = txtAreaEl.value.substring(poscur, txtAreaEl.value.length)
+                txtAreaEl.value = debut + "\n" + fin
                 txtAreaEl.setSelectionRange(poscur + 1, poscur + 1)
             }
         }
@@ -40,8 +41,8 @@ const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitCo
 
     const auto_grow = () => {
         const element = document.getElementById(id)!
-        element.style.height = "5px";
-        element.style.height = (element.scrollHeight) + "px";
+        element.style.height = "5px"
+        element.style.height = (element.scrollHeight) + "px"
     }
 
     return (
@@ -60,4 +61,4 @@ const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitCo
     )
 }
 
-export default TextArea;
+export default TextArea

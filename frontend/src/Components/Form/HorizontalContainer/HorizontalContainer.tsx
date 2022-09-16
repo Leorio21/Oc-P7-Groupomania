@@ -1,9 +1,8 @@
-import classNames from "classnames";
-import { PropsWithChildren } from "react";
-import cn from './HorizontalContainer.module.scss'
+import classNames from "classnames"
+import React, { PropsWithChildren } from "react"
+import cn from "./HorizontalContainer.module.scss"
 
-interface HorizontalContainerProps extends PropsWithChildren {
-}
+type HorizontalContainerProps = PropsWithChildren
 
 const HorizontalContainer = ({children}: HorizontalContainerProps) => {
 
@@ -14,4 +13,4 @@ const HorizontalContainer = ({children}: HorizontalContainerProps) => {
     )
 }
 
-export default HorizontalContainer;
+export default HorizontalContainer

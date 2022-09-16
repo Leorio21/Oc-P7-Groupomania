@@ -71,6 +71,10 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const modify = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as  {[fieldname: string]: Express.Multer.File[]};
+    console.log(req.body)
+    let bgImageName: string = req.body.userBg;
+    let oldBgImage: string | null = ''
+    let newBgImage: boolean = false;
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -82,7 +86,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         if (!user) {
             throw 'Utilisateur introuvable'
         }
-        if (+req.params.id != req.auth.userId && req.auth.role == 'ADMIN') {
+        if (+req.params.id !== req.auth.userId && req.auth.role === 'ADMIN') {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId 
@@ -96,7 +100,6 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
         if(validUser || validAdmin) {
             let nameAvatar:string;
-            let nameBg: string;
             if(req.body.newPassword) {
                 user.password = await bcrypt.hash(req.body.newPassword, 12);
             }
@@ -104,7 +107,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 nameAvatar = (files['avatar'][0].filename).split('.')[0]
                 try {
                     await sharp(`./images/${files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
-                    if(user.avatar != null) {
+                    if(user.avatar !== null) {
                         await fs.unlink(`images/${user.avatar}`);
                     }
                     user.avatar = `${nameAvatar}.webp`
@@ -112,23 +115,27 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                     throw ('Erreur traitement image avatar')
                 }
             }
-            if (files['bgImg']) {
-                nameBg = (files['bgImg'][0].filename).split('.')[0]
+            oldBgImage = user.background
+            if (files['bgPicture']) {
+                bgImageName = (files['bgPicture'][0].filename).split('.')[0] + '.webp'
                 try {
-                    await sharp(`./images/${files['bgImg'][0].filename}`).toFile(`images/${nameBg}.webp`)
-                    if(user.background != null) {
-                        await fs.unlink(`images/${user.background}`);
-                    }
-                    user.background = `${nameBg}.webp`
+                    await sharp(`./images/${files['bgPicture'][0].filename}`).toFile(`images/${bgImageName}`)
+                    newBgImage = true
+                    user.background = `${req.protocol}://${req.get('host')}/images/${bgImageName}`
                 } catch {
                     throw ('Erreur traitement image de fond')
                 }
             }
-            if(validAdmin) {
+            if((newBgImage && oldBgImage) || (bgImageName === '' && oldBgImage !== '' && oldBgImage !== null )) {
+                const oldImageName = oldBgImage!.split('/images/')[1];
+                await fs.unlink(`images/${oldImageName}`);
+                user.background = ''
+            }
+            /* if(validAdmin) {
                 user.firstName = req.body.firstName;
                 user.lastName = req.body.lastName;
                 user.email = req.body.email
-            }
+            } */
             await prisma.user.update({
                 where: {
                     id: +req.params.id 
@@ -152,8 +159,8 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         if (files['avatar']) {
             await fs.unlink(`images/${files!['avatar'][0].filename}`);
         }
-        if (files!['bgImg']) {
-            await fs.unlink(`images/${files!['bgImg'][0].filename}`);
+        if (files!['bgPicture']) {
+            await fs.unlink(`images/${files!['bgPicture'][0].filename}`);
         }
     }
 }

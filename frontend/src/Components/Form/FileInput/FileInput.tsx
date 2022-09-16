@@ -1,9 +1,9 @@
-import { ChangeEventHandler, PropsWithChildren, ReactElement, useEffect, useState } from "react";
-import { Path, UseFormGetValues, UseFormRegister } from "react-hook-form";
-import { IFormValues } from "../../../interface/Index";
+import React, { PropsWithChildren }  from "react"
+import { Path, UseFormRegister } from "react-hook-form"
+import { IFormValues } from "../../../interface/Index"
 
-import classNames from "classnames";
-import cn from './FileInput.module.scss'
+import classNames from "classnames"
+import cn from "./FileInput.module.scss"
 
 interface FileInputProps extends PropsWithChildren {
     id: string,
@@ -23,4 +23,4 @@ const FileInput = ({id, name, register, accept, multiple, children}: FileInputPr
     )
 }
 
-export default FileInput;
+export default FileInput

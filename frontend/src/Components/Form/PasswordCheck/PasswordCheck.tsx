@@ -1,13 +1,17 @@
-import { CheckIcon, XIcon } from '@heroicons/react/solid';
+import React from "react"
+import { CheckIcon, XIcon } from "@heroicons/react/solid"
 
-import classNames from "classnames";
-import cn from './PasswordCheck.module.scss'
+import classNames from "classnames"
+import { Control, FieldValues, Path, useWatch } from "react-hook-form"
+import cn from "./PasswordCheck.module.scss"
 
-interface PasswordCheckProps {
-    password: string | null
+interface PasswordCheckProps<T extends FieldValues>{
+    name: Path<T>
+    control: Control<T>
 }
 
-const passwordCheck = ({password}: PasswordCheckProps) => {
+const passwordCheck = <T extends FieldValues>({name, control}: PasswordCheckProps<T>) => {
+    const password = useWatch({ control, name})
 
     return (
         <div className={classNames(cn.container)}>
@@ -21,4 +25,4 @@ const passwordCheck = ({password}: PasswordCheckProps) => {
     )
 }
 
-export default passwordCheck;
+export default passwordCheck

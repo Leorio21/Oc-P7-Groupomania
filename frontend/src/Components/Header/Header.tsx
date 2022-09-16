@@ -1,8 +1,8 @@
+import React from "react"
+import classNames from "classnames"
+import cn from "./Header.module.scss"
 
-import classNames from 'classnames';
-import cn from './Header.module.scss'
-
-import logo from '../../assets/logo_rose.webp'
+import logo from "../../assets/logo_rose.webp"
 
 const Header = () => {
     return (
@@ -13,4 +13,4 @@ const Header = () => {
     )
 }
 
-export default Header;
+export default Header

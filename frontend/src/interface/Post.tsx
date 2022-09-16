@@ -1,4 +1,4 @@
-import { Post, PostLike, Comment } from '../../../backend/node_modules/@prisma/client';
+import { Post, PostLike, Comment } from "../../../backend/node_modules/@prisma/client"
 
 export type OnePost = 
     Post & {

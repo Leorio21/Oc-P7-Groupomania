@@ -1,26 +1,26 @@
-import axios from "axios";
-import { useCallback, useContext, useEffect, useReducer, useState } from "react";
-import { AuthContext } from "../../Context/AuthContext";
+import axios from "axios"
+import React, { useContext, useEffect, useReducer, useState } from "react"
+import { AuthContext } from "../../Context/AuthContext"
 
-import classNames from "classnames";
-import cn from './PostsList.module.scss'
+import classNames from "classnames"
+import cn from "./PostsList.module.scss"
 
-import Post from "./Post";
-import { OnePost, OptionAxios } from '../../interface/Index';
-import Modal from "../Modal/Modal";
-import FormPost from "../Form/FormPost";
+import Post from "./Post"
+import { OnePost, OptionAxios } from "../../interface/Index"
+import Modal from "../Modal/Modal"
+import FormPost from "../Form/FormPost"
 
-const initilTextError = ''
+const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case 'display':
-            state = action.payload!
+        case "display":
+            state = action.payload ?? "Texte non defini"
             return state
-        case 'hide':
-            state = ''
+        case "hide":
+            state = ""
             return state
     }
-    return state;
+    return state
 }
 
 interface PostListProps {
@@ -30,29 +30,29 @@ interface PostListProps {
 const PostsList = ({postUser}:  PostListProps) => {
 
     const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     const [posts, setPosts] = useState<OnePost[]>([])
     
     const option: OptionAxios = {
         headers: {
-            Authorization: `Bearer ${authContext!.token}`
+            Authorization: `Bearer ${authContext?.token}`
         }
     }
 
     const fetchData = async (option: OptionAxios) => {
         try {
-            const getPosts = await axios.get('http://127.0.0.1:3000/api/post', option)
+            const getPosts = await axios.get("http://127.0.0.1:3000/api/post", option)
             setPosts(getPosts.data)
         } catch (error: any) {
             if(error.response.data.message){
-                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data.message}`})
+                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data.message}`})
             } else if (error.response.data) {
-                dispatchModal({type: 'display', payload: `Une erreur est survenue : ${error.response.data}`})
+                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data}`})
             }
         }
     }
     
-    const onPostSubmit = (newPost: OnePost) => {
+    const onPostSubmit = (newPost: OnePost): void => {
             setPosts((prevState) => {
                 const newPostsArray = [...prevState]
                 newPostsArray.unshift(newPost)
@@ -60,7 +60,7 @@ const PostsList = ({postUser}:  PostListProps) => {
             })
     }
 
-    const onPostDelete = (postToDelete: number) => {
+    const onPostDelete = (postToDelete: number): void => {
         setPosts((prevState) => {
             const newPostArray = prevState.filter((post) => post.id != postToDelete)
             return newPostArray
@@ -73,7 +73,7 @@ const PostsList = ({postUser}:  PostListProps) => {
         } else {
             fetchData(option)
         }
-    }, [])
+    }, [postUser])
 
 
     return (
@@ -89,7 +89,7 @@ const PostsList = ({postUser}:  PostListProps) => {
                     placeHolder='Publiez quelque chose ...'
                     onPostSubmit={onPostSubmit}
                 />}
-                {posts && posts!.map((post:OnePost) => {
+                {posts && posts?.map((post:OnePost) => {
                     return (
                         <Post
                             post={post}
@@ -99,9 +99,9 @@ const PostsList = ({postUser}:  PostListProps) => {
                     )
                 })}
             </div>
-            {textError != '' && <Modal text={textError} onCloseModal={() => {dispatchModal({type: 'hide'})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
         </>
     )
 }
 
-export default PostsList;
+export default PostsList

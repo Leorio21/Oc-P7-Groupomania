@@ -11,7 +11,7 @@
     border-radius: 15px;
     box-shadow: 0 0 25px vars.$box-shadow-color;
     margin: 15px;
-    &:hover .menu {
+    &:hover .menu, :focus-within .menu {
         visibility: visible;
     }
 }

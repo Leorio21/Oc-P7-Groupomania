@@ -1,7 +1,9 @@
-import classNames from "classnames";
-import cn from './Home.module.scss'
+import React from "react"
 
-import PostsList from "../../Components/Post/PostsList";
+import classNames from "classnames"
+import cn from "./Home.module.scss"
+
+import PostsList from "../../Components/Post/PostsList"
 
 
 const Home = () => {
@@ -13,4 +15,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default Home

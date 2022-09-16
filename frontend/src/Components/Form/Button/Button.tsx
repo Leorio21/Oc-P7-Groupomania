@@ -1,8 +1,8 @@
-import { MouseEventHandler } from "react";
+import React, { MouseEventHandler } from "react"
 
 interface ButtonProps {
     tabIndex: number,
-    type: 'button' | 'submit' | 'reset' | undefined,
+    type: "button" | "submit" | "reset" | undefined,
     onClickHandler?: MouseEventHandler,
     label: string
 }
@@ -14,4 +14,4 @@ const Button = ({tabIndex, type, onClickHandler, label}: ButtonProps) => {
     )
 }
 
-export default Button;
+export default Button

@@ -3,6 +3,8 @@ export interface IFormValues {
     password: string,
     confirmPassword: string,
     content: string,
+    bgPicture: Array<File>,
+    avatar: Array<File>,
     photo: Array<File>
 }
 

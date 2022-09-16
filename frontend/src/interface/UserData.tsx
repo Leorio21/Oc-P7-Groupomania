@@ -1,4 +1,4 @@
-import { Role } from '../../../backend/node_modules/@prisma/client'
+import { Role } from "../../../backend/node_modules/@prisma/client"
 
 export interface UserDataLs {
     userId: number,
