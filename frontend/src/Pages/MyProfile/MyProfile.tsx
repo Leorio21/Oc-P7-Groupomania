@@ -39,7 +39,7 @@ const MyProfile = () => {
     
     const authContext = useContext(AuthContext)
 
-    const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { bgPicture: undefined }, resolver: yupResolver(schemaProfile)})
+    const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
     
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
@@ -73,6 +73,12 @@ const MyProfile = () => {
         setUserBgPictureUrl(null)
         resetField("bgPicture")
     }
+
+    const onDeleteAvatarPicture = () => {
+        setUserAvatarUrl(null)
+        resetField("avatar")
+    }
+
     const onFormSubmit = async (data: IFormValues) => {
         try {
             const myFormData = new FormData()
@@ -85,6 +91,15 @@ const MyProfile = () => {
             }
             if (data.bgPicture) {
                 myFormData.append("bgPicture", data.bgPicture[0])
+            }
+            if (userAvatarUrl) {
+                const avatarImg = userAvatarUrl
+                myFormData.append("userAvatar", avatarImg)
+            } else {
+                myFormData.append("userAvatar", "")
+            }
+            if (data.avatar) {
+                myFormData.append("avatar", data.avatar[0])
             }
             const option = {
                 headers: {
@@ -114,7 +129,7 @@ const MyProfile = () => {
     useEffect(() => {
         if(getValues("avatar")) {
             if (getValues("avatar").length > 0) {
-                setUserBgPictureUrl(window.URL.createObjectURL([...getValues("avatar")][0]))
+                setUserAvatarUrl(window.URL.createObjectURL([...getValues("avatar")][0]))
             }
         }
     }, [watch("avatar")])
@@ -126,12 +141,21 @@ const MyProfile = () => {
     return (
         <>
             <form className={classNames(cn.form)} onSubmit={handleSubmit(onFormSubmit)}>
-                <div className={classNames(cn.picture_container)}>
+                <div className={classNames(cn.bg_container)}>
                     {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
-                    <div className={classNames(cn.menuImg)}>
-                        <TrashIcon className={classNames(cn.icon)} onClick={onDeleteBgPicture}/>
+                    <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
+                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
                         <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                            <PencilIcon className={classNames(cn.icon)} />
+                            <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
+                        </FileInput>
+                    </div>
+                </div>
+                <div className={classNames(cn.avatar_container)}>
+                    {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
+                    <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
+                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
+                        <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+                            <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
                         </FileInput>
                     </div>
                 </div>
@@ -139,7 +163,7 @@ const MyProfile = () => {
                     tabIndex={0}
                     type='submit'
                     label="Enregistrer"
-                    />
+                />
             </form>
             {textError != "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
         </>

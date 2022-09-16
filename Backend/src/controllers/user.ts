@@ -71,10 +71,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const modify = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as  {[fieldname: string]: Express.Multer.File[]};
-    console.log(req.body)
     let bgImageName: string = req.body.userBg;
     let oldBgImage: string | null = ''
     let newBgImage: boolean = false;
+    let avatarImageName: string = req.body.userAvatar;
+    let oldAvatarImage: string | null = ''
+    let newAvatarImage: boolean = false;
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -103,17 +105,21 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
             if(req.body.newPassword) {
                 user.password = await bcrypt.hash(req.body.newPassword, 12);
             }
+            oldAvatarImage = user.avatar
             if (files['avatar']) {
-                nameAvatar = (files['avatar'][0].filename).split('.')[0]
+                avatarImageName = (files['avatar'][0].filename).split('.')[0] + '.webp'
                 try {
-                    await sharp(`./images/${files['avatar'][0].filename}`).toFile(`images/${nameAvatar}.webp`)
-                    if(user.avatar !== null) {
-                        await fs.unlink(`images/${user.avatar}`);
-                    }
-                    user.avatar = `${nameAvatar}.webp`
+                    await sharp(`./images/${files['avatar'][0].filename}`).toFile(`images/${avatarImageName}`)
+                    newAvatarImage = true
+                    user.avatar = `${req.protocol}://${req.get('host')}/images/${avatarImageName}`
                 } catch {
                     throw ('Erreur traitement image avatar')
                 }
+            }
+            if((newAvatarImage && oldAvatarImage) || (avatarImageName === '' && oldAvatarImage !== '' && oldAvatarImage !== null )) {
+                const oldAvatarName = oldAvatarImage!.split('/images/')[1];
+                await fs.unlink(`images/${oldAvatarName}`);
+                user.avatar = ''
             }
             oldBgImage = user.background
             if (files['bgPicture']) {
@@ -127,8 +133,8 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 }
             }
             if((newBgImage && oldBgImage) || (bgImageName === '' && oldBgImage !== '' && oldBgImage !== null )) {
-                const oldImageName = oldBgImage!.split('/images/')[1];
-                await fs.unlink(`images/${oldImageName}`);
+                const oldBgName = oldBgImage!.split('/images/')[1];
+                await fs.unlink(`images/${oldBgName}`);
                 user.background = ''
             }
             /* if(validAdmin) {
