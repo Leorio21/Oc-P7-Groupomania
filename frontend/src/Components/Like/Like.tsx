@@ -12,12 +12,12 @@ import { AuthContext } from "../../Context/AuthContext"
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "Texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -25,7 +25,7 @@ interface LikeProps {
     likeData: OnePostLike[],
     userLikePost: boolean,
     postId: number,
-    onClickLike: Function
+    onClickLike: () => void
 }
 
 const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
@@ -35,7 +35,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     const [postLike, setPostLike] = useState(likeData)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     
-    const onKeyDownHandler = (event: any) => {
+    const onKeyDownHandler = (event: React.KeyboardEvent<SVGSVGElement>) => {
         if (event.key === "Enter") {
             onClickLikeHandler()
         }

@@ -8,7 +8,7 @@ import cn from "./Comment.module.scss"
 
 import AdminMenu from "../AdminMenu/AdminMenu"
 import Modal from "../Modal/Modal"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { AuthContext } from "../../Context/AuthContext"
 import FormComment from "../Form/FormComment"
 import { Link } from "react-router-dom"
@@ -16,20 +16,20 @@ import { Link } from "react-router-dom"
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "Texte non defini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non defini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
 interface CommentProps {
     comment: OnePostComment,
     postId: number,
-    onModifyComment: Function,
-    onDeleteComment: Function
+    onModifyComment: (commentToModify: number, modifyBy: string, newContent: string) => void,
+    onDeleteComment: (commentToDelete: number) => void
 }
 
 const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentProps) => {
@@ -41,42 +41,46 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     
 
-    const onModifyHandler = () => {
+    const onModifyHandler = (): void => {
         setEditMode(!editMode)
     }
 
-    const onModifyCommentHandler = (commentId: number, updatedBy: Role, content: string) => {
+    const onModifyCommentHandler = (commentId: number, updatedBy: Role, content: string): void => {
         setUpdatedBy(updatedBy)
-        onModifyComment(commentId, content)
+        onModifyComment(commentId, updatedBy, content)
         setEditMode(!editMode)
     }
 
-    const onDeleteHandler = async (commentId: number) => {
+    const onDeleteHandler = async (): Promise<void> => {
         const option = {
             headers: {
                 Authorization: `Bearer ${authContext?.token}`
             }
         }
-            try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${commentId}`, option)
-                onDeleteComment(commentId)
-            } catch (error: any) {
-                if(error.response.data.message){
+        try {
+            await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, option)
+            onDeleteComment(comment.id)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
                     dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response.data) {
+                } else if (error.response?.data) {
                     dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
                 }
+            } else {
+                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
             }
+        }
     }
 
     const modifyAuthor: string = useMemo(() => {
         switch (updatedBy) {
-            case "ADMIN":
-                return "\n(modifié par Admin)"
-            case "MODERATOR":
-                return "\n(modifié par Modérateur)"
+        case "ADMIN":
+            return "\n(modifié par Admin)"
+        case "MODERATOR":
+            return "\n(modifié par Modérateur)"
         }
-            return "\n(modifié)"
+        return "\n(modifié)"
     }, [updatedBy])
     
     useEffect(() => {
@@ -103,7 +107,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                         </div>
                     </div>
                     {editMode ?
-                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} comment={comment} postId={postId} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onSubmitForm={onModifyCommentHandler} editMode />
+                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} comment={comment} postId={postId} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onModifyForm={onModifyCommentHandler} editMode />
                         :
                         <div className={classNames(cn.content)}>{comment.content}{updatedBy && ("\n" + modifyAuthor)}</div>}
                 </div>

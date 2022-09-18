@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { useParams } from "react-router-dom"
 import { AuthContext } from "../../Context/AuthContext"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { UserCircleIcon } from "@heroicons/react/solid"
 
 import { OneUser } from "../../interface/Index"
@@ -14,48 +14,52 @@ import PostsList from "../../Components/Post/PostsList"
 
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-	switch(action.type) {
-	case "display":
-		state = action.payload ?? "Texte non défini"
-		return state
-	case "hide":
-		state = ""
-		return state
-	}
-	return state
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
+    }
+    return state
 }
 
 const Profile = () => {
 
-	const params = useParams()
-	const authContext = useContext(AuthContext)
-	const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
-	const [userData, setUserData] = useState<OneUser>()
+    const params = useParams()
+    const authContext = useContext(AuthContext)
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
+    const [userData, setUserData] = useState<OneUser>()
 
-	const recupUserData = async () => {
-		try {
-			const option = {
-				headers: {
-					Authorization: `Bearer ${authContext?.token}`
-				}
-			}
-			const response = await axios.get(`http://127.0.0.1:3000/api/auth/${params.userId}`, option)
-			setUserData(response.data.user)
-		} catch (error: any) {
-			if(error.response.data.message){
-				dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-			} else if (error.response.data) {
-				dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
-			}
-		}
-	}
+    const recupUserData = async () => {
+        try {
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${authContext?.token}`
+                }
+            }
+            const response = await axios.get(`http://127.0.0.1:3000/api/auth/${params.userId}`, option)
+            setUserData(response.data.user)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            } else {
+                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+            }
+        }
+    }
 
-	useEffect(() => {
-		recupUserData()
-	}, [params.userId])
+    useEffect(() => {
+        recupUserData()
+    }, [params.userId])
     
-	return (
-		<>{userData &&
+    return (
+        <>{userData &&
             <>
                 <div className={classNames(cn.picture_container)}>
                     {userData?.background && <img src={userData?.background} alt='image de fond utilisateur' className={classNames(cn.backgroundPicture)} />}
@@ -65,9 +69,9 @@ const Profile = () => {
                 <PostsList postUser={userData.post}/>
                 {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
             </>
-		}
-		</>
-	)
+        }
+        </>
+    )
 }
 
 export default Profile

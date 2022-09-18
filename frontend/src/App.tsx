@@ -15,29 +15,29 @@ import MyProfile from "./Pages/MyProfile/MyProfile"
 
 function App() {
 
-	const authContext = useContext(AuthContext)
+    const authContext = useContext(AuthContext)
 
-	const ProtectedRoute = ({connected}:{connected: boolean | undefined}) => {
-		if(!connected) {
-			return <Navigate to='/' replace />
-		}
-		return <Outlet />
-	}
+    const ProtectedRoute = ({connected}:{connected: boolean | undefined}) => {
+        if(!connected) {
+            return <Navigate to='/' replace />
+        }
+        return <Outlet />
+    }
 
-	return (
-		<>
-			<Header />
-			{authContext?.connected && <NavBar />}
-			<Routes>
-				<Route path='/' element={<Connect />} />
-				<Route element={<ProtectedRoute connected={authContext?.connected} />}>
-					<Route path='/profile/:userId' element={<Profile />} />
-					<Route path='/myProfile' element={<MyProfile />} />
-					<Route path='/home' element={<Home />} />
-				</Route>
-			</Routes>
-		</>
-	)
+    return (
+        <>
+            <Header />
+            {authContext?.connected && <NavBar />}
+            <Routes>
+                <Route path='/' element={<Connect />} />
+                <Route element={<ProtectedRoute connected={authContext?.connected} />}>
+                    <Route path='/profile/:userId' element={<Profile />} />
+                    <Route path='/myProfile' element={<MyProfile />} />
+                    <Route path='/home' element={<Home />} />
+                </Route>
+            </Routes>
+        </>
+    )
 }
 
 export default App

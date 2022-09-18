@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
@@ -25,12 +25,12 @@ const schemaProfile = yup.object({
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "Texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -60,11 +60,13 @@ const MyProfile = () => {
             setUserLastName(response.data.user.lastName)
             setUserBgPictureUrl(response.data.user.background)
             setUserAvatarUrl(response.data.user.avatar)
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
             }
         }
     }
@@ -108,14 +110,15 @@ const MyProfile = () => {
                 }
             }
             await axios.put(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, myFormData, option)
-        } catch (error: any) {
-            console.log(error)
-            if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data.error}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data}`})
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
             }
-        } 
+        }
     }
 
     useEffect(() => {

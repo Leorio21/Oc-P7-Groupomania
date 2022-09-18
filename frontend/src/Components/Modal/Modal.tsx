@@ -6,7 +6,7 @@ import cn from "./Modal.module.scss"
 
 interface ModalProps {
     text: string
-    onCloseModal: Function
+    onCloseModal: () => void
 }
 
 const Modal = ({text, onCloseModal}: ModalProps) => {

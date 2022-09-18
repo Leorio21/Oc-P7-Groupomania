@@ -1,13 +1,13 @@
-
 import { IFormValues, OnePostComment } from "../../interface/Index"
 import { Path, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 
+import { Role } from "../../../../backend/node_modules/@prisma/client"
 import TextArea from "./TextArea/TextArea"
 import React, { useContext, useReducer } from "react"
 import { AuthContext } from "../../Context/AuthContext"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import Modal from "../Modal/Modal"
 
 const schemaComment = yup.object({
@@ -17,12 +17,12 @@ const schemaComment = yup.object({
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -34,11 +34,12 @@ interface FormCommentProps {
     name: Path<IFormValues>
     placeHolder: string,
     comment?: OnePostComment,
-    onSubmitForm: Function,
+    onCreateForm?: (newComment: OnePostComment) => void,
+    onModifyForm?: (commentId: number, updatedBy: Role, content: string) => void,
     editMode?: boolean
 }
 
-const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment, onSubmitForm}: FormCommentProps) => {
+const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment, onCreateForm, onModifyForm}: FormCommentProps) => {
     
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
@@ -60,13 +61,17 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
-            const modifyComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment!.id}`, data, option)
-            onSubmitForm(comment?.id, modifyComment.data.updatedBy, data.content)
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+            const modifyComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment?.id}`, data, option)
+            onModifyForm && onModifyForm(comment!.id, modifyComment.data.updatedBy, data.content)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            } else {
+                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
             }
         }
     }
@@ -80,12 +85,16 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
             }
             const bddComment = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/comment`, data, option)
             const newComment: OnePostComment = { ...bddComment.data.comment }
-            onSubmitForm(newComment)
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+            onCreateForm && onCreateForm(newComment)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            } else {
+                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
             }
         }
     }

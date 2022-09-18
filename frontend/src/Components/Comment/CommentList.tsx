@@ -12,19 +12,19 @@ import FormComment from "../Form/FormComment"
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "Texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
 interface CommentListProps {
     arrayComment: OnePostComment[],
     postId: number,
-    changeCountComm: Function
+    changeCountComm: (newCounterComm: number) => void
 }
 
 const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) => {
@@ -32,7 +32,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
     const [comments, setComments] = useState(arrayComment)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
 
-    const onModifyCommentHandler = (commentToModify: number, newContent: string) => {
+    const onModifyCommentHandler = (commentToModify: number, modifyBy: string, newContent: string): void => {
         setComments((prevState) => {
             const newCommentsArray = [...prevState]
             const indexOfCommentToModify = newCommentsArray.findIndex((comment) => comment.id == commentToModify)
@@ -41,7 +41,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         })
     }
 
-    const onDeleteCommentHandler = (commentToDelete: number) => {
+    const onDeleteCommentHandler = (commentToDelete: number): void => {
         setComments((prevState) => {
             const newCommentsArray = prevState.filter((comment) => comment.id != commentToDelete)
             changeCountComm(newCommentsArray.length)
@@ -49,7 +49,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
         })
     }
 
-    const onCommentSubmit = (newComment: OnePostComment) => {
+    const onCommentSubmit = (newComment: OnePostComment): void => {
         setComments((prevState) => {
             const newCommentsArray = [...prevState]
             newCommentsArray.push(newComment)
@@ -80,7 +80,7 @@ const CommentList = ({arrayComment, postId, changeCountComm}: CommentListProps) 
                     postId={postId}
                     name='content'
                     placeHolder='Ecrivez un commentaire ...'
-                    onSubmitForm={onCommentSubmit}
+                    onCreateForm={onCommentSubmit}
                 />
             </div>
             {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}

@@ -9,7 +9,7 @@ interface AuthContextInterface {
     lastName: string
     avatar: string
     connected: boolean
-    setConnectHandle: Function
+    setConnectHandle: (isConnected: boolean) => void
 }
 
 export const AuthContext = createContext<AuthContextInterface | null>(null)
@@ -24,7 +24,7 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
     const [avatar, setAvatar] = useState("")
     const [connected, setConnected] = useState(false)
 
-    const setConnectHandle = (isConnected: boolean) => {
+    const setConnectHandle = (isConnected: boolean): void => {
         setConnected(isConnected)
     }
 

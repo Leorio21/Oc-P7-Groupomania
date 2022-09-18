@@ -1,40 +1,40 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/solid"
 
 import classNames from "classnames"
-import React, { useReducer } from "react"
+import React, { KeyboardEvent, useReducer } from "react"
 import Modal from "../Modal/Modal"
 import cn from "./AdminMenu.module.scss"
 
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
 
 interface AdminMenuProps {
     id: number,
-    onModifyClick: Function,
-    onDeleteClick: Function
+    onModifyClick: () => void,
+    onDeleteClick: () => void
 }
 
 const AdminMenu = ({ id, onModifyClick, onDeleteClick}: AdminMenuProps) => {
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     
-    const onModifyKeyDownHandler = (event: any) => {
+    const onModifyKeyDownHandler = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
             onModifyHandler()
         }
     }
 
-    const onDeleteKeyDownHandler = (event: any) => {
+    const onDeleteKeyDownHandler = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
             onDeleteHandler()
         }
@@ -45,7 +45,7 @@ const AdminMenu = ({ id, onModifyClick, onDeleteClick}: AdminMenuProps) => {
     }
 
     const onDeleteHandler = () => {
-        onDeleteClick(id)
+        onDeleteClick()
     }
 
     return (

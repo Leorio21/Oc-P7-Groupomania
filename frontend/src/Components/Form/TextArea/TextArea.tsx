@@ -12,7 +12,7 @@ interface TextAreaProps {
     placeHolder: string,
     register: UseFormRegister<IFormValues>,
     value?: string,
-    onSubmitComment: Function,
+    onSubmitComment: () => void,
     editMode?: boolean,
     postForm?: boolean,
 }

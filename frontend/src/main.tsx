@@ -8,9 +8,9 @@ import App from "./App"
 import "./index.scss"
 
 ReactDOM.createRoot(document.getElementById("app-root") as HTMLElement).render(
-	<AuthContextProvider>
-		<BrowserRouter>
-			<App />
-		</BrowserRouter>
-	</AuthContextProvider>
+    <AuthContextProvider>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </AuthContextProvider>
 )

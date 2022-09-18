@@ -5,7 +5,7 @@ import { AuthContext } from "../../Context/AuthContext"
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react"
 import { UserCircleIcon } from "@heroicons/react/solid"
 import { OnePost } from "../../interface/Index"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 import classNames from "classnames"
 import cn from "./Post.module.scss"
@@ -20,12 +20,12 @@ import { Link } from "react-router-dom"
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }): string => {
     switch (action.type) {
-        case "display":
-            state = action.payload ?? "Texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -93,11 +93,13 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
             try {
                 await axios.delete(`http://127.0.0.1:3000/api/post/${post.id}`, option)
                 onDeletePost(post.id)
-            } catch (error: any) {
-                if (error.response.data.message) {
-                    dispatchModal({ type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}` })
-                } else if (error.response.data) {
-                    dispatchModal({ type: "display", payload: `Une erreur est survenue :\n${error.response.data}` })
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.message){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
                 }
             }
         }
@@ -107,16 +109,14 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
     post object. */
     const modifyAuthor: string = useMemo(() => {
         switch (post.updatedBy) {
-            case "ADMIN":
-                return "(modifié par Admin)"
-            case "MODERATOR":
-                return "(modifié par Modérateur)"
+        case "ADMIN":
+            return "(modifié par Admin)"
+        case "MODERATOR":
+            return "(modifié par Modérateur)"
         }
         return "(modifié)"
     }, [post.updatedBy])
 
-    /* A hook that is called after every render. It is used to update the postedAt state every 6
-    seconds. */
     useEffect(() => {
         if (editMode) {
             const element = document.getElementById(`content${postData.id}`)!
@@ -143,7 +143,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                     <div className={classNames(cn.header_title)}>
                         <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                         <div className={classNames(cn.author_container)}>
-                        <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
+                            <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
                             <span>Il y a {postedAt}</span>
                         </div>
                     </div>

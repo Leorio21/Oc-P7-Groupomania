@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { AuthContext } from "../../Context/AuthContext"
 
@@ -13,12 +13,12 @@ import FormPost from "../Form/FormPost"
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "Texte non defini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "Texte non defini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -43,21 +43,23 @@ const PostsList = ({postUser}:  PostListProps) => {
         try {
             const getPosts = await axios.get("http://127.0.0.1:3000/api/post", option)
             setPosts(getPosts.data)
-        } catch (error: any) {
-            if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue : ${error.response.data}`})
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
             }
         }
     }
     
     const onPostSubmit = (newPost: OnePost): void => {
-            setPosts((prevState) => {
-                const newPostsArray = [...prevState]
-                newPostsArray.unshift(newPost)
-                return newPostsArray
-            })
+        setPosts((prevState) => {
+            const newPostsArray = [...prevState]
+            newPostsArray.unshift(newPost)
+            return newPostsArray
+        })
     }
 
     const onPostDelete = (postToDelete: number): void => {

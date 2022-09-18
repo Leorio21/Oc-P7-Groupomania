@@ -2,7 +2,7 @@ import { PhotographIcon } from "@heroicons/react/outline"
 import { Path, useForm } from "react-hook-form"
 import { IFormValues, OnePost } from "../../interface/Index"
 import { AuthContext } from "../../Context/AuthContext"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
@@ -23,12 +23,12 @@ const schemaPost = yup.object({
 const initilTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
-        case "display":
-            state = action.payload ?? "texte non défini"
-            return state
-        case "hide":
-            state = ""
-            return state
+    case "display":
+        state = action.payload ?? "texte non défini"
+        return state
+    case "hide":
+        state = ""
+        return state
     }
     return state
 }
@@ -42,7 +42,7 @@ interface FormPostProps {
     name: Path<IFormValues>
     placeHolder: string,
     post?: OnePost,
-    onPostSubmit: Function,
+    onPostSubmit: (newPost: OnePost) => void,
     editMode?: boolean,
 }
 
@@ -92,13 +92,15 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             resetPicture()
             resetField("content")
             auto_grow()
-        } catch (error: any) {
-            if (!error.response) {
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            } else {
                 dispatchModal({type: "display", payload: `${error}`})
-            } else if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
             }
         }
     }
@@ -125,7 +127,7 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
-            const bddPost = await axios.put(`http://127.0.0.1:3000/api/post/${post!.id}`, myFormData, option)
+            const bddPost = await axios.put(`http://127.0.0.1:3000/api/post/${post?.id}`, myFormData, option)
             const newPost: OnePost = {
                 ...bddPost.data.post,
                 like: [],
@@ -140,13 +142,15 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             resetPicture()
             resetField("content")
             auto_grow()
-        } catch (error: any) {
-            if (!error.response) {
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            } else {
                 dispatchModal({type: "display", payload: `${error}`})
-            } else if(error.response.data.message){
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-            } else if (error.response.data) {
-                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
             }
         }
     }
