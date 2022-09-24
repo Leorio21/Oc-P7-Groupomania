@@ -3,8 +3,10 @@
 .form {
     display: flex;
     flex-direction: column;
+    align-items: center;
     min-width: 300px;
     border-radius: 15px;
+    padding: 20px;
     margin: 15px auto;
     & button {
         padding: 5px 15px;
@@ -41,42 +43,6 @@
     }
 }
 
-.avatar_container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: vars.$color-dark;
-    &:hover .menuImg {
-        visibility: visible;
-    }
-    & img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-    }
-}
-
-.avatarPicture {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: vars.$color-dark;
-}
-
-.name {
-    width: 100%;
-    padding: 30px;
-    font-size: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .menuImg {
     position: absolute;
     background-color: vars.$dark-shadow-color;
@@ -109,4 +75,77 @@
     &--pencil:hover {
         color: vars.$color-green;
     }
+}
+
+.profil_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.avatar_container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: vars.$color-dark;
+    &:hover .menuImg {
+        visibility: visible;
+    }
+    & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+}
+
+.avatarPicture {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: vars.$color-dark;
+}
+
+.profil {
+    min-width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.personnal_info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.name {
+    padding: 10px;
+    font-size: 50px;
+}
+
+.newPassword_container {
+    padding: 20px 0px;
+}
+
+.validation_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.current_password input{
+    width: 100%
+}
+
+.validation {
+    margin-top: 10px;
 }

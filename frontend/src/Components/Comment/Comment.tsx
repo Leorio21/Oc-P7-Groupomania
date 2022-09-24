@@ -103,7 +103,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                             </div>
                         </Link>
                         <div className={classNames(cn.menu)}>
-                            {(authContext?.userId == comment.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu id={comment.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
+                            {(authContext?.userId == comment.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                         </div>
                     </div>
                     {editMode ?

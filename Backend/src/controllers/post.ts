@@ -99,7 +99,7 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
             },
         });
         if (!post) {
-            throw 'Post/Commentaire introuvable'
+            throw 'Post'
         }
         if(post.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
             if (post.authorId != req.auth.userId) {

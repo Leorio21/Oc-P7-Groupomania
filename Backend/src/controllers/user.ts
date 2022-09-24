@@ -3,12 +3,18 @@ import jwt from 'jsonwebtoken';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import {Request, Response, NextFunction } from 'express'
+import { passwordSchema } from '../middleware/password';
 
 import { PrismaClient, User,} from '@prisma/client';
 const prisma = new PrismaClient()
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
-
+    if(!passwordSchema.validate(req.body.password)) {
+        return res.status(400).json({message: "Le mot de passe n'est pas assez sécurisé"})
+    }
+    if (req.body.password !== req.body.confirmPassword) {
+        throw `Les mots de passe ne correspondent pas`
+    }
     try {
         if (await prisma.user.findUnique({
             where: {
@@ -16,9 +22,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
             }
         })) {
             throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
-        }
-        if (req.body.password != req.body.confirmPassword) {
-            throw `Les mots de passe ne correspondent pas`
         }
         const [lastName, firstName]: string[] = req.body.email.split('@')[0].split('.')
         const hash: string = await bcrypt.hash(req.body.password, 12);
@@ -77,6 +80,14 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
     let avatarImageName: string = req.body.userAvatar;
     let oldAvatarImage: string | null = ''
     let newAvatarImage: boolean = false;
+    if (req.body.newPassword) {
+        if(!passwordSchema.validate(req.body.newPassword)) {
+            throw"Le mot de passe n'est pas assez sécurisé"
+        }
+        if (req.body.newPassword !== req.body.confirmNewPassword) {
+            throw "Les mots de passe ne correspondent pas"
+        }
+    }
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -101,7 +112,6 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         }
         const validUser: boolean = await bcrypt.compare(req.body.password, user.password);
         if(validUser || validAdmin) {
-            let nameAvatar:string;
             if(req.body.newPassword) {
                 user.password = await bcrypt.hash(req.body.newPassword, 12);
             }
@@ -137,11 +147,11 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 await fs.unlink(`images/${oldBgName}`);
                 user.background = ''
             }
-            /* if(validAdmin) {
+            if(validAdmin) {
                 user.firstName = req.body.firstName;
                 user.lastName = req.body.lastName;
                 user.email = req.body.email
-            } */
+            }
             await prisma.user.update({
                 where: {
                     id: +req.params.id 

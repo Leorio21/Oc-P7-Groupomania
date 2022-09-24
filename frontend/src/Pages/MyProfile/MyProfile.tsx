@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import Modal from "../../Components/Modal/Modal"
 import { AuthContext } from "../../Context/AuthContext"
-import { IFormValues, OneUser } from "../../interface/Index"
+import { IFormValues } from "../../interface/Index"
 
 import classNames from "classnames"
 import cn from "./MyProfile.module.scss"
@@ -12,6 +12,9 @@ import FileInput from "../../Components/Form/FileInput/FileInput"
 import { useForm } from "react-hook-form"
 import { PencilIcon, TrashIcon } from "@heroicons/react/solid"
 import Button from "../../Components/Form/Button/Button"
+import LabeledInput from "../../Components/Form/LabeledInput/LabeledInput"
+import PasswordCheck from "../../Components/Form/PasswordCheck/PasswordCheck"
+import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfirm"
 
 const schemaProfile = yup.object({
     firstName: yup.string(),
@@ -39,14 +42,15 @@ const MyProfile = () => {
     
     const authContext = useContext(AuthContext)
 
-    const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
+    const { register, handleSubmit, control, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
     
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     const [userFirstName, setUserFirstName] = useState("")
     const [userLastName, setUserLastName] = useState("")
-    const [userBgPictureUrl, setUserBgPictureUrl] = useState<string | null | undefined>()
-    const [userAvatarUrl, setUserAvatarUrl] = useState<string | null | undefined>()
+    const [userEmail, setUserEmail] = useState("")
+    const [userBgPictureUrl, setUserBgPictureUrl] = useState<string>("")
+    const [userAvatarUrl, setUserAvatarUrl] = useState<string>("")
 
     const recupUserData = async () => {
         try {
@@ -58,6 +62,7 @@ const MyProfile = () => {
             const response = await axios.get(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, option)
             setUserFirstName(response.data.user.firstName)
             setUserLastName(response.data.user.lastName)
+            setUserEmail(response.data.user.email)
             setUserBgPictureUrl(response.data.user.background)
             setUserAvatarUrl(response.data.user.avatar)
         } catch (error: unknown) {
@@ -71,38 +76,34 @@ const MyProfile = () => {
         }
     }
 
-    const onDeleteBgPicture = () => {
-        setUserBgPictureUrl(null)
+    const onDeleteBgPicture = (): void => {
+        setUserBgPictureUrl("")
         resetField("bgPicture")
     }
 
-    const onDeleteAvatarPicture = () => {
-        setUserAvatarUrl(null)
+    const onDeleteAvatarPicture = (): void => {
+        setUserAvatarUrl("")
         resetField("avatar")
+    }
+
+    const resetUserForm = ():void => {
+        resetField("avatar")
+        resetField("bgPicture")
+        resetField("password")
+        resetField("newPassword")
+        resetField("confirmNewPassword")
     }
 
     const onFormSubmit = async (data: IFormValues) => {
         try {
             const myFormData = new FormData()
-            myFormData.append("password", "Fleurs#44")
-            if (userBgPictureUrl) {
-                const bgImg = userBgPictureUrl
-                myFormData.append("userBg", bgImg)
-            } else {
-                myFormData.append("userBg", "")
-            }
-            if (data.bgPicture) {
-                myFormData.append("bgPicture", data.bgPicture[0])
-            }
-            if (userAvatarUrl) {
-                const avatarImg = userAvatarUrl
-                myFormData.append("userAvatar", avatarImg)
-            } else {
-                myFormData.append("userAvatar", "")
-            }
-            if (data.avatar) {
-                myFormData.append("avatar", data.avatar[0])
-            }
+            myFormData.append("password", data.password)
+            data.newPassword && myFormData.append("newPassword", data.newPassword)
+            data.confirmNewPassword && myFormData.append("confirmNewPassword", data.confirmNewPassword)
+            myFormData.append("userBg", userBgPictureUrl)
+            data.bgPicture && myFormData.append("bgPicture", data.bgPicture[0])
+            myFormData.append("userAvatar", userAvatarUrl)
+            data.avatar && myFormData.append("avatar", data.avatar[0])
             const option = {
                 headers: {
                     "Content-Type":"multipart/form-data",
@@ -110,6 +111,7 @@ const MyProfile = () => {
                 }
             }
             await axios.put(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, myFormData, option)
+            resetUserForm()
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 if(error.response?.data.message){
@@ -147,28 +149,105 @@ const MyProfile = () => {
                 <div className={classNames(cn.bg_container)}>
                     {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
                     <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
-                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
                         <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
                             <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
                         </FileInput>
+                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
                     </div>
                 </div>
-                <div className={classNames(cn.avatar_container)}>
-                    {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
-                    <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
-                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
-                        <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                            <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
-                        </FileInput>
+                <div className={classNames(cn.profil_container)} >
+                    <div className={classNames(cn.avatar_container)}>
+                        {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
+                        <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
+                            <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+                                <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
+                            </FileInput>
+                            <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
+                        </div>
+                    </div>
+                    
+                    <div className={classNames(cn.profil)} >
+                        {authContext?.role === "ADMIN" ?
+                            <>
+                                <LabeledInput
+                                    tabIndex={0}
+                                    type="test"
+                                    id="firstName"
+                                    name="firstName"
+                                    label={"Prénom :"}
+                                    placeHolder={"Prénom"}
+                                    register={register}
+                                    required={false}
+                                />
+                                <LabeledInput
+                                    tabIndex={0}
+                                    type="test"
+                                    id="lastName"
+                                    name="lastName"
+                                    label={"Nom :"}
+                                    placeHolder={"Nom"}
+                                    register={register}
+                                    required={false}
+                                />
+                            </>
+                            :
+                            <div className={classNames(cn.personnal_info)} >
+                                <div className={classNames(cn.name)} >{userFirstName}</div>
+                                <div className={classNames(cn.name)} >{userLastName}</div>
+                                <div className={classNames(cn.mail)} >{userEmail}</div>
+                            </div>
+                        }
+                        <div className={classNames(cn.newPassword_container)} >
+                            <div className={classNames(cn.newPassword)} >
+                                <LabeledInput
+                                    tabIndex={0}
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPassword"
+                                    label={"Nouveau mot de passe :"}
+                                    placeHolder={"Nouveau mot de passe"}
+                                    register={register}
+                                    required={false}
+                                />
+                                <PasswordCheck control={control} name='newPassword'/>
+                                <LabeledInput
+                                    tabIndex={0}
+                                    type="password"
+                                    id="confirmNewPassword"
+                                    name="confirmNewPassword"
+                                    label={"Confirmer mot de passe :"}
+                                    placeHolder={"Confirmer mot de passe"}
+                                    register={register}
+                                    required={false}
+                                />
+                                <PasswordConfirm control={control}  name='newPassword' nameConfirm='confirmNewPassword' />
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <Button 
-                    tabIndex={0}
-                    type='submit'
-                    label="Enregistrer"
-                />
+                <div className={classNames(cn.validation_container)} >
+                    <div className={classNames(cn.current_password)} >
+                        <LabeledInput
+                            tabIndex={0}
+                            type="password"
+                            id="password"
+                            name="password"
+                            label={"Votre mot de passe :"}
+                            placeHolder={"Votre mot de passe"}
+                            register={register}
+                            required={false}
+                        />
+                    </div>
+                    <div className={classNames(cn.validation)} >
+                        <Button 
+                            tabIndex={0}
+                            type='submit'
+                            label="Enregistrer"
+                        />
+                    </div>
+                </div>
             </form>
-            {textError != "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
         </>
     )
 }

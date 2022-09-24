@@ -2,7 +2,7 @@ import passwordValidator from 'password-validator';
 import { Request, Response, NextFunction } from 'express';
 
 // Create a schema
-const passwordSchema = new passwordValidator();
+export const passwordSchema = new passwordValidator();
 
 // Add properties to it
 passwordSchema

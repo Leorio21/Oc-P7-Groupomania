@@ -19,12 +19,11 @@ const reducerModal = (state: string, action: { type: string; payload: string; })
 }
 
 interface AdminMenuProps {
-    id: number,
     onModifyClick: () => void,
     onDeleteClick: () => void
 }
 
-const AdminMenu = ({ id, onModifyClick, onDeleteClick}: AdminMenuProps) => {
+const AdminMenu = ({ onModifyClick, onDeleteClick}: AdminMenuProps) => {
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     

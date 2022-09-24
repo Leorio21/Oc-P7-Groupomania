@@ -67,7 +67,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
      * editMode state.
      * @param {OnePost} modifyPost - OnePost = {
      */
-    const onPostSubmitHandler = useCallback(() => {
+    const onPostSubmitHandler = //useCallback(() => {
         (modifyPost: OnePost): void => {
             setPostData((prevState) => {
                 const newPost = prevState
@@ -78,21 +78,22 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
             })
             setEditMode(!editMode)
         }
-    }, [])
+    //}, [])
 
     /**
      * OnDeleteHandler is a function that deletes a post from the database and the frontend.
      */
-    const onDeleteHandler = useCallback(() => {
+    const onDeleteHandler = //useCallback(() => {
         async (): Promise<void> => {
+            console.log("delete post : " + postData.id)
             const option = {
                 headers: {
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
             try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${post.id}`, option)
-                onDeletePost(post.id)
+                await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
+                onDeletePost(postData.id)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.message){
@@ -103,7 +104,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                 }
             }
         }
-    }, [])
+    //}, [])
 
     /* A memoized function that returns a string based on the value of the updatedBy property of the
     post object. */
@@ -148,7 +149,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                         </div>
                     </div>
                     <div className={classNames(cn.menu)}>
-                        {(authContext?.userId == postData.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu id={postData.id} onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler} />}
+                        {(authContext?.userId == postData.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler} />}
                     </div>
                 </div>
                 {editMode ?

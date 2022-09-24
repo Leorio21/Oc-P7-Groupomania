@@ -11,7 +11,7 @@ interface PasswordCheckProps<T extends FieldValues>{
 }
 
 const passwordCheck = <T extends FieldValues>({name, control}: PasswordCheckProps<T>) => {
-    const password = useWatch({ control, name})
+    const password = useWatch({ control, name })
 
     return (
         <div className={classNames(cn.container)}>
