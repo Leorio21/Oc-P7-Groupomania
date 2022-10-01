@@ -40,4 +40,6 @@ app.use('/api/auth', userRoutes);
 
 app.use('/api/post', postRoutes);
 
+app.listen(3000)
+
 export default app;

@@ -182,6 +182,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body)
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -196,7 +197,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         if (req.auth.role == 'ADMIN') {
             adminUser = await prisma.user.findUnique({
                 where: {
-                    id: +req.auth.userId 
+                    id: +req.auth.userId
                 },
             });
             if (!adminUser || adminUser.role != 'ADMIN') {

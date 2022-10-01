@@ -21,18 +21,6 @@
         color: vars.$color-green;
         width: 40px;
     }
-    & button {
-        padding: 5px 15px;
-        border-radius: 15px;
-        background-color: vars.$color-green;
-        color: vars.$font-color-light;
-        border: none;
-        height: 40px;
-        &:hover {
-            background-color: vars.$color-hover-green;
-            color: vars.$font-color-dark;
-        }
-    }
     & label {
         padding: 5px 10px;
         border-radius: 15px;

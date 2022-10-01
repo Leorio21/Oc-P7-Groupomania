@@ -1,0 +1,27 @@
+@use "../../../sass/Utils/vars";
+
+button {
+    padding: 5px 15px;
+    border-radius: 15px;
+    width: 150px;
+    border: none;
+    height: 40px;
+}
+
+.red {
+        background-color: vars.$color-primary;
+        color: vars.$font-color-light;
+        &:hover {
+            background-color: vars.$color-hover-primary;
+            color: vars.$font-color-dark;
+        }
+    }
+    
+.green {
+    background-color: vars.$color-green;
+    color: vars.$font-color-light;
+    &:hover {
+        background-color: vars.$color-hover-green;
+        color: vars.$font-color-dark;
+    }
+}

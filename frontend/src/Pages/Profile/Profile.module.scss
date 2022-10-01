@@ -18,11 +18,11 @@
 
 .avatarPicture {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 150px;
+    height: 150px;
     left: 50%;
     bottom: 0px;
-    transform: translate(-50%, 30%);
+    transform: translate(-50%, 15%);
     border-radius: 50%;
     background: vars.$color-dark;
 }

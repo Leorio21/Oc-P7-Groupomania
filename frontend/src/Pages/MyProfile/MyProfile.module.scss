@@ -8,19 +8,6 @@
     border-radius: 15px;
     padding: 20px;
     margin: 15px auto;
-    & button {
-        padding: 5px 15px;
-        border-radius: 15px;
-        background-color: vars.$color-green;
-        color: vars.$font-color-light;
-        width: 150px;
-        border: none;
-        height: 40px;
-        &:hover {
-            background-color: vars.$color-hover-green;
-            color: vars.$font-color-dark;
-        }
-    }
 }
 
 .bg_container {
@@ -147,5 +134,8 @@
 }
 
 .validation {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
     margin-top: 10px;
 }

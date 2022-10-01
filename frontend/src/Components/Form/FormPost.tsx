@@ -190,7 +190,7 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                     editMode={editMode}
                 />
                 <HorizontalContainer>
-                    <Button tabIndex={0} type={"submit"} label={buttonLabel} />
+                    <Button tabIndex={0} type={"submit"} label={buttonLabel} color="green"/>
                     <FileInput id={`picture${post?.id}`} name='photo' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
                         <PhotographIcon className={classesIcon} />Photo
                     </FileInput>

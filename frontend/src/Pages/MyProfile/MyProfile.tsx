@@ -19,6 +19,7 @@ import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfi
 const schemaProfile = yup.object({
     firstName: yup.string(),
     lastName: yup.string(),
+    password: yup.string().required(),
     newPassword: yup.string(),
     confirmNewPassword: yup.string(),
     avatar: yup.mixed(),
@@ -42,7 +43,7 @@ const MyProfile = () => {
     
     const authContext = useContext(AuthContext)
 
-    const { register, handleSubmit, control, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
+    const { register, handleSubmit, formState: { errors }, control, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
     
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
@@ -113,6 +114,32 @@ const MyProfile = () => {
             await axios.put(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, myFormData, option)
             resetUserForm()
         } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                }
+            }
+        }
+    }
+
+    const deleteAccount = async (data: IFormValues) => {
+        try {
+            const option = {
+                headers: {
+                    "Content-Type":"multipart/form-data",
+                    Authorization: `Bearer ${authContext?.token}`
+                },
+                data: {
+                    password: data.password
+                }
+            }
+            await axios.delete(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, option)
+            localStorage.removeItem("userData")
+            authContext?.setConnectHandle(false)
+        } catch (error: unknown) {
+            console.log(error)
             if (error instanceof AxiosError) {
                 if(error.response?.data.message){
                     dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
@@ -235,14 +262,23 @@ const MyProfile = () => {
                             label={"Votre mot de passe :"}
                             placeHolder={"Votre mot de passe"}
                             register={register}
-                            required={false}
+                            required
                         />
                     </div>
+                    <p>{errors.password?.message && "Veuillez saisir votre mot de passe"}</p>
                     <div className={classNames(cn.validation)} >
+                        <Button 
+                            tabIndex={0}
+                            type='button'
+                            label="Supprimer mon compte"
+                            onClickHandler={handleSubmit(deleteAccount)}
+                            color="red"
+                        />
                         <Button 
                             tabIndex={0}
                             type='submit'
                             label="Enregistrer"
+                            color="green"
                         />
                     </div>
                 </div>
