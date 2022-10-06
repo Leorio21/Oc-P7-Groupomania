@@ -1,4 +1,4 @@
-import React, { useReducer } from "react"
+import React, { useCallback, useReducer } from "react"
 import { IFormValues } from "../../interface/Index"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -45,21 +45,23 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     const { register, handleSubmit, control, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaSignUp)})
 
-    const onSignUpSubmit = async (data: IFormValues) => {
-        try {
-            const userData = await axios.post("http://127.0.0.1:3000/api/auth/signup", data)
-            localStorage.setItem("userData", JSON.stringify(userData.data))
-            authContext?.setConnectHandle(true)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+    const onSignUpSubmit = useCallback(
+        async (data: IFormValues) => {
+            try {
+                const userData = await axios.post("http://127.0.0.1:3000/api/auth/signup", data)
+                localStorage.setItem("token", JSON.stringify(userData.data.token))
+                authContext?.setConnectHandle(true)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
                 }
             }
-        }
-    }
+        }, []
+    )
     
     return (
         <>

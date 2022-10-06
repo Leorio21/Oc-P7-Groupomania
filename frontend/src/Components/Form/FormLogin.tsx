@@ -43,7 +43,7 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
     const onLoginSubmit = async (data: IFormValues) => {
         try {
             const userData = await axios.post("http://127.0.0.1:3000/api/auth/login", data)
-            localStorage.setItem("userData", JSON.stringify(userData.data))
+            localStorage.setItem("token", JSON.stringify(userData.data.token))
             authContext?.setConnectHandle(true)
         } catch (error: unknown) {
             if (error instanceof AxiosError) {

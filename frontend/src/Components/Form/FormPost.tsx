@@ -20,7 +20,7 @@ const schemaPost = yup.object({
     photo: yup.mixed()
 }).required()
 
-const initilTextError = ""
+const initialTextError = ""
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
@@ -49,7 +49,7 @@ interface FormPostProps {
 const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, placeHolder, onPostSubmit, editMode}: FormPostProps) => {
 
     const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
+    const [textError, dispatchModal] = useReducer(reducerModal, initialTextError)
     const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)})
     const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image)
 

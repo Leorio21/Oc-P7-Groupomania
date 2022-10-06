@@ -83,28 +83,26 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
     /**
      * OnDeleteHandler is a function that deletes a post from the database and the frontend.
      */
-    const onDeleteHandler = //useCallback(() => {
-        async (): Promise<void> => {
-            console.log("delete post : " + postData.id)
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext?.token}`
-                }
+    const onDeleteHandler = useCallback( async (): Promise<void> => {
+        console.log("delete post : " + postData.id)
+        const option = {
+            headers: {
+                Authorization: `Bearer ${authContext?.token}`
             }
-            try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
-                onDeletePost(postData.id)
-            } catch (error: unknown) {
-                if (error instanceof AxiosError) {
-                    if(error.response?.data.message){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                    } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
-                    }
+        }
+        try {
+            await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
+            onDeletePost(postData.id)
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                } else if (error.response?.data) {
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
                 }
             }
         }
-    //}, [])
+    }, [])
 
     /* A memoized function that returns a string based on the value of the updatedBy property of the
     post object. */

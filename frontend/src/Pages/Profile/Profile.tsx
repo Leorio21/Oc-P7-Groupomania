@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { AuthContext } from "../../Context/AuthContext"
 import axios, { AxiosError } from "axios"
-import { UserCircleIcon } from "@heroicons/react/solid"
+import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid"
 
 import { OneUser } from "../../interface/Index"
 
@@ -39,7 +39,7 @@ const Profile = () => {
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
-            const response = await axios.get(`http://127.0.0.1:3000/api/auth/${params.userId}`, option)
+            const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${params.userId}`, option)
             setUserData(response.data.user)
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
@@ -65,7 +65,7 @@ const Profile = () => {
                     {userData?.background && <img src={userData?.background} alt='image de fond utilisateur' className={classNames(cn.backgroundPicture)} />}
                     {userData?.avatar ? <img src={userData?.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
                 </div>
-                <div className={classNames(cn.name)}>{userData?.firstName} {userData?.lastName}</div>
+                <div className={classNames(cn.name)}>{userData?.firstName} {userData?.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
                 <PostsList postUser={userData.post}/>
                 {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
             </>

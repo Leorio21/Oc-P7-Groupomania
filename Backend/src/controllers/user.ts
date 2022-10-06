@@ -61,6 +61,30 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 process.env.RANDOM_KEY_TOKEN!,
                 { expiresIn: '48h' }
                 ),
+        });
+    } catch (error) {
+        return res.status(404).json({ message: error });
+    }
+}
+
+export const getUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: req.auth.userId
+            },
+        });
+        if (!user) {
+            throw "Utilisateur introuvable";
+        }
+        return res.status(200).json({
+            token: jwt.sign(
+                {
+                    userId: user.id
+                },
+                process.env.RANDOM_KEY_TOKEN!,
+                { expiresIn: '48h' }
+                ),
             userId: user.id,
             role: user.role,
             firstName: user.firstName,
@@ -99,14 +123,14 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         if (!user) {
             throw 'Utilisateur introuvable'
         }
-        if (+req.params.id !== req.auth.userId && req.auth.role === 'ADMIN') {
+        if (+req.params.id !== req.auth.userId) {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId 
                 },
             });
-            if (!adminUser) {
-                throw 'Utilisateur introuvable'
+            if (!adminUser || adminUser.role !== 'ADMIN') {
+                throw 'Modifications non autorisées'
             }
             validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
         }
@@ -148,9 +172,10 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 user.background = ''
             }
             if(validAdmin) {
-                user.firstName = req.body.firstName;
-                user.lastName = req.body.lastName;
+                user.firstName = req.body.firstName
+                user.lastName = req.body.lastName
                 user.email = req.body.email
+                user.role = req.body.role
             }
             await prisma.user.update({
                 where: {
@@ -182,7 +207,6 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body)
     try {
         let adminUser: User | null;
         let validAdmin: boolean = false;
@@ -232,6 +256,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
                 email: true,
                 avatar: true,
                 background: true,
+                role: true,
                 post : {
                     include: {
                             author: {

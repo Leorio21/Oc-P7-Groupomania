@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useReducer, useState } from "react"
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react"
 import { UserCircleIcon } from "@heroicons/react/solid"
 import { OnePostComment } from "../../interface/Index"
 import { Role } from "../../../../backend/node_modules/@prisma/client"
@@ -51,27 +51,29 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         setEditMode(!editMode)
     }
 
-    const onDeleteHandler = async (): Promise<void> => {
-        const option = {
-            headers: {
-                Authorization: `Bearer ${authContext?.token}`
-            }
-        }
-        try {
-            await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, option)
-            onDeleteComment(comment.id)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+    const onDeleteHandler = useCallback(
+        async (): Promise<void> => {
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${authContext?.token}`
                 }
-            } else {
-                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
             }
-        }
-    }
+            try {
+                await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, option)
+                onDeleteComment(comment.id)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.message){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
+                } else {
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+                }
+            }
+        }, []
+    )
 
     const modifyAuthor: string = useMemo(() => {
         switch (updatedBy) {

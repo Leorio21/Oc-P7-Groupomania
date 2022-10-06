@@ -13,7 +13,7 @@ const NavBar = () => {
     const authContext = useContext(AuthContext)
 
     const onLogOutHandler = () => {
-        localStorage.removeItem("userData")
+        localStorage.removeItem("token")
 
         authContext?.setConnectHandle(false)
     }

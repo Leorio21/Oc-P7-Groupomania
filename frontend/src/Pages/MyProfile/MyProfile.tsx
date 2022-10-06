@@ -15,6 +15,8 @@ import Button from "../../Components/Form/Button/Button"
 import LabeledInput from "../../Components/Form/LabeledInput/LabeledInput"
 import PasswordCheck from "../../Components/Form/PasswordCheck/PasswordCheck"
 import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfirm"
+import { useParams } from "react-router-dom"
+import LabeledSelect from "../../Components/Form/LabeledSelect/LabeledSelect"
 
 const schemaProfile = yup.object({
     firstName: yup.string(),
@@ -41,9 +43,10 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 
 const MyProfile = () => {
     
+    const params = useParams()
     const authContext = useContext(AuthContext)
 
-    const { register, handleSubmit, formState: { errors }, control, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
+    const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
     
     
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
@@ -52,6 +55,9 @@ const MyProfile = () => {
     const [userEmail, setUserEmail] = useState("")
     const [userBgPictureUrl, setUserBgPictureUrl] = useState<string>("")
     const [userAvatarUrl, setUserAvatarUrl] = useState<string>("")
+    const [userRole, setUserRole] = useState("")
+
+    const userId = params.userId ? params.userId : authContext?.userId
 
     const recupUserData = async () => {
         try {
@@ -60,12 +66,16 @@ const MyProfile = () => {
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
-            const response = await axios.get(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, option)
+            const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${userId}`, option)
             setUserFirstName(response.data.user.firstName)
+            setValue("firstName", response.data.user.firstName)
             setUserLastName(response.data.user.lastName)
+            setValue("lastName", response.data.user.lastName)
             setUserEmail(response.data.user.email)
+            setValue("email", response.data.user.email)
             setUserBgPictureUrl(response.data.user.background)
             setUserAvatarUrl(response.data.user.avatar)
+            setUserRole(response.data.user.role)
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 if(error.response?.data.message){
@@ -98,6 +108,10 @@ const MyProfile = () => {
     const onFormSubmit = async (data: IFormValues) => {
         try {
             const myFormData = new FormData()
+            data.firstName && myFormData.append("firstName", data.firstName)
+            data.lastName && myFormData.append("lastName", data.lastName)
+            data.email && myFormData.append("email", data.email)
+            data.role && myFormData.append("role", data.role)
             myFormData.append("password", data.password)
             data.newPassword && myFormData.append("newPassword", data.newPassword)
             data.confirmNewPassword && myFormData.append("confirmNewPassword", data.confirmNewPassword)
@@ -111,7 +125,7 @@ const MyProfile = () => {
                     Authorization: `Bearer ${authContext?.token}`
                 }
             }
-            await axios.put(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, myFormData, option)
+            await axios.put(`http://127.0.0.1:3000/api/auth/${userId}`, myFormData, option)
             resetUserForm()
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
@@ -128,18 +142,16 @@ const MyProfile = () => {
         try {
             const option = {
                 headers: {
-                    "Content-Type":"multipart/form-data",
                     Authorization: `Bearer ${authContext?.token}`
                 },
-                data: {
-                    password: data.password
-                }
+                data: {password: data.password}
             }
-            await axios.delete(`http://127.0.0.1:3000/api/auth/${authContext?.userId}`, option)
-            localStorage.removeItem("userData")
-            authContext?.setConnectHandle(false)
+            await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
+            if(!params.userId) {
+                localStorage.removeItem("userData")
+                authContext?.setConnectHandle(false)
+            }
         } catch (error: unknown) {
-            console.log(error)
             if (error instanceof AxiosError) {
                 if(error.response?.data.message){
                     dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
@@ -148,6 +160,7 @@ const MyProfile = () => {
                 }
             }
         }
+        
     }
 
     useEffect(() => {
@@ -156,19 +169,16 @@ const MyProfile = () => {
                 setUserBgPictureUrl(window.URL.createObjectURL([...getValues("bgPicture")][0]))
             }
         }
-    }, [watch("bgPicture")])
-
-    useEffect(() => {
         if(getValues("avatar")) {
             if (getValues("avatar").length > 0) {
                 setUserAvatarUrl(window.URL.createObjectURL([...getValues("avatar")][0]))
             }
         }
-    }, [watch("avatar")])
+    }, [watch("bgPicture"), watch("avatar")])
 
     useEffect(() => {
         recupUserData()
-    }, [])
+    }, [params.userId])
 
     return (
         <>
@@ -198,7 +208,7 @@ const MyProfile = () => {
                             <>
                                 <LabeledInput
                                     tabIndex={0}
-                                    type="test"
+                                    type="text"
                                     id="firstName"
                                     name="firstName"
                                     label={"Prénom :"}
@@ -208,7 +218,7 @@ const MyProfile = () => {
                                 />
                                 <LabeledInput
                                     tabIndex={0}
-                                    type="test"
+                                    type="text"
                                     id="lastName"
                                     name="lastName"
                                     label={"Nom :"}
@@ -216,12 +226,31 @@ const MyProfile = () => {
                                     register={register}
                                     required={false}
                                 />
+                                <LabeledInput
+                                    tabIndex={0}
+                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    label={"Email :"}
+                                    placeHolder={"Email"}
+                                    register={register}
+                                    required={false}
+                                />
+                                <LabeledSelect
+                                    tabIndex={0}
+                                    name="role"
+                                    label="Rôle :"
+                                    id="role"
+                                    role={userRole}
+                                    register={register}
+                                    options={["USER", "MODERATOR", "ADMIN"]} />
                             </>
                             :
                             <div className={classNames(cn.personnal_info)} >
                                 <div className={classNames(cn.name)} >{userFirstName}</div>
                                 <div className={classNames(cn.name)} >{userLastName}</div>
                                 <div className={classNames(cn.mail)} >{userEmail}</div>
+                                <div className={classNames(cn.role)} >Role : {userRole}</div>
                             </div>
                         }
                         <div className={classNames(cn.newPassword_container)} >
