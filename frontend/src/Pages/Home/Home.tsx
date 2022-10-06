@@ -1,16 +1,25 @@
-import React from "react"
+import React, { useContext, useEffect, useState } from "react"
 
 import classNames from "classnames"
 import cn from "./Home.module.scss"
 
 import PostsList from "../../Components/Post/PostsList"
+import { AuthContext } from "../../Context/AuthContext"
 
 
 const Home = () => {
 
+    const authContext = useContext(AuthContext)
+
+    const [isConnected, setIsConnected] = useState(false)
+
+    useEffect (() => {
+        setIsConnected(authContext?.userId !== -1 ? true : false)
+    }, [authContext?.userId])
+
     return (
         <>
-            <PostsList />
+            {isConnected ? <PostsList /> : "Chargement en cours ..."}
         </>
     )
 }
