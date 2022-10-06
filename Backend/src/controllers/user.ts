@@ -218,7 +218,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         if (!user) {
             throw 'Utilisateur introuvable'
         }
-        if (req.auth.role == 'ADMIN') {
+        if (req.auth.role === 'ADMIN') {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId

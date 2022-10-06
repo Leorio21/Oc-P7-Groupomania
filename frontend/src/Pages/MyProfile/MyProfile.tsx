@@ -139,28 +139,30 @@ const MyProfile = () => {
     }
 
     const deleteAccount = async (data: IFormValues) => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext?.token}`
-                },
-                data: {password: data.password}
-            }
-            await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
-            if(!params.userId) {
-                localStorage.removeItem("userData")
-                authContext?.setConnectHandle(false)
-            }
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+        const deleteAccount = confirm("Êtes-vous sûr de vouloir supprimer votre compte ??\nToutes vos données et messages seront supprimés")
+        if (deleteAccount) {
+            try {
+                const option = {
+                    headers: {
+                        Authorization: `Bearer ${authContext?.token}`
+                    },
+                    data: {password: data.password}
+                }
+                await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
+                if(!params.userId) {
+                    localStorage.removeItem("token")
+                    authContext?.setConnectHandle(false)
+                }
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.message){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
                 }
             }
         }
-        
     }
 
     useEffect(() => {
@@ -247,8 +249,10 @@ const MyProfile = () => {
                             </>
                             :
                             <div className={classNames(cn.personnal_info)} >
-                                <div className={classNames(cn.name)} >{userFirstName}</div>
-                                <div className={classNames(cn.name)} >{userLastName}</div>
+                                <p className={classNames(cn.name)}>
+                                    <div className={classNames(cn.userName)} >{userFirstName}</div>
+                                    <div className={classNames(cn.userName)} >{userLastName}</div>
+                                </p>
                                 <div className={classNames(cn.mail)} >{userEmail}</div>
                                 <div className={classNames(cn.role)} >Role : {userRole}</div>
                             </div>

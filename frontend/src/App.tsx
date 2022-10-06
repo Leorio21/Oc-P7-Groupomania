@@ -30,7 +30,7 @@ function App() {
             {authContext?.connected && <NavBar />}
             <Routes>
                 <Route path='/' element={<Connect />} />
-                <Route element={<ProtectedRoute connected={authContext?.connected} />}>
+                <Route element={<ProtectedRoute connected={authContext?.userId !== -1 ? true : false} />}>
                     <Route path='/profile/:userId' element={<Profile />} />
                     <Route path='/myProfile' element={<MyProfile />} />
                     <Route path='/myProfile/:userId' element={<MyProfile />} />
