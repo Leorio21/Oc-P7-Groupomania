@@ -52,6 +52,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 localStorage.setItem("token", JSON.stringify(userData.data.token))
                 authContext?.setConnectHandle(true)
             } catch (error: unknown) {
+                console.log(error)
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
                         dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})

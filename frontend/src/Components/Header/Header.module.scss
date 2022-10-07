@@ -1,9 +1,9 @@
-@use '../../sass/Utils/vars';
+@use "../../sass/Utils/vars";
+@use "../../sass/Utils/mixinMQ";
 
 .header {
     padding: 20px;
     width: 100%;
-    color: vars.$font-color-light;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,6 +11,10 @@
     color: vars.$color-primary;
     & img {
         width: 90px;
+        margin: 20px;
+    }
+    @include mixinMQ.tablette {
+        flex-direction: row;
     }
 }
 

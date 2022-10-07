@@ -12,6 +12,7 @@ import "./App.module.scss"
 import NavBar from "./Components/NavBar/NavBar"
 import Profile from "./Pages/Profile/Profile"
 import MyProfile from "./Pages/MyProfile/MyProfile"
+import Error from "./Pages/Error/Error"
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
                     <Route path='/myProfile/:userId' element={<MyProfile />} />
                     <Route path='/home' element={<Home />} />
                 </Route>
+                <Route path='*' element={<Error />} />
             </Routes>
         </>
     )

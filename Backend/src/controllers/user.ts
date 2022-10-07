@@ -35,7 +35,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         });
         return next();
     } catch (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({ error });
     }
 }
 
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 ),
         });
     } catch (error) {
-        return res.status(404).json({ message: error });
+        return res.status(404).json({ error });
     }
 }
 
@@ -92,7 +92,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
             avatar: user.avatar
         });
     } catch (error) {
-        return res.status(404).json({ message: error });
+        return res.status(404).json({ error });
     }
 }
 
@@ -195,7 +195,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         }
         return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
-        return res.status(403).json({ message: error });
+        return res.status(403).json({ error });
     } finally {
         if (files['avatar']) {
             await fs.unlink(`images/${files!['avatar'][0].filename}`);
@@ -240,7 +240,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         }
         return res.status(403).json({message: 'action non autorisée'})
     } catch (error) {
-        return res.status(403).json({ message: error });
+        return res.status(403).json({ error });
     }
 }
 
@@ -295,7 +295,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
             }
         })
         if (!user) {
-            return res.status(404).json({ message: 'Utilisateur introuvable'})
+            return res.status(404).json({ error: 'Utilisateur introuvable'})
         }
         return res.status(200).json({ user })
     } catch (error) {

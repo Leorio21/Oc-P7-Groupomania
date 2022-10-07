@@ -1,0 +1,27 @@
+@use "../../sass/Utils/vars";
+@use "../../sass/Utils/mixinMQ";
+
+.error_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    & img {
+        width: 200px;
+    }
+}
+
+.primary_title {
+    padding: 20px;
+}
+
+.error_texte {
+    padding: 20px;
+    font-size: 20px;
+}
+
+.secondary_title {
+    color: vars.$color-primary;
+    font-size: 3rem;
+    padding: 20px;
+}

@@ -249,10 +249,10 @@ const MyProfile = () => {
                             </>
                             :
                             <div className={classNames(cn.personnal_info)} >
-                                <p className={classNames(cn.name)}>
-                                    <div className={classNames(cn.userName)} >{userFirstName}</div>
-                                    <div className={classNames(cn.userName)} >{userLastName}</div>
-                                </p>
+                                <div className={classNames(cn.name)}>
+                                    <p className={classNames(cn.userName)} >{userFirstName}</p>
+                                    <p className={classNames(cn.userName)} >{userLastName}</p>
+                                </div>
                                 <div className={classNames(cn.mail)} >{userEmail}</div>
                                 <div className={classNames(cn.role)} >Role : {userRole}</div>
                             </div>
