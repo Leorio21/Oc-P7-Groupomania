@@ -56,3 +56,10 @@
         color: vars.$color-green;
     }
 }
+
+.noPost {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: vars.$color-secondary;
+}

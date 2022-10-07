@@ -155,8 +155,8 @@ const MyProfile = () => {
                 }
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
-                    if(error.response?.data.message){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
                     } else if (error.response?.data) {
                         dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
                     }

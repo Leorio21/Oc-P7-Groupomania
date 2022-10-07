@@ -8,3 +8,10 @@ export interface UserDataLs {
     token: string,
     role: Role,
 }
+
+export interface UserProfil {
+    id: number,
+    firstName: string,
+    lastName: string,
+    avatar: string,
+}

@@ -31,6 +31,7 @@ const Profile = () => {
     const authContext = useContext(AuthContext)
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     const [userData, setUserData] = useState<OneUser>()
+    const [noPost, setNoPost] = useState(true)
 
     const recupUserData = async () => {
         try {
@@ -41,10 +42,13 @@ const Profile = () => {
             }
             const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${params.userId}`, option)
             setUserData(response.data.user)
+            if (response.data.user.post.length !== 0) {
+                setNoPost(false)
+            }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                if(error.response?.data.error){
+                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
                 } else if (error.response?.data) {
                     dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
                 }
@@ -66,7 +70,7 @@ const Profile = () => {
                     {userData?.avatar ? <img src={userData?.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
                 </div>
                 <div className={classNames(cn.name)}>{userData?.firstName} {userData?.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
-                <PostsList postUser={userData.post}/>
+                {!noPost ? <PostsList postUser={userData.post}/> : <div className={classNames(cn.noPost)}>Aucune publications</div>}
                 {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
             </>
         }

@@ -10,7 +10,7 @@ const prisma = new PrismaClient()
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     if(!passwordSchema.validate(req.body.password)) {
-        return res.status(400).json({message: "Le mot de passe n'est pas assez sécurisé"})
+        return res.status(400).json({ error: "Le mot de passe n'est pas assez sécurisé"})
     }
     if (req.body.password !== req.body.confirmPassword) {
         throw `Les mots de passe ne correspondent pas`
@@ -62,6 +62,22 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 { expiresIn: '48h' }
                 ),
         });
+    } catch (error) {
+        return res.status(404).json({ error });
+    }
+}
+
+export const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await prisma.user.findMany({
+            select: {
+                id:true,
+                firstName: true,
+                lastName: true,
+                avatar: true,
+            }
+        })
+        return res.status(200).json({ user });
     } catch (error) {
         return res.status(404).json({ error });
     }
@@ -193,7 +209,7 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
             });
             return res.status(201).json({ message: 'Utilisateur modifié !' });
         }
-        return res.status(403).json({message: 'action non autorisée'})
+        return res.status(403).json({ error: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ error });
     } finally {
@@ -238,7 +254,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
             })
             return res.status(200).json({ message: 'Utilisateur supprimé' })
         }
-        return res.status(403).json({message: 'action non autorisée'})
+        return res.status(403).json({ error: 'action non autorisée'})
     } catch (error) {
         return res.status(403).json({ error });
     }

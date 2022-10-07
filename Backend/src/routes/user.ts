@@ -28,5 +28,6 @@ router.get('/user/:id', auth, userCtrl.getUserProfile);
 
 router.get('/connect', auth, userCtrl.getUser);
 
+router.get('/members', auth, userCtrl.getAllUser);
 
 export default router;

@@ -1,0 +1,40 @@
+@use '../../sass/Utils/vars';
+
+.user_container {
+    width: 200px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+.avatarPicture {
+    margin: 0px auto;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: vars.$color-dark;
+}
+
+.name {
+    width: 100%;
+    padding: 30px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav__link {
+    color: vars.$color-secondary;
+    text-decoration: none;
+    &:visited {
+        color: vars.$color-secondary;
+    }
+    &:hover {
+        color: vars.$color-primary;
+        text-decoration: underline;
+    }
+}

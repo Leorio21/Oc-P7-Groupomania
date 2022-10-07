@@ -10,7 +10,7 @@ export const likePost = async (req: Request, res: Response, _next: NextFunction)
                 id: +req.params.id
             }})
             if (!post) {
-                return res.status(400).json({ message: 'Post introuvable' }) 
+                return res.status(400).json({ error: 'Post introuvable' }) 
             }
 
             const like = await prisma.postLike.findMany({

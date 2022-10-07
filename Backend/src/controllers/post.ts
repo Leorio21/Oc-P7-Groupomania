@@ -138,7 +138,7 @@ export const modifyPost = async (req: Request, res: Response, _next: NextFunctio
                 },
                 message: 'Commentaire modifié' })
         }
-        return res.status(403).json({message: 'action non autorisée'})
+        return res.status(403).json({ error: 'action non autorisée'})
     } catch (error) {
         if(files['photo'] && newImage) {
             fs.unlink(`images/${imageName}`)
@@ -173,8 +173,8 @@ export const deletePost = async (req: Request, res: Response, _next: NextFunctio
             }
             return res.status(200).json({ message: 'Post supprimé' })
         }
-        return res.status(403).json({message: 'action non autorisée'})
+        return res.status(403).json({ error: 'action non autorisée'})
     } catch (error) {
-        return res.status(403).json({ message: error });
+        return res.status(403).json({ error });
     }
 }

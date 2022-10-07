@@ -13,6 +13,7 @@ import NavBar from "./Components/NavBar/NavBar"
 import Profile from "./Pages/Profile/Profile"
 import MyProfile from "./Pages/MyProfile/MyProfile"
 import Error from "./Pages/Error/Error"
+import Members from "./Pages/Members/Members"
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
                     <Route path='/myProfile' element={<MyProfile />} />
                     <Route path='/myProfile/:userId' element={<MyProfile />} />
                     <Route path='/home' element={<Home />} />
+                    <Route path='/members' element={<Members />} />
                 </Route>
                 <Route path='*' element={<Error />} />
             </Routes>
