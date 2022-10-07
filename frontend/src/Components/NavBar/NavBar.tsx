@@ -14,7 +14,6 @@ const NavBar = () => {
 
     const onLogOutHandler = () => {
         localStorage.removeItem("token")
-
         authContext?.setConnectHandle(false)
     }
 

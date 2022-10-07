@@ -1,6 +1,6 @@
 import { ThumbUpIcon } from "@heroicons/react/outline"
 import { ThumbUpIcon as ThumbUpIconSolid } from "@heroicons/react/solid"
-import React, { useContext, useReducer, useState } from "react"
+import React, { useCallback, useContext, useReducer, useState } from "react"
 
 import classNames from "classnames"
 import cn from "./Like.module.scss"
@@ -41,28 +41,30 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
         }
     }
 
-    const onClickLikeHandler = async () => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext?.token}`
+    const onClickLikeHandler = useCallback(
+        async () => {
+            try {
+                const option = {
+                    headers: {
+                        Authorization: `Bearer ${authContext?.token}`
+                    }
                 }
+                const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
+                if (userLikePost) {
+                    const newLikeArray = postLike.filter((like) => like.userId !== authContext?.userId)
+                    setPostLike(newLikeArray)
+                } else {
+                    const newLike: OnePostLike = { ...bddLike.data.like }
+                    const newLikeArray = [...postLike]
+                    newLikeArray.push(newLike)
+                    setPostLike(newLikeArray)
+                }
+                onClickLike()
+            } catch (error) {
+                dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error}`})
             }
-            const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
-            if (userLikePost) {
-                const newLikeArray = postLike.filter((like) => like.userId !== authContext?.userId)
-                setPostLike(newLikeArray)
-            } else {
-                const newLike: OnePostLike = { ...bddLike.data.like }
-                const newLikeArray = [...postLike]
-                newLikeArray.push(newLike)
-                setPostLike(newLikeArray)
-            }
-            onClickLike()
-        } catch (error) {
-            dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error}`})
-        }
-    }
+        }, [postId]
+    )
 
     return (
         <>

@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import React, { useContext, useEffect, useReducer, useState } from "react"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
 import { AuthContext } from "../../Context/AuthContext"
 
 import classNames from "classnames"
@@ -39,20 +39,22 @@ const PostsList = ({postUser}:  PostListProps) => {
         }
     }
 
-    const fetchData = async (option: OptionAxios) => {
-        try {
-            const getPosts = await axios.get("http://127.0.0.1:3000/api/post", option)
-            setPosts(getPosts.data)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.error){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+    const fetchData = useCallback(
+        async (option: OptionAxios): Promise<void> => {
+            try {
+                const getPosts = await axios.get("http://127.0.0.1:3000/api/post", option)
+                setPosts(getPosts.data)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
                 }
             }
-        }
-    }
+        }, []
+    )
     
     const onPostSubmit = (newPost: OnePost): void => {
         setPosts((prevState) => {

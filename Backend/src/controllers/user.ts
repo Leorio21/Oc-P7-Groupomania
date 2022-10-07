@@ -139,13 +139,13 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
         if (!user) {
             throw 'Utilisateur introuvable'
         }
-        if (+req.params.id !== req.auth.userId) {
+        if (req.auth.role === "ADMIN") {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId 
                 },
             });
-            if (!adminUser || adminUser.role !== 'ADMIN') {
+            if (!adminUser) {
                 throw 'Modifications non autorisées'
             }
             validAdmin = await bcrypt.compare(req.body.password, adminUser.password);
@@ -191,7 +191,9 @@ export const modify = async (req: Request, res: Response, next: NextFunction) =>
                 user.firstName = req.body.firstName
                 user.lastName = req.body.lastName
                 user.email = req.body.email
-                user.role = req.body.role
+                if(+req.params.id !== req.auth.userId) {
+                    user.role = req.body.role
+                }
             }
             await prisma.user.update({
                 where: {

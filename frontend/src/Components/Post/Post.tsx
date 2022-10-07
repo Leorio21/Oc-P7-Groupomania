@@ -67,7 +67,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
      * editMode state.
      * @param {OnePost} modifyPost - OnePost = {
      */
-    const onPostSubmitHandler = //useCallback(() => {
+    const onPostSubmitHandler = useCallback(
         (modifyPost: OnePost): void => {
             setPostData((prevState) => {
                 const newPost = prevState
@@ -77,32 +77,34 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                 return newPost
             })
             setEditMode(!editMode)
-        }
-    //}, [])
+        }, []
+    )
 
     /**
      * OnDeleteHandler is a function that deletes a post from the database and the frontend.
      */
-    const onDeleteHandler = useCallback( async (): Promise<void> => {
-        console.log("delete post : " + postData.id)
-        const option = {
-            headers: {
-                Authorization: `Bearer ${authContext?.token}`
-            }
-        }
-        try {
-            await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
-            onDeletePost(postData.id)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.error){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+    const onDeleteHandler = useCallback(
+        async (): Promise<void> => {
+            console.log("delete post : " + postData.id)
+            const option = {
+                headers: {
+                    Authorization: `Bearer ${authContext?.token}`
                 }
             }
-        }
-    }, [])
+            try {
+                await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
+                onDeletePost(postData.id)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
+                }
+            }
+        }, [postData]
+    )
 
     /* A memoized function that returns a string based on the value of the updatedBy property of the
     post object. */

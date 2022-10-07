@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import React, { useContext, useEffect, useReducer, useState } from "react"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import Modal from "../../Components/Modal/Modal"
@@ -59,33 +59,35 @@ const MyProfile = () => {
 
     const userId = params.userId ? params.userId : authContext?.userId
 
-    const recupUserData = async () => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext?.token}`
+    const recupUserData = useCallback(
+        async () => {
+            try {
+                const option = {
+                    headers: {
+                        Authorization: `Bearer ${authContext?.token}`
+                    }
+                }
+                const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${userId}`, option)
+                setUserFirstName(response.data.user.firstName)
+                setValue("firstName", response.data.user.firstName)
+                setUserLastName(response.data.user.lastName)
+                setValue("lastName", response.data.user.lastName)
+                setUserEmail(response.data.user.email)
+                setValue("email", response.data.user.email)
+                setUserBgPictureUrl(response.data.user.background)
+                setUserAvatarUrl(response.data.user.avatar)
+                setUserRole(response.data.user.role)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.message){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
                 }
             }
-            const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${userId}`, option)
-            setUserFirstName(response.data.user.firstName)
-            setValue("firstName", response.data.user.firstName)
-            setUserLastName(response.data.user.lastName)
-            setValue("lastName", response.data.user.lastName)
-            setUserEmail(response.data.user.email)
-            setValue("email", response.data.user.email)
-            setUserBgPictureUrl(response.data.user.background)
-            setUserAvatarUrl(response.data.user.avatar)
-            setUserRole(response.data.user.role)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
-                }
-            }
-        }
-    }
+        }, [userId]
+    )
 
     const onDeleteBgPicture = (): void => {
         setUserBgPictureUrl("")
@@ -105,54 +107,29 @@ const MyProfile = () => {
         resetField("confirmNewPassword")
     }
 
-    const onFormSubmit = async (data: IFormValues) => {
-        try {
-            const myFormData = new FormData()
-            data.firstName && myFormData.append("firstName", data.firstName)
-            data.lastName && myFormData.append("lastName", data.lastName)
-            data.email && myFormData.append("email", data.email)
-            data.role && myFormData.append("role", data.role)
-            myFormData.append("password", data.password)
-            data.newPassword && myFormData.append("newPassword", data.newPassword)
-            data.confirmNewPassword && myFormData.append("confirmNewPassword", data.confirmNewPassword)
-            myFormData.append("userBg", userBgPictureUrl)
-            data.bgPicture && myFormData.append("bgPicture", data.bgPicture[0])
-            myFormData.append("userAvatar", userAvatarUrl)
-            data.avatar && myFormData.append("avatar", data.avatar[0])
-            const option = {
-                headers: {
-                    "Content-Type":"multipart/form-data",
-                    Authorization: `Bearer ${authContext?.token}`
-                }
-            }
-            await axios.put(`http://127.0.0.1:3000/api/auth/${userId}`, myFormData, option)
-            resetUserForm()
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.message){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
-                }
-            }
-        }
-    }
-
-    const deleteAccount = async (data: IFormValues) => {
-        const deleteAccount = confirm("Êtes-vous sûr de vouloir supprimer votre compte ??\nToutes vos données et messages seront supprimés")
-        if (deleteAccount) {
+    const onFormSubmit = useCallback(
+        async (data: IFormValues): Promise<void> => {
             try {
+                const myFormData = new FormData()
+                data.firstName && myFormData.append("firstName", data.firstName)
+                data.lastName && myFormData.append("lastName", data.lastName)
+                data.email && myFormData.append("email", data.email)
+                data.role && myFormData.append("role", data.role)
+                myFormData.append("password", data.password)
+                data.newPassword && myFormData.append("newPassword", data.newPassword)
+                data.confirmNewPassword && myFormData.append("confirmNewPassword", data.confirmNewPassword)
+                myFormData.append("userBg", userBgPictureUrl)
+                data.bgPicture && myFormData.append("bgPicture", data.bgPicture[0])
+                myFormData.append("userAvatar", userAvatarUrl)
+                data.avatar && myFormData.append("avatar", data.avatar[0])
                 const option = {
                     headers: {
+                        "Content-Type":"multipart/form-data",
                         Authorization: `Bearer ${authContext?.token}`
-                    },
-                    data: {password: data.password}
+                    }
                 }
-                await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
-                if(!params.userId) {
-                    localStorage.removeItem("token")
-                    authContext?.setConnectHandle(false)
-                }
+                await axios.put(`http://127.0.0.1:3000/api/auth/${userId}`, myFormData, option)
+                resetUserForm()
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
@@ -162,8 +139,37 @@ const MyProfile = () => {
                     }
                 }
             }
-        }
-    }
+        }, [userId]
+    )
+
+    const deleteAccount = useCallback(
+        async (data: IFormValues): Promise<void> => {
+            const deleteAccount = confirm("Êtes-vous sûr de vouloir supprimer votre compte ??\nToutes vos données et messages seront supprimés")
+            if (deleteAccount) {
+                try {
+                    const option = {
+                        headers: {
+                            Authorization: `Bearer ${authContext?.token}`
+                        },
+                        data: {password: data.password}
+                    }
+                    await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
+                    if(!params.userId) {
+                        localStorage.removeItem("token")
+                        authContext?.setConnectHandle(false)
+                    }
+                } catch (error: unknown) {
+                    if (error instanceof AxiosError) {
+                        if(error.response?.data.error){
+                            dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        } else if (error.response?.data) {
+                            dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        }
+                    }
+                }
+            }
+        }, [userId]
+    )
 
     useEffect(() => {
         if(getValues("bgPicture")) {

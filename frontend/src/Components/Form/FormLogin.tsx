@@ -1,4 +1,4 @@
-import React, { useReducer } from "react"
+import React, { useCallback, useReducer } from "react"
 import { IFormValues } from "../../interface/Index"
 import LabeledInput from "./LabeledInput/LabeledInput"
 import Button from "../../Components/Form/Button/Button"
@@ -40,23 +40,25 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
     const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaLogin)})
 
-    const onLoginSubmit = async (data: IFormValues) => {
-        try {
-            const userData = await axios.post("http://127.0.0.1:3000/api/auth/login", data)
-            localStorage.setItem("token", JSON.stringify(userData.data.token))
-            authContext?.setConnectHandle(true)
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.error){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+    const onLoginSubmit = useCallback(
+        async (data: IFormValues) => {
+            try {
+                const userData = await axios.post("http://127.0.0.1:3000/api/auth/login", data)
+                localStorage.setItem("token", JSON.stringify(userData.data.token))
+                authContext?.setConnectHandle(true)
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
+                } else {
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
                 }
-            } else {
-                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
             }
-        }
-    }
+        }, []
+    )
     
     return (
         <>

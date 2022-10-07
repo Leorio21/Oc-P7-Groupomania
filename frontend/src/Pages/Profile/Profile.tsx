@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from "react"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { AuthContext } from "../../Context/AuthContext"
 import axios, { AxiosError } from "axios"
@@ -33,30 +33,32 @@ const Profile = () => {
     const [userData, setUserData] = useState<OneUser>()
     const [noPost, setNoPost] = useState(true)
 
-    const recupUserData = async () => {
-        try {
-            const option = {
-                headers: {
-                    Authorization: `Bearer ${authContext?.token}`
+    const recupUserData = useCallback(
+        async (): Promise<void> => {
+            try {
+                const option = {
+                    headers: {
+                        Authorization: `Bearer ${authContext?.token}`
+                    }
+                }
+                const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${params.userId}`, option)
+                setUserData(response.data.user)
+                if (response.data.user.post.length !== 0) {
+                    setNoPost(false)
+                }
+            } catch (error: unknown) {
+                if (error instanceof AxiosError) {
+                    if(error.response?.data.error){
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                    } else if (error.response?.data) {
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                    }
+                } else {
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
                 }
             }
-            const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${params.userId}`, option)
-            setUserData(response.data.user)
-            if (response.data.user.post.length !== 0) {
-                setNoPost(false)
-            }
-        } catch (error: unknown) {
-            if (error instanceof AxiosError) {
-                if(error.response?.data.error){
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
-                } else if (error.response?.data) {
-                    dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
-                }
-            } else {
-                dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
-            }
-        }
-    }
+        }, [params.userId]
+    )
 
     useEffect(() => {
         recupUserData()
