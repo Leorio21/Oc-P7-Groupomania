@@ -49,7 +49,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const bddLike = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/like`, {}, option)
+                const bddLike = await axios.post(`${authContext?.apiUrl}/api/post/${postId}/like`, {}, option)
                 if (userLikePost) {
                     const newLikeArray = postLike.filter((like) => like.userId !== authContext?.userId)
                     setPostLike(newLikeArray)

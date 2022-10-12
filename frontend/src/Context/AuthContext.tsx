@@ -3,6 +3,7 @@ import React, { createContext, PropsWithChildren, useEffect, useMemo, useReducer
 import Modal from "../Components/Modal/Modal"
 
 interface AuthContextInterface {
+    apiUrl: string
     userId: number
     token: string
     role: string
@@ -29,6 +30,10 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 export const AuthContext = createContext<AuthContextInterface | null>(null)
 
 const AuthContextProvider = ({children}: PropsWithChildren) => {
+
+    const apiUrl = useMemo(() => {
+        return "http://192.172.1.82:3000"
+    }, [])
     
     const [textError, dispatchModal] = useReducer(reducerModal, initialTextError)
     const [userId, setUserId] = useState(-1)
@@ -51,7 +56,7 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             }
         }
         try {
-            const userData = await axios.get("http://127.0.0.1:3000/api/auth/connect", option)
+            const userData = await axios.get(`${apiUrl}/api/auth/connect`, option)
             localStorage.setItem("token", JSON.stringify(userData.data.token))
             setUserId(userData.data.userId)
             setFirstName(userData.data.firstName)
@@ -75,6 +80,7 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
 
     const contextValues = useMemo(() => {
         return {
+            apiUrl,
             userId,
             token,
             role,
@@ -82,7 +88,7 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             lastName,
             avatar,
             connected, setConnectHandle}
-    }, [userId, token, role, firstName, lastName, avatar, connected])
+    }, [apiUrl, userId, token, role, firstName, lastName, avatar, connected])
 
     useEffect(() => {
         if(localStorage.getItem("token")) {

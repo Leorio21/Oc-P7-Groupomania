@@ -62,7 +62,7 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const modifyComment = await axios.put(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment?.id}`, data, option)
+                const modifyComment = await axios.put(`${authContext?.apiUrl}/api/post/${postId}/comment/${comment?.id}`, data, option)
                 onModifyForm && onModifyForm(comment!.id, modifyComment.data.updatedBy, data.content)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
@@ -86,7 +86,7 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const bddComment = await axios.post(`http://127.0.0.1:3000/api/post/${postId}/comment`, data, option)
+                const bddComment = await axios.post(`${authContext?.apiUrl}/api/post/${postId}/comment`, data, option)
                 const newComment: OnePostComment = { ...bddComment.data.comment }
                 onCreateForm && onCreateForm(newComment)
             } catch (error: unknown) {

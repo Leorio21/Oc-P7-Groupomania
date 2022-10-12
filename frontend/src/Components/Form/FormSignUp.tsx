@@ -48,7 +48,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
     const onSignUpSubmit = useCallback(
         async (data: IFormValues) => {
             try {
-                const userData = await axios.post("http://127.0.0.1:3000/api/auth/signup", data)
+                const userData = await axios.post(`${authContext?.apiUrl}/api/auth/signup`, data)
                 localStorage.setItem("token", JSON.stringify(userData.data.token))
                 authContext?.setConnectHandle(true)
             } catch (error: unknown) {

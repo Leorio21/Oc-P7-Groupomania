@@ -1,23 +1,26 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from "express"
 
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role } from "@prisma/client"
 const prisma = new PrismaClient()
 
-export const createComment = async (req: Request, res: Response, next: NextFunction) => {
+export const createComment = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
-                id: +req.params.id
-            }
+                id: +req.params.id,
+            },
         })
-        if(!post) {
-            throw 'post non trouvé'
+        if (!post) {
+            throw "post non trouvé"
         }
         const comment = await prisma.comment.create({
             data: {
                 postId: +req.params.id,
                 authorId: req.auth.userId,
-                content: req.body.content
+                content: req.body.content,
             },
         })
         return res.status(201).json({
@@ -26,81 +29,95 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
                 author: {
                     firstName: req.auth.firstName,
                     lastName: req.auth.lastName,
-                    avatar: req.auth.avatar
-                }
+                    avatar: req.auth.avatar,
+                },
             },
-            message: 'Commentaire enregistré'
+            message: "Commentaire enregistré",
         })
-
     } catch (error) {
         return res.status(400).json({ error })
     }
 }
 
-export const modifyComment = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyComment = async (
+    req: Request,
+    res: Response
+) => {
     try {
-            let authorUpdate: Role = 'USER';
-            const post = await prisma.post.findUnique({
+        let authorUpdate: Role = "USER"
+        const post = await prisma.post.findUnique({
+            where: {
+                id: +req.params.id,
+            },
+        })
+        const comment = await prisma.comment.findUnique({
+            where: {
+                id: +req.params.comId,
+            },
+        })
+        if (!post || !comment) {
+            throw "Post/Commentaire introuvable"
+        }
+        if (
+            comment.authorId == req.auth.userId ||
+            req.auth.role == "ADMIN" ||
+            req.auth.role == "MODERATOR"
+        ) {
+            if (comment.authorId != req.auth.userId) {
+                authorUpdate = req.auth.role
+            }
+            await prisma.comment.updateMany({
                 where: {
-                    id: +req.params.id 
+                    id: +req.params.comId,
                 },
-            });
-            const comment = await prisma.comment.findUnique({
-                where: {
-                    id: +req.params.comId
-                }
-            })
-            if (!post || !comment) {
-                throw 'Post/Commentaire introuvable'
-            }
-            if(comment.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
-                if (comment.authorId != req.auth.userId) {
-                    authorUpdate = req.auth.role
-                }
-                await prisma.comment.updateMany({
-                    where: {
-                        id: +req.params.comId
-                    },
-                    data: {
-                        content: req.body.content,
-                        updatedBy: authorUpdate
-                    }
-                })
-                return res.status(200).json({
+                data: {
+                    content: req.body.content,
                     updatedBy: authorUpdate,
-                    message: 'Commentaire modifié' })
-            }
-            return res.status(403).json({ error: 'action non autorisée'})
+                },
+            })
+            return res.status(200).json({
+                updatedBy: authorUpdate,
+                message: "Commentaire modifié",
+            })
+        }
+        return res.status(403).json({ error: "action non autorisée" })
     } catch (error) {
-        return res.status(403).json({ error });
+        return res.status(403).json({ error })
     }
 }
 
-export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteComment = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
-                id: +req.params.id 
+                id: +req.params.id,
             },
-        });
+        })
         const comment = await prisma.comment.findUnique({
             where: {
-                id: +req.params.comId
-            }
+                id: +req.params.comId,
+            },
         })
         if (!post || !comment) {
-            throw 'Post/Commentaire introuvable'
+            throw "Post/Commentaire introuvable"
         }
-        if(comment.authorId == req.auth.userId || req.auth.role == 'ADMIN' || req.auth.role == 'MODERATOR') {
+        if (
+            comment.authorId == req.auth.userId ||
+            req.auth.role == "ADMIN" ||
+            req.auth.role == "MODERATOR"
+        ) {
             await prisma.comment.delete({
                 where: {
-                    id: +req.params.comId
-                }
+                    id: +req.params.comId,
+                },
             })
-            return res.status(200).json({ message: 'Commentaire supprimé' })
+            return res.status(200).json({ message: "Commentaire supprimé" })
         }
-        return res.status(403).json({ error: 'action non autorisée'})
+        return res.status(403).json({ error: "action non autorisée" })
     } catch (error) {
-        return res.status(403).json({ error });
+        return res.status(403).json({ error })
     }
 }

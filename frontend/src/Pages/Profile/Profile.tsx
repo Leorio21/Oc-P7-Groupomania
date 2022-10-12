@@ -41,7 +41,7 @@ const Profile = () => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${params.userId}`, option)
+                const response = await axios.get(`${authContext?.apiUrl}:3000/api/auth/user/${params.userId}`, option)
                 setUserData(response.data.user)
                 if (response.data.user.post.length !== 0) {
                     setNoPost(false)

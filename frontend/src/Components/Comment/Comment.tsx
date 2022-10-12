@@ -59,7 +59,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                 }
             }
             try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${postId}/comment/${comment.id}`, option)
+                await axios.delete(`${authContext?.apiUrl}/api/post/${postId}/comment/${comment.id}`, option)
                 onDeleteComment(comment.id)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
@@ -84,14 +84,6 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         }
         return "\n(modifié)"
     }, [updatedBy])
-    
-    useEffect(() => {
-        if(editMode) {
-            const element = document.getElementById(`editCom${postId}`)!
-            element.style.height = "5px"
-            element.style.height = (element.scrollHeight) + "px"
-        }
-    }, [editMode])
     
     return (
         <>

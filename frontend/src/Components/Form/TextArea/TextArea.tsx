@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Path, UseFormRegister } from "react-hook-form"
 import { IFormValues } from "../../../interface/Index"
 
@@ -18,7 +18,7 @@ interface TextAreaProps {
 }
 
 const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitComment, editMode, postForm }: TextAreaProps) => {
-
+    
     const onKeyDownHandler = (event: any) => {
         if (!postForm) {
             const txtAreaEl = document.getElementById(id)! as HTMLTextAreaElement
@@ -44,6 +44,10 @@ const TextArea = ({tabIndex, id, placeHolder, name,  value, register, onSubmitCo
         element.style.height = "5px"
         element.style.height = (element.scrollHeight) + "px"
     }
+
+    useEffect(() => {
+        auto_grow()
+    }, [])
 
     return (
         <textarea

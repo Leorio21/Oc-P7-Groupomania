@@ -77,7 +77,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                 return newPost
             })
             setEditMode(!editMode)
-        }, []
+        }, [editMode]
     )
 
     /**
@@ -92,7 +92,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                 }
             }
             try {
-                await axios.delete(`http://127.0.0.1:3000/api/post/${postData.id}`, option)
+                await axios.delete(`${authContext?.apiUrl}/api/post/${postData.id}`, option)
                 onDeletePost(postData.id)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
@@ -103,7 +103,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                     }
                 }
             }
-        }, [postData]
+        }, [postData.id, authContext?.token]
     )
 
     /* A memoized function that returns a string based on the value of the updatedBy property of the
@@ -117,14 +117,6 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
         }
         return "(modifié)"
     }, [post.updatedBy])
-
-    useEffect(() => {
-        if (editMode) {
-            const element = document.getElementById(`content${postData.id}`)!
-            element.style.height = "5px"
-            element.style.height = (element.scrollHeight) + "px"
-        }
-    }, [editMode])
 
     /* Updating the postedAt state every 60 seconds. */
     useEffect(() => {

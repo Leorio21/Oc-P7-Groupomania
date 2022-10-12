@@ -34,7 +34,7 @@ const Members = () => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const response = await axios.get("http://127.0.0.1:3000/api/auth/members", option)
+                const response = await axios.get(`${authContext?.apiUrl}/api/auth/members`, option)
                 setUserList(response.data.user)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {

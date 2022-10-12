@@ -79,7 +79,7 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const bddPost = await axios.post("http://127.0.0.1:3000/api/post/", myFormData, option)
+                const bddPost = await axios.post(`${authContext?.apiUrl}/api/post/`, myFormData, option)
                 const newPost: OnePost = {
                     ...bddPost.data.post,
                     like: [],

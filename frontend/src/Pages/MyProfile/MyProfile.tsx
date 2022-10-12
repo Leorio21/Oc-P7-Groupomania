@@ -15,7 +15,7 @@ import Button from "../../Components/Form/Button/Button"
 import LabeledInput from "../../Components/Form/LabeledInput/LabeledInput"
 import PasswordCheck from "../../Components/Form/PasswordCheck/PasswordCheck"
 import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfirm"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import LabeledSelect from "../../Components/Form/LabeledSelect/LabeledSelect"
 
 const schemaProfile = yup.object({
@@ -45,6 +45,7 @@ const MyProfile = () => {
     
     const params = useParams()
     const authContext = useContext(AuthContext)
+    const navigate = useNavigate()
 
     const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)})
     
@@ -67,7 +68,7 @@ const MyProfile = () => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const response = await axios.get(`http://127.0.0.1:3000/api/auth/user/${userId}`, option)
+                const response = await axios.get(`${authContext?.apiUrl}/api/auth/user/${userId}`, option)
                 setUserFirstName(response.data.user.firstName)
                 setValue("firstName", response.data.user.firstName)
                 setUserLastName(response.data.user.lastName)
@@ -128,7 +129,7 @@ const MyProfile = () => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                await axios.put(`http://127.0.0.1:3000/api/auth/${userId}`, myFormData, option)
+                await axios.put(`${authContext?.apiUrl}/api/auth/${userId}`, myFormData, option)
                 resetUserForm()
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
@@ -153,11 +154,12 @@ const MyProfile = () => {
                         },
                         data: {password: data.password}
                     }
-                    await axios.delete(`http://127.0.0.1:3000/api/auth/${userId}`, option)
+                    await axios.delete(`${authContext?.apiUrl}/api/auth/${userId}`, option)
                     if(!params.userId) {
                         localStorage.removeItem("token")
                         authContext?.setConnectHandle(false)
                     }
+                    navigate("/home")
                 } catch (error: unknown) {
                     if (error instanceof AxiosError) {
                         if(error.response?.data.error){
@@ -191,7 +193,7 @@ const MyProfile = () => {
     return (
         <>
             <form className={classNames(cn.form)} onSubmit={handleSubmit(onFormSubmit)}>
-                <div className={classNames(cn.bg_container)}>
+                <div className={classNames(cn.bg_container)} tabIndex={0}>
                     {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
                     <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
                         <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>

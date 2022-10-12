@@ -42,7 +42,7 @@ const PostsList = ({postUser}:  PostListProps) => {
     const fetchData = useCallback(
         async (option: OptionAxios): Promise<void> => {
             try {
-                const getPosts = await axios.get("http://127.0.0.1:3000/api/post", option)
+                const getPosts = await axios.get(`${authContext?.apiUrl}/api/post`, option)
                 setPosts(getPosts.data)
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {

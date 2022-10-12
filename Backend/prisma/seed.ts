@@ -1,55 +1,56 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient, Prisma } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
 const userData: Prisma.UserCreateInput[] = [
     {
-        email: 'admin.admin@groupomania.fr',
-        firstName: 'admin',
-        lastName: 'admin',
-        password: '$2b$12$024o3crNp5Ii0rYCtI7Mo.rUj7R7jUdeE2uSl24Q4Br0NuuITzgJ',
+        email: "admin.admin@groupomania.fr",
+        firstName: "admin",
+        lastName: "admin",
+        password: "$2b$12$024o3crNp5Ii0rYCtI7Mo.rUj7R7jUdeE2uSl24Q4Br0NuuITzgJ",
         avatar: null,
         background: null,
-        role:'ADMIN',
+        role: "ADMIN",
     },
     {
-        email: 'lefeuvre.jerome@groupomania.fr',
-        firstName: 'jerome',
-        lastName: 'lefeuvre',
-        password: '$2b$12$12ALM8OaQDpJfup0hFOTY.cSvbXkuPktnJUC01PHoOeJ6M5p72Z3O',
+        email: "lefeuvre.jerome@groupomania.fr",
+        firstName: "jerome",
+        lastName: "lefeuvre",
+        password:
+            "$2b$12$12ALM8OaQDpJfup0hFOTY.cSvbXkuPktnJUC01PHoOeJ6M5p72Z3O",
         avatar: null,
         background: null,
-        role:'MODERATOR',
+        role: "MODERATOR",
         post: {
             create: [
                 {
-                    content: 'content test 1',
+                    content: "content test 1",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 2',
+                    content: "content test 2",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 3',
+                    content: "content test 3",
                     image: null,
                     updatedBy: null,
                 },
-            ]
+            ],
         },
         comment: {
-            create : [
+            create: [
                 {
-                    content: 'test comm 1',
+                    content: "test comm 1",
                     postId: 2,
                 },
                 {
-                    content: 'test comm 2',
+                    content: "test comm 2",
                     postId: 3,
                 },
-            ]
+            ],
         },
         like: {
             create: [
@@ -62,47 +63,48 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     postId: 1,
                 },
-            ]
-        }
+            ],
+        },
     },
     {
-        email: 'lefeuvre.armel@groupomania.fr',
-        firstName: 'armel',
-        lastName: 'lefeuvre',
-        password: '$2b$12$qJyddzg4QUS.NwnFbBcOt.HlAFwxKQZbQsDpRRT4VZ5B/nqH6alLW',
+        email: "lefeuvre.armel@groupomania.fr",
+        firstName: "armel",
+        lastName: "lefeuvre",
+        password:
+            "$2b$12$qJyddzg4QUS.NwnFbBcOt.HlAFwxKQZbQsDpRRT4VZ5B/nqH6alLW",
         avatar: null,
         background: null,
-        role:'USER',
+        role: "USER",
         post: {
             create: [
                 {
-                    content: 'content test 4',
+                    content: "content test 4",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 5',
+                    content: "content test 5",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 6',
+                    content: "content test 6",
                     image: null,
                     updatedBy: null,
                 },
-            ]
+            ],
         },
         comment: {
-            create : [
+            create: [
                 {
-                    content: 'test comm 3',
+                    content: "test comm 3",
                     postId: 2,
                 },
                 {
-                    content: 'test comm 4',
+                    content: "test comm 4",
                     postId: 1,
                 },
-            ]
+            ],
         },
         like: {
             create: [
@@ -115,47 +117,48 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     postId: 4,
                 },
-            ]
-        }
+            ],
+        },
     },
     {
-        email: 'lefeuvre.catherine@groupomania.fr',
-        firstName: 'catherine',
-        lastName: 'lefeuvre',
-        password: '$2b$12$qJyddzg4QUS.NwnFbBcOt.HlAFwxKQZbQsDpRRT4VZ5B/nqH6alLW',
+        email: "lefeuvre.catherine@groupomania.fr",
+        firstName: "catherine",
+        lastName: "lefeuvre",
+        password:
+            "$2b$12$qJyddzg4QUS.NwnFbBcOt.HlAFwxKQZbQsDpRRT4VZ5B/nqH6alLW",
         avatar: null,
         background: null,
-        role:'USER',
+        role: "USER",
         post: {
             create: [
                 {
-                    content: 'content test 7',
+                    content: "content test 7",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 8',
+                    content: "content test 8",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 9',
+                    content: "content test 9",
                     image: null,
                     updatedBy: null,
                 },
-            ]
+            ],
         },
         comment: {
-            create : [
+            create: [
                 {
-                    content: 'test comm 5',
+                    content: "test comm 5",
                     postId: 6,
                 },
                 {
-                    content: 'test comm 6',
+                    content: "test comm 6",
                     postId: 4,
                 },
-            ]
+            ],
         },
         like: {
             create: [
@@ -168,47 +171,48 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     postId: 1,
                 },
-            ]
-        }
+            ],
+        },
     },
     {
-        email: 'lefeuvre.matthieu@groupomania.fr',
-        firstName: 'matthieu',
-        lastName: 'lefeuvre',
-        password: '$2b$12$q5Jh1XJVJiwqOdEFl9BBo.W8l5dy71QIeYaL5buIn7Vj1rHprJLb2',
+        email: "lefeuvre.matthieu@groupomania.fr",
+        firstName: "matthieu",
+        lastName: "lefeuvre",
+        password:
+            "$2b$12$q5Jh1XJVJiwqOdEFl9BBo.W8l5dy71QIeYaL5buIn7Vj1rHprJLb2",
         avatar: null,
         background: null,
-        role:'USER',
+        role: "USER",
         post: {
             create: [
                 {
-                    content: 'content test 10',
+                    content: "content test 10",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 11',
+                    content: "content test 11",
                     image: null,
                     updatedBy: null,
                 },
                 {
-                    content: 'content test 12',
+                    content: "content test 12",
                     image: null,
                     updatedBy: null,
                 },
-            ]
+            ],
         },
         comment: {
-            create : [
+            create: [
                 {
-                    content: 'test comm 7',
+                    content: "test comm 7",
                     postId: 9,
                 },
                 {
-                    content: 'test comm 8',
+                    content: "test comm 8",
                     postId: 10,
                 },
-            ]
+            ],
         },
         like: {
             create: [
@@ -221,8 +225,8 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     postId: 1,
                 },
-            ]
-        }
+            ],
+        },
     },
 ]
 

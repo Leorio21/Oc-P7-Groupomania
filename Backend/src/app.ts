@@ -1,45 +1,42 @@
-import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import path from 'path';
-import { Request, Response, NextFunction } from 'express'
-import { existsSync } from 'node:fs';
-import { mkdir } from 'node:fs/promises';
+import express from "express"
+import helmet from "helmet"
+import cors from "cors"
+import path from "path"
+import { Request, Response, NextFunction } from "express"
+import { existsSync } from "node:fs"
+import { mkdir } from "node:fs/promises"
 
+require("dotenv").config()
 
-require('dotenv').config();
+import userRoutes from "./routes/user"
+import postRoutes from "./routes/post"
 
-import userRoutes from './routes/user';
-import postRoutes from './routes/post';
+const imagesDir = path.join(__dirname, "images")
 
-const imagesDir = path.join(__dirname, 'images')
-
-if(!existsSync(imagesDir)){
+if (!existsSync(imagesDir)) {
     try {
-        mkdir(imagesDir);
+        mkdir(imagesDir)
     } catch {
-        console.log('Erreur lors de la création du dossier images')
+        console.log("Erreur lors de la création du dossier images")
     }
-};
+}
 
-const app = express();
+const app = express()
 
-app.use('/images', express.static(imagesDir));
+app.use("/images", express.static(imagesDir))
 
-app.use(cors());
-app.use(helmet());
+app.use(cors())
+app.use(helmet())
 
-app.use(express.json());
+app.use(express.json())
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-    res.setHeader('Cross-Origin-Resource-Policy', '*');
-    next();
-});
+    res.setHeader("Cross-Origin-Resource-Policy", "*")
+    next()
+})
 
-app.use('/api/auth', userRoutes);
+app.use("/api/auth", userRoutes)
 
-app.use('/api/post', postRoutes);
+app.use("/api/post", postRoutes)
 
-app.listen(3000)
-
-export default app;
+export default app

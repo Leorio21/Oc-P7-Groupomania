@@ -1,45 +1,48 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from "express"
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
-export const likePost = async (req: Request, res: Response, _next: NextFunction) => {
+export const likePost = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const post = await prisma.post.findUnique({
             where: {
-                id: +req.params.id
-            }})
-            if (!post) {
-                return res.status(400).json({ error: 'Post introuvable' }) 
-            }
+                id: +req.params.id,
+            },
+        })
+        if (!post) {
+            return res.status(400).json({ error: "Post introuvable" })
+        }
 
-            const like = await prisma.postLike.findMany({
-                where: {
-                    postId: +req.params.id,
-                    userId: req.auth.userId
-                }
-            })
+        const like = await prisma.postLike.findMany({
+            where: {
+                postId: +req.params.id,
+                userId: req.auth.userId,
+            },
+        })
         if (like[0]) {
             await prisma.postLike.deleteMany({
                 where: {
                     postId: +req.params.id,
-                    userId: req.auth.userId
-                }
+                    userId: req.auth.userId,
+                },
             })
-            return res.status(201).json({message: 'Like supprimé'})
+            return res.status(201).json({ message: "Like supprimé" })
         }
         const newLike = await prisma.postLike.create({
             data: {
                 postId: +req.params.id,
-                userId: req.auth.userId
-            }
+                userId: req.auth.userId,
+            },
         })
         return res.status(201).json({
             like: newLike,
-            message: 'Like enregistré'
+            message: "Like enregistré",
         })
     } catch (error) {
         return res.status(400).json({ error })
     }
-
 }
