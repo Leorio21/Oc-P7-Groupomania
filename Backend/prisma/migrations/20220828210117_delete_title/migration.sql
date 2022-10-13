@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `post` DROP COLUMN `title`;
+ALTER TABLE `Post` DROP COLUMN `title`;
