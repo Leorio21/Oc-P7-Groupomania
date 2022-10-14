@@ -85,7 +85,6 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
      */
     const onDeleteHandler = useCallback(
         async (): Promise<void> => {
-            console.log("delete post : " + postData.id)
             const option = {
                 headers: {
                     Authorization: `Bearer ${authContext?.token}`

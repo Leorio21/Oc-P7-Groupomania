@@ -63,7 +63,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             } catch (error) {
                 dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error}`})
             }
-        }, [postId]
+        }, [postId, userLikePost]
     )
 
     return (

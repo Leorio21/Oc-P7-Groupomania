@@ -33,7 +33,7 @@ const Profile = () => {
     const [userData, setUserData] = useState<OneUser>()
     const [noPost, setNoPost] = useState(true)
 
-    const recupUserData = useCallback(
+    const recupUserData = 
         async (): Promise<void> => {
             try {
                 const option = {
@@ -41,7 +41,7 @@ const Profile = () => {
                         Authorization: `Bearer ${authContext?.token}`
                     }
                 }
-                const response = await axios.get(`${authContext?.apiUrl}:3000/api/auth/user/${params.userId}`, option)
+                const response = await axios.get(`${authContext?.apiUrl}/api/auth/user/${params.userId}`, option)
                 setUserData(response.data.user)
                 if (response.data.user.post.length !== 0) {
                     setNoPost(false)
@@ -57,8 +57,7 @@ const Profile = () => {
                     dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
                 }
             }
-        }, [params.userId]
-    )
+        }
 
     useEffect(() => {
         recupUserData()

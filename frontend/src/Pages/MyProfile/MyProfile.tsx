@@ -140,7 +140,7 @@ const MyProfile = () => {
                     }
                 }
             }
-        }, [userId]
+        }, [userId, userBgPictureUrl, userAvatarUrl]
     )
 
     const deleteAccount = useCallback(
