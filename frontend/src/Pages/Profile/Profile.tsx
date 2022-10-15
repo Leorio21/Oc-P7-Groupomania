@@ -1,37 +1,37 @@
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import { AuthContext } from "../../Context/AuthContext"
-import axios, { AxiosError } from "axios"
-import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { AuthContext } from "../../Context/AuthContext";
+import axios, { AxiosError } from "axios";
+import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid";
 
-import { OneUser } from "../../interface/Index"
+import { OneUser } from "../../interface/Index";
 
-import classNames from "classnames"
-import cn from "./Profile.module.scss"
+import classNames from "classnames";
+import cn from "./Profile.module.scss";
 
-import Modal from "../../Components/Modal/Modal"
-import PostsList from "../../Components/Post/PostsList"
+import Modal from "../../Components/Modal/Modal";
+import PostsList from "../../Components/Post/PostsList";
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload ?? "Texte non défini"
-        return state
+        state = action.payload ?? "Texte non défini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 
 const Profile = () => {
 
-    const params = useParams()
-    const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
-    const [userData, setUserData] = useState<OneUser>()
-    const [noPost, setNoPost] = useState(true)
+    const params = useParams();
+    const authContext = useContext(AuthContext);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [userData, setUserData] = useState<OneUser>();
+    const [noPost, setNoPost] = useState(true);
 
     const recupUserData = 
         async (): Promise<void> => {
@@ -40,28 +40,28 @@ const Profile = () => {
                     headers: {
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const response = await axios.get(`${authContext?.apiUrl}/api/auth/user/${params.userId}`, option)
-                setUserData(response.data.user)
+                };
+                const response = await axios.get(`${authContext?.apiUrl}/api/auth/user/${params.userId}`, option);
+                setUserData(response.data.user);
                 if (response.data.user.post.length !== 0) {
-                    setNoPost(false)
+                    setNoPost(false);
                 }
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
                 }
             }
-        }
+        };
 
     useEffect(() => {
-        recupUserData()
-    }, [params.userId])
+        recupUserData();
+    }, [params.userId]);
     
     return (
         <>{userData &&
@@ -72,11 +72,11 @@ const Profile = () => {
                 </div>
                 <div className={classNames(cn.name)}>{userData?.firstName} {userData?.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
                 {!noPost ? <PostsList postUser={userData.post}/> : <div className={classNames(cn.noPost)}>Aucune publications</div>}
-                {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+                {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
             </>
         }
         </>
-    )
-}
+    );
+};
 
-export default Profile
+export default Profile;

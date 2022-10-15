@@ -1,22 +1,22 @@
-import { PencilIcon, TrashIcon } from "@heroicons/react/solid"
+import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 
-import classNames from "classnames"
-import React, { KeyboardEvent, useReducer } from "react"
-import Modal from "../Modal/Modal"
-import cn from "./AdminMenu.module.scss"
+import classNames from "classnames";
+import React, { KeyboardEvent, useReducer } from "react";
+import Modal from "../Modal/Modal";
+import cn from "./AdminMenu.module.scss";
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload
-        return state
+        state = action.payload;
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 
 interface AdminMenuProps {
     onModifyClick: () => void,
@@ -25,35 +25,35 @@ interface AdminMenuProps {
 
 const AdminMenu = ({ onModifyClick, onDeleteClick}: AdminMenuProps) => {
     
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     
     const onModifyKeyDownHandler = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
-            onModifyHandler()
+            onModifyHandler();
         }
-    }
+    };
 
     const onDeleteKeyDownHandler = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
-            onDeleteHandler()
+            onDeleteHandler();
         }
-    }
+    };
 
     const onModifyHandler = () => {
-        onModifyClick()
-    }
+        onModifyClick();
+    };
 
     const onDeleteHandler = () => {
-        onDeleteClick()
-    }
+        onDeleteClick();
+    };
 
     return (
         <>
             <PencilIcon tabIndex={0} onKeyDown={onModifyKeyDownHandler} onClick={onModifyHandler} className={classNames(cn["menu-icone"])} />
             <TrashIcon tabIndex={0} onKeyDown={onDeleteKeyDownHandler} onClick={onDeleteHandler} className={classNames(cn["menu-icone"])} />
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide", payload: ""})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide", payload: ""});}} />}
         </>
-    )
-}
+    );
+};
 
-export default AdminMenu
+export default AdminMenu;

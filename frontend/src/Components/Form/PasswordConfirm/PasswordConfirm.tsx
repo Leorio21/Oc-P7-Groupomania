@@ -1,9 +1,9 @@
-import React from "react"
-import { CheckIcon, XIcon } from "@heroicons/react/solid"
+import React from "react";
+import { CheckIcon, XIcon } from "@heroicons/react/solid";
 
-import classNames from "classnames"
-import { Control, FieldValues, Path, useWatch } from "react-hook-form"
-import cn from "./PasswordConfirm.module.scss"
+import classNames from "classnames";
+import { Control, FieldValues, Path, useWatch } from "react-hook-form";
+import cn from "./PasswordConfirm.module.scss";
 
 interface PasswordConfirmProps<T extends FieldValues>{
     name: Path<T>
@@ -12,15 +12,15 @@ interface PasswordConfirmProps<T extends FieldValues>{
 }
 const PasswordConfirm = <T extends FieldValues>({name, nameConfirm, control}: PasswordConfirmProps<T>) => {
 
-    const password = useWatch({name, control})
-    const passwordConfirm = useWatch({name: nameConfirm, control})
+    const password = useWatch({name, control});
+    const passwordConfirm = useWatch({name: nameConfirm, control});
 
     return (
         <div className={classNames(cn.container)}>
             {password === passwordConfirm ? <span><CheckIcon className={classNames(cn.icon, cn.iconCheck)} /> Les mots de passe sont identique</span>:<span><XIcon className={classNames(cn.icon, cn.iconX)} /> Les mots de passe ne sont pas identique</span>}
             
         </div>
-    )
-}
+    );
+};
 
-export default PasswordConfirm
+export default PasswordConfirm;

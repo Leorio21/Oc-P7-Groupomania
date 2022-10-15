@@ -1,7 +1,7 @@
-import React from "react"
-import logo from "../../assets/logo_rouge.webp"
-import classNames from "classnames"
-import cn from "./Error.module.scss"
+import React from "react";
+import logo from "../../assets/logo_rouge.webp";
+import classNames from "classnames";
+import cn from "./Error.module.scss";
 
 
 const Error = () => {
@@ -12,7 +12,7 @@ const Error = () => {
             <p className={classNames(cn.error_texte)}>La page demandée n&apos;existe pas</p>
             <h2 className={classNames(cn.secondary_title)}>Groupomania</h2>
         </div>
-    )
-}
+    );
+};
 
-export default Error
+export default Error;

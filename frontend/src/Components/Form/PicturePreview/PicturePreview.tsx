@@ -1,8 +1,8 @@
-import { XIcon } from "@heroicons/react/outline"
-import React, { MouseEventHandler } from "react"
+import { XIcon } from "@heroicons/react/outline";
+import React, { MouseEventHandler } from "react";
 
-import classNames from "classnames"
-import cn from "./PicturePreview.module.scss"
+import classNames from "classnames";
+import cn from "./PicturePreview.module.scss";
 
 interface PicturePreviewProps {
     pictureUrl: string | null | undefined,
@@ -22,7 +22,7 @@ const PicturePreview = ({pictureUrl, resetPicture}: PicturePreviewProps) => {
                 }
             </div>
         </>
-    )
-}
+    );
+};
 
-export default PicturePreview
+export default PicturePreview;

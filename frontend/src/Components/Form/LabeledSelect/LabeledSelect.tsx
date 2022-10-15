@@ -1,8 +1,8 @@
-import React, { PropsWithChildren } from "react"
-import classNames from "classnames"
-import cn from "./LabeledSelect.module.scss"
-import { Path, UseFormRegister } from "react-hook-form"
-import { IFormValues } from "../../../interface/Index"
+import React, { PropsWithChildren } from "react";
+import classNames from "classnames";
+import cn from "./LabeledSelect.module.scss";
+import { Path, UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../../interface/Index";
 
 interface LabeledSelectProps extends PropsWithChildren {
     tabIndex: number
@@ -17,9 +17,9 @@ interface LabeledSelectProps extends PropsWithChildren {
 const LabeledSelect = ({tabIndex, name, label, id, role, register, options}: LabeledSelectProps) => {
     
     const selectOptions = options.map((option, key) => {
-        const isSelected = role.includes(option)
-        return (<option value={option} key={key} selected={isSelected}>{option}</option>)
-    })
+        const isSelected = role.includes(option);
+        return (<option value={option} key={key} selected={isSelected}>{option}</option>);
+    });
 
     return (
         <div className={classNames(cn.selectContainer)}>
@@ -28,7 +28,7 @@ const LabeledSelect = ({tabIndex, name, label, id, role, register, options}: Lab
                 {selectOptions}
             </select>
         </div>
-    )
-}
+    );
+};
 
-export default LabeledSelect
+export default LabeledSelect;

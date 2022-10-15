@@ -1,9 +1,9 @@
-import React from "react"
-import { Path, UseFormRegister } from "react-hook-form"
-import { IFormValues } from "../../../interface/Index"
+import React from "react";
+import { Path, UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../../interface/Index";
 
-import classNames from "classnames"
-import cn from "./LabeledInput.module.scss"
+import classNames from "classnames";
+import cn from "./LabeledInput.module.scss";
 
 interface LabeledInputProps {
     tabIndex: number,
@@ -22,7 +22,7 @@ const LabeledInput = ({tabIndex, type, id, label, name, placeHolder, register, r
         <label htmlFor={id} className={classNames(cn.label)}>{label}
             <input tabIndex={tabIndex} id={id} type={type} {...register(name, { required })} placeholder={placeHolder} className={classNames(cn.input)} />
         </label>
-    )
-}
+    );
+};
 
-export default LabeledInput
+export default LabeledInput;

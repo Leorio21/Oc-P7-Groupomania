@@ -1,9 +1,9 @@
-import fs from "fs/promises"
-import { Request, Response } from "express"
+import fs from "fs/promises";
+import { Request, Response } from "express";
 
-import { PrismaClient, Role } from "@prisma/client"
-import sharp from "sharp"
-const prisma = new PrismaClient()
+import { PrismaClient, Role } from "@prisma/client";
+import sharp from "sharp";
+const prisma = new PrismaClient();
 
 export const getAllPost = async (
     _req: Request,
@@ -45,30 +45,33 @@ export const getAllPost = async (
             orderBy: {
                 createdAt: "desc",
             },
-        })
-        return res.status(200).json(posts)
+        });
+        return res.status(200).json(posts);
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     }
-}
+};
 
 export const createPost = async (
     req: Request,
     res: Response
 ) => {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] }
-    let imageName: string | null = null
-    let newImage = false
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    let imageName: string | null = null;
+    let newImage = false;
     try {
+        if (!files["photo"] && req.body.content === "") {
+            throw "Impossible de créer un post vide";
+        }
         if (files["photo"]) {
-            imageName = files["photo"][0].filename.split(".")[0] + ".webp"
+            imageName = files["photo"][0].filename.split(".")[0] + ".webp";
             try {
                 await sharp(`./images/${files["photo"][0].filename}`).toFile(
                     `images/${imageName}`
-                )
-                newImage = true
+                );
+                newImage = true;
             } catch {
-                throw "Erreur traiement image"
+                throw "Erreur traiement image";
             }
         }
         const newPost = await prisma.post.create({
@@ -79,40 +82,40 @@ export const createPost = async (
                     imageName &&
                     `${req.protocol}://${req.get("host")}/images/${imageName}`,
             },
-        })
+        });
         return res.status(201).json({
             post: newPost,
             message: "Post enregistré",
-        })
+        });
     } catch (error) {
         if (files["photo"] && newImage) {
-            fs.unlink(`images/${imageName}`)
+            fs.unlink(`images/${imageName}`);
         }
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     } finally {
         if (files["photo"]) {
-            await fs.unlink(`images/${files["photo"][0].filename}`)
+            await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }
-}
+};
 
 export const modifyPost = async (
     req: Request,
     res: Response
 ) => {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] }
-    let imageName: string = req.body.image
-    let oldImage: string | null = ""
-    let newImage = false
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    let imageName: string = req.body.image;
+    let oldImage: string | null = "";
+    let newImage = false;
     try {
-        let authorUpdate: Role = "USER"
+        let authorUpdate: Role = "USER";
         const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!post) {
-            throw "Post"
+            throw "Post";
         }
         if (
             post.authorId == req.auth.userId ||
@@ -120,27 +123,27 @@ export const modifyPost = async (
             req.auth.role == "MODERATOR"
         ) {
             if (post.authorId != req.auth.userId) {
-                authorUpdate = req.auth.role
+                authorUpdate = req.auth.role;
             }
-            oldImage = post.image
+            oldImage = post.image;
             if (files["photo"]) {
-                imageName = files["photo"][0].filename.split(".")[0] + ".webp"
+                imageName = files["photo"][0].filename.split(".")[0] + ".webp";
                 try {
                     await sharp(
                         `./images/${files["photo"][0].filename}`
-                    ).toFile(`images/${imageName}`)
-                    newImage = true
+                    ).toFile(`images/${imageName}`);
+                    newImage = true;
                 } catch {
-                    throw "Erreur traiement image"
+                    throw "Erreur traiement image";
                 }
             }
             if (
                 (newImage && oldImage) ||
                 (imageName == "" && oldImage != "" && oldImage != null)
             ) {
-                const oldImageName = oldImage!.split("/images/")[1]
-                await fs.unlink(`images/${oldImageName}`)
-                post.image = ""
+                const oldImageName = oldImage!.split("/images/")[1];
+                await fs.unlink(`images/${oldImageName}`);
+                post.image = "";
             }
             await prisma.post.updateMany({
                 where: {
@@ -155,7 +158,7 @@ export const modifyPost = async (
                         : post.image,
                     updatedBy: authorUpdate,
                 },
-            })
+            });
             return res.status(200).json({
                 post: {
                     content: req.body.content,
@@ -167,20 +170,20 @@ export const modifyPost = async (
                     updatedBy: authorUpdate,
                 },
                 message: "Commentaire modifié",
-            })
+            });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
         if (files["photo"] && newImage) {
-            fs.unlink(`images/${imageName}`)
+            fs.unlink(`images/${imageName}`);
         }
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     } finally {
         if (files["photo"]) {
-            await fs.unlink(`images/${files["photo"][0].filename}`)
+            await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }
-}
+};
 
 export const deletePost = async (
     req: Request,
@@ -191,9 +194,9 @@ export const deletePost = async (
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!post) {
-            throw "Post introuvable"
+            throw "Post introuvable";
         }
         if (
             post.authorId == req.auth.userId ||
@@ -204,15 +207,15 @@ export const deletePost = async (
                 where: {
                     id: +req.params.id,
                 },
-            })
+            });
             if (post.image) {
-                const imageName = post.image.split("/images/")[1]
-                await fs.unlink(`images/${imageName}`)
+                const imageName = post.image.split("/images/")[1];
+                await fs.unlink(`images/${imageName}`);
             }
-            return res.status(200).json({ message: "Post supprimé" })
+            return res.status(200).json({ message: "Post supprimé" });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
-        return res.status(403).json({ error })
+        return res.status(403).json({ error });
     }
-}
+};

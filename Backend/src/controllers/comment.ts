@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response, NextFunction } from "express";
 
-import { PrismaClient, Role } from "@prisma/client"
-const prisma = new PrismaClient()
+import { PrismaClient, Role } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const createComment = async (
     req: Request,
@@ -12,9 +12,9 @@ export const createComment = async (
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!post) {
-            throw "post non trouvé"
+            throw "post non trouvé";
         }
         const comment = await prisma.comment.create({
             data: {
@@ -22,7 +22,7 @@ export const createComment = async (
                 authorId: req.auth.userId,
                 content: req.body.content,
             },
-        })
+        });
         return res.status(201).json({
             comment: {
                 ...comment,
@@ -33,30 +33,30 @@ export const createComment = async (
                 },
             },
             message: "Commentaire enregistré",
-        })
+        });
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     }
-}
+};
 
 export const modifyComment = async (
     req: Request,
     res: Response
 ) => {
     try {
-        let authorUpdate: Role = "USER"
+        let authorUpdate: Role = "USER";
         const post = await prisma.post.findUnique({
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         const comment = await prisma.comment.findUnique({
             where: {
                 id: +req.params.comId,
             },
-        })
+        });
         if (!post || !comment) {
-            throw "Post/Commentaire introuvable"
+            throw "Post/Commentaire introuvable";
         }
         if (
             comment.authorId == req.auth.userId ||
@@ -64,7 +64,7 @@ export const modifyComment = async (
             req.auth.role == "MODERATOR"
         ) {
             if (comment.authorId != req.auth.userId) {
-                authorUpdate = req.auth.role
+                authorUpdate = req.auth.role;
             }
             await prisma.comment.updateMany({
                 where: {
@@ -74,17 +74,17 @@ export const modifyComment = async (
                     content: req.body.content,
                     updatedBy: authorUpdate,
                 },
-            })
+            });
             return res.status(200).json({
                 updatedBy: authorUpdate,
                 message: "Commentaire modifié",
-            })
+            });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
-        return res.status(403).json({ error })
+        return res.status(403).json({ error });
     }
-}
+};
 
 export const deleteComment = async (
     req: Request,
@@ -95,14 +95,14 @@ export const deleteComment = async (
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         const comment = await prisma.comment.findUnique({
             where: {
                 id: +req.params.comId,
             },
-        })
+        });
         if (!post || !comment) {
-            throw "Post/Commentaire introuvable"
+            throw "Post/Commentaire introuvable";
         }
         if (
             comment.authorId == req.auth.userId ||
@@ -113,11 +113,11 @@ export const deleteComment = async (
                 where: {
                     id: +req.params.comId,
                 },
-            })
-            return res.status(200).json({ message: "Commentaire supprimé" })
+            });
+            return res.status(200).json({ message: "Commentaire supprimé" });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
-        return res.status(403).json({ error })
+        return res.status(403).json({ error });
     }
-}
+};

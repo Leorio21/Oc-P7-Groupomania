@@ -1,27 +1,27 @@
-import axios, { AxiosError } from "axios"
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
-import { AuthContext } from "../../Context/AuthContext"
+import axios, { AxiosError } from "axios";
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { AuthContext } from "../../Context/AuthContext";
 
-import classNames from "classnames"
-import cn from "./PostsList.module.scss"
+import classNames from "classnames";
+import cn from "./PostsList.module.scss";
 
-import Post from "./Post"
-import { OnePost, OptionAxios } from "../../interface/Index"
-import Modal from "../Modal/Modal"
-import FormPost from "../Form/FormPost"
+import Post from "./Post";
+import { OnePost, OptionAxios } from "../../interface/Index";
+import Modal from "../Modal/Modal";
+import FormPost from "../Form/FormPost";
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload ?? "Texte non defini"
-        return state
+        state = action.payload ?? "Texte non defini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 
 interface PostListProps {
     postUser?: OnePost[]
@@ -29,55 +29,55 @@ interface PostListProps {
 
 const PostsList = ({postUser}:  PostListProps) => {
 
-    const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
-    const [posts, setPosts] = useState<OnePost[]>([])
+    const authContext = useContext(AuthContext);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [posts, setPosts] = useState<OnePost[]>([]);
     
     const option: OptionAxios = {
         headers: {
             Authorization: `Bearer ${authContext?.token}`
         }
-    }
+    };
 
     const fetchData = useCallback(
         async (option: OptionAxios): Promise<void> => {
             try {
-                const getPosts = await axios.get(`${authContext?.apiUrl}/api/post`, option)
-                setPosts(getPosts.data)
+                const getPosts = await axios.get(`${authContext?.apiUrl}/api/post`, option);
+                setPosts(getPosts.data);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 }
             }
         }, []
-    )
+    );
     
     const onPostSubmit = (newPost: OnePost): void => {
         setPosts((prevState) => {
-            const newPostsArray = [...prevState]
-            newPostsArray.unshift(newPost)
-            return newPostsArray
-        })
-    }
+            const newPostsArray = [...prevState];
+            newPostsArray.unshift(newPost);
+            return newPostsArray;
+        });
+    };
 
     const onPostDelete = (postToDelete: number): void => {
         setPosts((prevState) => {
-            const newPostArray = prevState.filter((post) => post.id != postToDelete)
-            return newPostArray
-        })
-    }
+            const newPostArray = prevState.filter((post) => post.id != postToDelete);
+            return newPostArray;
+        });
+    };
     
     useEffect(() => {
         if (postUser) {
-            setPosts(postUser)
+            setPosts(postUser);
         } else {
-            fetchData(option)
+            fetchData(option);
         }
-    }, [postUser])
+    }, [postUser]);
 
 
     return (
@@ -100,12 +100,12 @@ const PostsList = ({postUser}:  PostListProps) => {
                             onDeletePost={onPostDelete}
                             key={post.id}
                         />
-                    )
+                    );
                 })}
             </div>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
-    )
-}
+    );
+};
 
-export default PostsList
+export default PostsList;

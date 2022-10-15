@@ -1,36 +1,36 @@
-import React, { useContext, useEffect, useReducer } from "react"
-import { useNavigate } from "react-router-dom"
-import { AuthContext } from "../../Context/AuthContext"
+import React, { useContext, useEffect, useReducer } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../Context/AuthContext";
 
-import classNames from "classnames"
-import cn from "./Connect.module.scss"
+import classNames from "classnames";
+import cn from "./Connect.module.scss";
 
-import FormLogin from "../../Components/Form/FormLogin"
-import FormSignUp from "../../Components/Form/FormSignUp"
+import FormLogin from "../../Components/Form/FormLogin";
+import FormSignUp from "../../Components/Form/FormSignUp";
 
-const initialForm = "login"
+const initialForm = "login";
 const reducerForm = (state: string) => {
-    return state === "login" ? "signup" : "login"
-}
+    return state === "login" ? "signup" : "login";
+};
 
 const Connect = () => {
-    const navigate = useNavigate()
-    const authContext = useContext(AuthContext)
+    const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
 
-    const [activeForm, toggleForm] = useReducer(reducerForm, initialForm)
+    const [activeForm, toggleForm] = useReducer(reducerForm, initialForm);
     
     const onKeyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        console.log(event)
+        console.log(event);
         if (event.key === " " || event.key === "Enter") {
-            toggleForm()
+            toggleForm();
         }
-    }
+    };
 
     useEffect(() => {
         if (authContext?.connected) {
-            navigate("/home")
+            navigate("/home");
         }
-    }, [authContext?.connected])
+    }, [authContext?.connected]);
 
     return (
         <>
@@ -56,7 +56,7 @@ const Connect = () => {
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Connect
+export default Connect;

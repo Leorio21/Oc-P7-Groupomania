@@ -1,7 +1,7 @@
-import classNames from "classnames"
-import React, { MouseEventHandler } from "react"
+import classNames from "classnames";
+import React, { MouseEventHandler } from "react";
 
-import cn from "./Button.module.scss"
+import cn from "./Button.module.scss";
 
 interface ButtonProps {
     tabIndex: number
@@ -15,7 +15,7 @@ const Button = ({tabIndex, type, onClickHandler, label, color}: ButtonProps) => 
 
     return (
         <button className={color && classNames(cn[color])} tabIndex={tabIndex} type={type} onClick={onClickHandler}>{label}</button>
-    )
-}
+    );
+};
 
-export default Button
+export default Button;

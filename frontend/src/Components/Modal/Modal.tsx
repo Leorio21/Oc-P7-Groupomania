@@ -1,8 +1,8 @@
-import React from "react"
-import { createPortal } from "react-dom"
+import React from "react";
+import { createPortal } from "react-dom";
 
-import classNames from "classnames"
-import cn from "./Modal.module.scss"
+import classNames from "classnames";
+import cn from "./Modal.module.scss";
 
 interface ModalProps {
     text: string
@@ -12,8 +12,8 @@ interface ModalProps {
 const Modal = ({text, onCloseModal}: ModalProps) => {
 
     const onClickHandler = () => {
-        onCloseModal()
-    }
+        onCloseModal();
+    };
     
     return createPortal(
         <div className={classNames(cn.overlay)} onClick={onClickHandler}>
@@ -22,7 +22,7 @@ const Modal = ({text, onCloseModal}: ModalProps) => {
                 {text}
             </div>
         </div>, document.getElementById("modal-root")!
-    )
-}
+    );
+};
 
-export default Modal
+export default Modal;

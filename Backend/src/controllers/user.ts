@@ -1,12 +1,12 @@
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-import sharp from "sharp"
-import fs from "fs/promises"
-import { Request, Response, NextFunction } from "express"
-import { passwordSchema } from "../middleware/password"
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import sharp from "sharp";
+import fs from "fs/promises";
+import { Request, Response, NextFunction } from "express";
+import { passwordSchema } from "../middleware/password";
 
-import { PrismaClient, User } from "@prisma/client"
-const prisma = new PrismaClient()
+import { PrismaClient, User } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const signup = async (
     req: Request,
@@ -16,10 +16,10 @@ export const signup = async (
     if (!passwordSchema.validate(req.body.password)) {
         return res
             .status(400)
-            .json({ error: "Le mot de passe n'est pas assez sécurisé" })
+            .json({ error: "Le mot de passe n'est pas assez sécurisé" });
     }
     if (req.body.password !== req.body.confirmPassword) {
-        throw "Les mots de passe ne correspondent pas"
+        throw "Les mots de passe ne correspondent pas";
     }
     try {
         if (
@@ -29,12 +29,12 @@ export const signup = async (
                 },
             })
         ) {
-            throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`
+            throw `Un utilisateur est déjà enregistré avec cette adresse em@il : ${req.body.email}`;
         }
         const [lastName, firstName]: string[] = req.body.email
             .split("@")[0]
-            .split(".")
-        const hash: string = await bcrypt.hash(req.body.password, 12)
+            .split(".");
+        const hash: string = await bcrypt.hash(req.body.password, 12);
         await prisma.user.create({
             data: {
                 firstName: firstName,
@@ -42,12 +42,12 @@ export const signup = async (
                 email: req.body.email,
                 password: hash,
             },
-        })
-        return next()
+        });
+        return next();
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     }
-}
+};
 
 export const login = async (
     req: Request,
@@ -58,16 +58,16 @@ export const login = async (
             where: {
                 email: req.body.email,
             },
-        })
+        });
         if (!user) {
-            throw "Nom d'utilisateur / Mot de passe incorrect"
+            throw "Nom d'utilisateur / Mot de passe incorrect";
         }
         const valid: boolean = await bcrypt.compare(
             req.body.password,
             user.password
-        )
+        );
         if (!valid) {
-            throw "Nom d'utilisateur / Mot de passe incorrect"
+            throw "Nom d'utilisateur / Mot de passe incorrect";
         }
         return res.status(200).json({
             token: jwt.sign(
@@ -77,11 +77,11 @@ export const login = async (
                 process.env.RANDOM_KEY_TOKEN!,
                 { expiresIn: "48h" }
             ),
-        })
+        });
     } catch (error) {
-        return res.status(404).json({ error })
+        return res.status(404).json({ error });
     }
-}
+};
 
 export const getAllUser = async (
     req: Request,
@@ -95,12 +95,12 @@ export const getAllUser = async (
                 lastName: true,
                 avatar: true,
             },
-        })
-        return res.status(200).json({ user })
+        });
+        return res.status(200).json({ user });
     } catch (error) {
-        return res.status(404).json({ error })
+        return res.status(404).json({ error });
     }
-}
+};
 
 export const getUser = async (
     req: Request,
@@ -111,9 +111,9 @@ export const getUser = async (
             where: {
                 id: req.auth.userId,
             },
-        })
+        });
         if (!user) {
-            throw "Utilisateur introuvable"
+            throw "Utilisateur introuvable";
         }
         return res.status(200).json({
             token: jwt.sign(
@@ -128,78 +128,75 @@ export const getUser = async (
             firstName: user.firstName,
             lastName: user.lastName,
             avatar: user.avatar,
-        })
+        });
     } catch (error) {
-        return res.status(404).json({ error })
+        return res.status(404).json({ error });
     }
-}
+};
 
 export const modify = async (
     req: Request,
     res: Response
 ) => {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] }
-    let bgImageName: string = req.body.userBg
-    let oldBgImage: string | null = ""
-    let newBgImage = false
-    let avatarImageName: string = req.body.userAvatar
-    let oldAvatarImage: string | null = ""
-    let newAvatarImage = false
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    let bgImageName: string = req.body.userBg;
+    let oldBgImage: string | null = "";
+    let newBgImage = false;
+    let avatarImageName: string = req.body.userAvatar;
+    let oldAvatarImage: string | null = "";
+    let newAvatarImage = false;
     if (req.body.newPassword) {
         if (!passwordSchema.validate(req.body.newPassword)) {
-            throw "Le mot de passe n'est pas assez sécurisé"
+            throw "Le mot de passe n'est pas assez sécurisé";
         }
         if (req.body.newPassword !== req.body.confirmNewPassword) {
-            throw "Les mots de passe ne correspondent pas"
+            throw "Les mots de passe ne correspondent pas";
         }
     }
     try {
-        let adminUser: User | null
-        let validAdmin = false
+        let adminUser: User | null;
+        let validAdmin = false;
         const user = await prisma.user.findUnique({
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!user) {
-            throw "Utilisateur introuvable"
+            throw "Utilisateur introuvable";
         }
         if (req.auth.role === "ADMIN") {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId,
                 },
-            })
+            });
             if (!adminUser) {
-                throw "Modifications non autorisées"
+                throw "Modifications non autorisées";
             }
             validAdmin = await bcrypt.compare(
                 req.body.password,
                 adminUser.password
-            )
+            );
         }
         const validUser: boolean = await bcrypt.compare(
             req.body.password,
             user.password
-        )
+        );
         if (validUser || validAdmin) {
             if (req.body.newPassword) {
-                user.password = await bcrypt.hash(req.body.newPassword, 12)
+                user.password = await bcrypt.hash(req.body.newPassword, 12);
             }
-            oldAvatarImage = user.avatar
+            oldAvatarImage = user.avatar;
             if (files["avatar"]) {
                 avatarImageName =
-                    files["avatar"][0].filename.split(".")[0] + ".webp"
+                    files["avatar"][0].filename.split(".")[0] + ".webp";
                 try {
                     await sharp(
                         `./images/${files["avatar"][0].filename}`
-                    ).toFile(`images/${avatarImageName}`)
-                    newAvatarImage = true
-                    user.avatar = `${req.protocol}://${req.get(
-                        "host"
-                    )}/images/${avatarImageName}`
+                    ).toFile(`images/${avatarImageName}`);
+                    newAvatarImage = true;
                 } catch {
-                    throw "Erreur traitement image avatar"
+                    throw "Erreur traitement image avatar";
                 }
             }
             if (
@@ -208,40 +205,37 @@ export const modify = async (
                     oldAvatarImage !== "" &&
                     oldAvatarImage !== null)
             ) {
-                const oldAvatarName = oldAvatarImage!.split("/images/")[1]
-                await fs.unlink(`images/${oldAvatarName}`)
-                user.avatar = ""
+                const oldAvatarName = oldAvatarImage!.split("/images/")[1];
+                await fs.unlink(`images/${oldAvatarName}`);
+                user.avatar = "";
             }
-            oldBgImage = user.background
+            oldBgImage = user.background;
             if (files["bgPicture"]) {
                 bgImageName =
-                    files["bgPicture"][0].filename.split(".")[0] + ".webp"
+                    files["bgPicture"][0].filename.split(".")[0] + ".webp";
                 try {
                     await sharp(
                         `./images/${files["bgPicture"][0].filename}`
-                    ).toFile(`images/${bgImageName}`)
-                    newBgImage = true
-                    user.background = `${req.protocol}://${req.get(
-                        "host"
-                    )}/images/${bgImageName}`
+                    ).toFile(`images/${bgImageName}`);
+                    newBgImage = true;
                 } catch {
-                    throw "Erreur traitement image de fond"
+                    throw "Erreur traitement image de fond";
                 }
             }
             if (
                 (newBgImage && oldBgImage) ||
                 (bgImageName === "" && oldBgImage !== "" && oldBgImage !== null)
             ) {
-                const oldBgName = oldBgImage!.split("/images/")[1]
-                await fs.unlink(`images/${oldBgName}`)
-                user.background = ""
+                const oldBgName = oldBgImage!.split("/images/")[1];
+                await fs.unlink(`images/${oldBgName}`);
+                user.background = "";
             }
             if (validAdmin) {
-                user.firstName = req.body.firstName
-                user.lastName = req.body.lastName
-                user.email = req.body.email
+                user.firstName = req.body.firstName;
+                user.lastName = req.body.lastName;
+                user.email = req.body.email;
                 if (+req.params.id !== req.auth.userId) {
-                    user.role = req.body.role
+                    user.role = req.body.role;
                 }
             }
             await prisma.user.update({
@@ -253,72 +247,76 @@ export const modify = async (
                     lastName: user.lastName,
                     email: user.email,
                     password: user.password,
-                    avatar: user.avatar,
-                    background: user.background,
+                    avatar: newAvatarImage ? `${req.protocol}://${req.get(
+                        "host"
+                    )}/images/${avatarImageName}` : user.avatar,
+                    background: newBgImage ? `${req.protocol}://${req.get(
+                        "host"
+                    )}/images/${bgImageName}` : user.background,
                     role: user.role,
                 },
-            })
-            return res.status(201).json({ message: "Utilisateur modifié !" })
+            });
+            return res.status(201).json({ message: "Utilisateur modifié !" });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
-        return res.status(403).json({ error })
+        return res.status(403).json({ error });
     } finally {
         if (files["avatar"]) {
-            await fs.unlink(`images/${files!["avatar"][0].filename}`)
+            await fs.unlink(`images/${files!["avatar"][0].filename}`);
         }
         if (files!["bgPicture"]) {
-            await fs.unlink(`images/${files!["bgPicture"][0].filename}`)
+            await fs.unlink(`images/${files!["bgPicture"][0].filename}`);
         }
     }
-}
+};
 
 export const deleteUser = async (
     req: Request,
     res: Response
 ) => {
     try {
-        let adminUser: User | null
-        let validAdmin = false
+        let adminUser: User | null;
+        let validAdmin = false;
         const user = await prisma.user.findUnique({
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!user) {
-            throw "Utilisateur introuvable"
+            throw "Utilisateur introuvable";
         }
         if (req.auth.role === "ADMIN") {
             adminUser = await prisma.user.findUnique({
                 where: {
                     id: +req.auth.userId,
                 },
-            })
+            });
             if (!adminUser || adminUser.role != "ADMIN") {
-                throw "Utilisateur introuvable"
+                throw "Utilisateur introuvable";
             }
             validAdmin = await bcrypt.compare(
                 req.body.password,
                 adminUser.password
-            )
+            );
         }
         const validUser: boolean = await bcrypt.compare(
             req.body.password,
             user.password
-        )
+        );
         if (validUser || validAdmin) {
             await prisma.user.delete({
                 where: {
                     id: +req.params.id,
                 },
-            })
-            return res.status(200).json({ message: "Utilisateur supprimé" })
+            });
+            return res.status(200).json({ message: "Utilisateur supprimé" });
         }
-        return res.status(403).json({ error: "action non autorisée" })
+        return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
-        return res.status(403).json({ error })
+        return res.status(403).json({ error });
     }
-}
+};
 
 export const getUserProfile = async (
     req: Request,
@@ -372,12 +370,12 @@ export const getUserProfile = async (
                     },
                 },
             },
-        })
+        });
         if (!user) {
-            return res.status(404).json({ error: "Utilisateur introuvable" })
+            return res.status(404).json({ error: "Utilisateur introuvable" });
         }
-        return res.status(200).json({ user })
+        return res.status(200).json({ user });
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     }
-}
+};

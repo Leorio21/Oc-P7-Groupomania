@@ -3,6 +3,6 @@ const MIME_TYPES = new Map<string, string>([
     ["image/png", "png"],
     ["image/gif", "gif"],
     ["image/webp", "webp"],
-])
+]);
 
-export default MIME_TYPES
+export default MIME_TYPES;

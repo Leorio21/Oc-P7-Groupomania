@@ -1,30 +1,30 @@
-import axios, { AxiosError } from "axios"
-import classNames from "classnames"
-import cn from "./Members.module.scss"
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
-import Modal from "../../Components/Modal/Modal"
-import User from "../../Components/User/User"
-import { AuthContext } from "../../Context/AuthContext"
-import { UserProfil } from "../../interface/Index"
+import axios, { AxiosError } from "axios";
+import classNames from "classnames";
+import cn from "./Members.module.scss";
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import Modal from "../../Components/Modal/Modal";
+import User from "../../Components/User/User";
+import { AuthContext } from "../../Context/AuthContext";
+import { UserProfil } from "../../interface/Index";
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload ?? "Texte non défini"
-        return state
+        state = action.payload ?? "Texte non défini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 
 const Members = () => {
 
-    const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
-    const [userList, setUserList] = useState<UserProfil[]>([])
+    const authContext = useContext(AuthContext);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const [userList, setUserList] = useState<UserProfil[]>([]);
 
     const recupUserData = useCallback(
         async (): Promise<void> => {
@@ -33,35 +33,35 @@ const Members = () => {
                     headers: {
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const response = await axios.get(`${authContext?.apiUrl}/api/auth/members`, option)
-                setUserList(response.data.user)
+                };
+                const response = await axios.get(`${authContext?.apiUrl}/api/auth/members`, option);
+                setUserList(response.data.user);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
                 }
             }
         }, []
-    )
+    );
 
     useEffect(() => {
-        recupUserData()
-    }, [])
+        recupUserData();
+    }, []);
     
     return (
         <div className={classNames(cn.members_container)}>
             {userList ? userList?.map((user) => {
-                return <User key={`user${user.id}`} user={user} />
+                return <User key={`user${user.id}`} user={user} />;
             }) : <div>Chargement en cours....</div>}
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </div>
-    )
-}
+    );
+};
 
-export default Members
+export default Members;

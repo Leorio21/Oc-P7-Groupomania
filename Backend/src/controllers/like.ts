@@ -1,7 +1,7 @@
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 
-import { PrismaClient } from "@prisma/client"
-const prisma = new PrismaClient()
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const likePost = async (
     req: Request,
@@ -12,9 +12,9 @@ export const likePost = async (
             where: {
                 id: +req.params.id,
             },
-        })
+        });
         if (!post) {
-            return res.status(400).json({ error: "Post introuvable" })
+            return res.status(400).json({ error: "Post introuvable" });
         }
 
         const like = await prisma.postLike.findMany({
@@ -22,27 +22,27 @@ export const likePost = async (
                 postId: +req.params.id,
                 userId: req.auth.userId,
             },
-        })
+        });
         if (like[0]) {
             await prisma.postLike.deleteMany({
                 where: {
                     postId: +req.params.id,
                     userId: req.auth.userId,
                 },
-            })
-            return res.status(201).json({ message: "Like supprimé" })
+            });
+            return res.status(201).json({ message: "Like supprimé" });
         }
         const newLike = await prisma.postLike.create({
             data: {
                 postId: +req.params.id,
                 userId: req.auth.userId,
             },
-        })
+        });
         return res.status(201).json({
             like: newLike,
             message: "Like enregistré",
-        })
+        });
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ error });
     }
-}
+};

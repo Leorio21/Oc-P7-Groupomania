@@ -1,21 +1,21 @@
-import { Link } from "react-router-dom"
-import { HomeIcon, LogoutIcon, UserCircleIcon, UserGroupIcon } from "@heroicons/react/outline"
+import { Link } from "react-router-dom";
+import { HomeIcon, LogoutIcon, UserCircleIcon, UserGroupIcon } from "@heroicons/react/outline";
 
-import classNames from "classnames"
-import cn from "./NavBar.module.scss"
+import classNames from "classnames";
+import cn from "./NavBar.module.scss";
 
-import React, { useContext } from "react"
-import { AuthContext } from "../../Context/AuthContext"
+import React, { useContext } from "react";
+import { AuthContext } from "../../Context/AuthContext";
 
 
 const NavBar = () => {
 
-    const authContext = useContext(AuthContext)
+    const authContext = useContext(AuthContext);
 
     const onLogOutHandler = () => {
-        localStorage.removeItem("token")
-        authContext?.setConnectHandle(false)
-    }
+        localStorage.removeItem("token");
+        authContext?.setConnectHandle(false);
+    };
 
     return (
         <nav className={classNames(cn.nav)}>
@@ -24,7 +24,7 @@ const NavBar = () => {
             <Link to="/members" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserGroupIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Membres</span></Link>
             <Link to="/" className={classNames(cn.link)} onClick={onLogOutHandler}><span className={classNames(cn.icon_container)}><LogoutIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Déconnexion</span></Link>
         </nav>
-    )
-}
+    );
+};
 
-export default NavBar
+export default NavBar;

@@ -1,31 +1,31 @@
-import { IFormValues, OnePostComment } from "../../interface/Index"
-import { Path, useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
+import { IFormValues, OnePostComment } from "../../interface/Index";
+import { Path, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-import { Role } from "../../../../backend/node_modules/@prisma/client"
-import TextArea from "./TextArea/TextArea"
-import React, { useCallback, useContext, useReducer } from "react"
-import { AuthContext } from "../../Context/AuthContext"
-import axios, { AxiosError } from "axios"
-import Modal from "../Modal/Modal"
+import { Role } from "../../../../backend/node_modules/@prisma/client";
+import TextArea from "./TextArea/TextArea";
+import React, { useCallback, useContext, useReducer } from "react";
+import { AuthContext } from "../../Context/AuthContext";
+import axios, { AxiosError } from "axios";
+import Modal from "../Modal/Modal";
 
 const schemaComment = yup.object({
     content: yup.string().required("Ce champ ne peut être vide"),
-}).required()
+}).required();
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload ?? "texte non défini"
-        return state
+        state = action.payload ?? "texte non défini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 interface FormCommentProps {
     classes: string,
     postId?: number,
@@ -41,18 +41,18 @@ interface FormCommentProps {
 
 const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment, onCreateForm, onModifyForm}: FormCommentProps) => {
     
-    const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
-    const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaComment)})
+    const authContext = useContext(AuthContext);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaComment)});
 
 
     const onSubmitHandler = (data: IFormValues) => {
         if (comment) {
-            modifyComment(data)
+            modifyComment(data);
         } else {
-            createNewComment(data)
+            createNewComment(data);
         }
-    }
+    };
 
     const modifyComment = useCallback(
         async (data: IFormValues) => {
@@ -61,22 +61,22 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                     headers: {
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const modifyComment = await axios.put(`${authContext?.apiUrl}/api/post/${postId}/comment/${comment?.id}`, data, option)
-                onModifyForm && onModifyForm(comment!.id, modifyComment.data.updatedBy, data.content)
+                };
+                const modifyComment = await axios.put(`${authContext?.apiUrl}/api/post/${postId}/comment/${comment?.id}`, data, option);
+                onModifyForm && onModifyForm(comment!.id, modifyComment.data.updatedBy, data.content);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
                 }
             }
         }, [comment]
-    )
+    );
 
     const createNewComment = useCallback(
         async (data: IFormValues) => {
@@ -85,23 +85,23 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                     headers: {
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const bddComment = await axios.post(`${authContext?.apiUrl}/api/post/${postId}/comment`, data, option)
-                const newComment: OnePostComment = { ...bddComment.data.comment }
-                onCreateForm && onCreateForm(newComment)
+                };
+                const bddComment = await axios.post(`${authContext?.apiUrl}/api/post/${postId}/comment`, data, option);
+                const newComment: OnePostComment = { ...bddComment.data.comment };
+                onCreateForm && onCreateForm(newComment);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.message){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"})
+                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
                 }
             }
         }, [postId]
-    )
+    );
 
     return (
         <>
@@ -117,9 +117,9 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                 />
                 <p>{errors.content?.message}</p>
             </form>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
-    )
-}
+    );
+};
 
-export default FormComment
+export default FormComment;

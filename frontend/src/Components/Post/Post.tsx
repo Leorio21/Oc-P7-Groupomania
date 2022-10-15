@@ -1,65 +1,65 @@
-import dayjs from "dayjs"
-import "dayjs/locale/fr"
-import relativeTime from "dayjs/plugin/relativeTime"
-import { AuthContext } from "../../Context/AuthContext"
-import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react"
-import { UserCircleIcon } from "@heroicons/react/solid"
-import { OnePost } from "../../interface/Index"
-import axios, { AxiosError } from "axios"
+import dayjs from "dayjs";
+import "dayjs/locale/fr";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { AuthContext } from "../../Context/AuthContext";
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import { UserCircleIcon } from "@heroicons/react/solid";
+import { OnePost } from "../../interface/Index";
+import axios, { AxiosError } from "axios";
 
-import classNames from "classnames"
-import cn from "./Post.module.scss"
+import classNames from "classnames";
+import cn from "./Post.module.scss";
 
-import Like from "../Like/Like"
-import CommentList from "../Comment/CommentList"
-import AdminMenu from "../AdminMenu/AdminMenu"
-import Modal from "../Modal/Modal"
-import FormPost from "../Form/FormPost"
-import { Link } from "react-router-dom"
+import Like from "../Like/Like";
+import CommentList from "../Comment/CommentList";
+import AdminMenu from "../AdminMenu/AdminMenu";
+import Modal from "../Modal/Modal";
+import FormPost from "../Form/FormPost";
+import { Link } from "react-router-dom";
 
-const initilTextError = ""
+const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }): string => {
     switch (action.type) {
     case "display":
-        state = action.payload ?? "Texte non défini"
-        return state
+        state = action.payload ?? "Texte non défini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 interface PostProps {
     post: OnePost,
     onDeletePost: (postToDelete: number) => void
 }
 
-dayjs.locale("fr")
-dayjs().format()
-dayjs.extend(relativeTime)
+dayjs.locale("fr");
+dayjs().format();
+dayjs.extend(relativeTime);
 
 const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
 
-    const authContext = useContext(AuthContext)
+    const authContext = useContext(AuthContext);
 
-    const [postData, setPostData] = useState(post)
-    const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext?.userId) ? true : false)
-    const [countComm, setCountComm] = useState(post.comment.length)
-    const [editMode, setEditMode] = useState(false)
-    const [postedAt, setPostedAt] = useState(dayjs(postData.createdAt).fromNow(true))
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError)
+    const [postData, setPostData] = useState(post);
+    const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext?.userId) ? true : false);
+    const [countComm, setCountComm] = useState(post.comment.length);
+    const [editMode, setEditMode] = useState(false);
+    const [postedAt, setPostedAt] = useState(dayjs(postData.createdAt).fromNow(true));
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const changeCountComm = (newCounterComm: number): void => {
-        setCountComm(newCounterComm)
-    }
+        setCountComm(newCounterComm);
+    };
 
     const changeLikePost = (): void => {
-        setUserLikePost(!userLikePost)
-    }
+        setUserLikePost(!userLikePost);
+    };
 
     const onModifyHandler = (): void => {
-        setEditMode(!editMode)
-    }
+        setEditMode(!editMode);
+    };
 
     /**
      * OnPostSubmitHandler takes a OnePost object and returns nothing. It sets the state of postData to
@@ -70,15 +70,15 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
     const onPostSubmitHandler = useCallback(
         (modifyPost: OnePost): void => {
             setPostData((prevState) => {
-                const newPost = prevState
-                newPost.content = modifyPost.content
-                newPost.image = modifyPost.image
-                newPost.updatedBy = modifyPost.updatedBy
-                return newPost
-            })
-            setEditMode(!editMode)
+                const newPost = prevState;
+                newPost.content = modifyPost.content;
+                newPost.image = modifyPost.image;
+                newPost.updatedBy = modifyPost.updatedBy;
+                return newPost;
+            });
+            setEditMode(!editMode);
         }, [editMode]
-    )
+    );
 
     /**
      * OnDeleteHandler is a function that deletes a post from the database and the frontend.
@@ -89,44 +89,44 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                 headers: {
                     Authorization: `Bearer ${authContext?.token}`
                 }
-            }
+            };
             try {
-                await axios.delete(`${authContext?.apiUrl}/api/post/${postData.id}`, option)
-                onDeletePost(postData.id)
+                await axios.delete(`${authContext?.apiUrl}/api/post/${postData.id}`, option);
+                onDeletePost(postData.id);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 }
             }
         }, [postData.id, authContext?.token]
-    )
+    );
 
     /* A memoized function that returns a string based on the value of the updatedBy property of the
     post object. */
     const modifyAuthor: string = useMemo(() => {
         switch (post.updatedBy) {
         case "ADMIN":
-            return "(modifié par Admin)"
+            return "(modifié par Admin)";
         case "MODERATOR":
-            return "(modifié par Modérateur)"
+            return "(modifié par Modérateur)";
         }
-        return "(modifié)"
-    }, [post.updatedBy])
+        return "(modifié)";
+    }, [post.updatedBy]);
 
     /* Updating the postedAt state every 60 seconds. */
     useEffect(() => {
         const intervalId = window.setInterval(() => {
-            setPostedAt(dayjs(postData.createdAt).fromNow(true))
-        }, 60000)
+            setPostedAt(dayjs(postData.createdAt).fromNow(true));
+        }, 60000);
 
         return () => {
-            window.clearInterval(intervalId)
-        }
-    }, [])
+            window.clearInterval(intervalId);
+        };
+    }, []);
 
     return (
         <>
@@ -175,9 +175,9 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                     <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
                 </div>
             </article>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => { dispatchModal({ type: "hide" }) }} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => { dispatchModal({ type: "hide" }); }} />}
         </>
-    )
-}
+    );
+};
 
-export default Post
+export default Post;

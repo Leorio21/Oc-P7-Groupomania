@@ -1,9 +1,9 @@
-import React from "react"
-import { CheckIcon, XIcon } from "@heroicons/react/solid"
+import React from "react";
+import { CheckIcon, XIcon } from "@heroicons/react/solid";
 
-import classNames from "classnames"
-import { Control, FieldValues, Path, useWatch } from "react-hook-form"
-import cn from "./PasswordCheck.module.scss"
+import classNames from "classnames";
+import { Control, FieldValues, Path, useWatch } from "react-hook-form";
+import cn from "./PasswordCheck.module.scss";
 
 interface PasswordCheckProps<T extends FieldValues>{
     name: Path<T>
@@ -11,7 +11,7 @@ interface PasswordCheckProps<T extends FieldValues>{
 }
 
 const passwordCheck = <T extends FieldValues>({name, control}: PasswordCheckProps<T>) => {
-    const password = useWatch({ control, name })
+    const password = useWatch({ control, name });
 
     return (
         <div className={classNames(cn.container)}>
@@ -22,7 +22,7 @@ const passwordCheck = <T extends FieldValues>({name, control}: PasswordCheckProp
             <span>{password?.match(/[\W]/) ? <CheckIcon className={classNames(cn.icon, cn.iconCheck)} />:<XIcon className={classNames(cn.icon, cn.iconX)} />} contenir au moins 1 symbole</span>
             <span>{password?.match(/^.{8,20}$/) ? <CheckIcon className={classNames(cn.icon, cn.iconCheck)} />:<XIcon className={classNames(cn.icon, cn.iconX)} />} faire entre 8 et 20 caractères</span>
         </div>
-    )
-}
+    );
+};
 
-export default passwordCheck
+export default passwordCheck;

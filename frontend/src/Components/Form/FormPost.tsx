@@ -1,37 +1,37 @@
-import { PhotographIcon } from "@heroicons/react/outline"
-import { Path, useForm } from "react-hook-form"
-import { IFormValues, OnePost } from "../../interface/Index"
-import { AuthContext } from "../../Context/AuthContext"
-import axios, { AxiosError } from "axios"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
+import { PhotographIcon } from "@heroicons/react/outline";
+import { Path, useForm } from "react-hook-form";
+import { IFormValues, OnePost } from "../../interface/Index";
+import { AuthContext } from "../../Context/AuthContext";
+import axios, { AxiosError } from "axios";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
 
 
-import PicturePreview from "./PicturePreview/PicturePreview"
-import TextArea from "./TextArea/TextArea"
-import FileInput from "./FileInput/FileInput"
-import Modal from "../Modal/Modal"
-import Button from "./Button/Button"
-import HorizontalContainer from "./HorizontalContainer/HorizontalContainer"
+import PicturePreview from "./PicturePreview/PicturePreview";
+import TextArea from "./TextArea/TextArea";
+import FileInput from "./FileInput/FileInput";
+import Modal from "../Modal/Modal";
+import Button from "./Button/Button";
+import HorizontalContainer from "./HorizontalContainer/HorizontalContainer";
 
 const schemaPost = yup.object({
     content: yup.string(),
     photo: yup.mixed()
-}).required()
+}).required();
 
-const initialTextError = ""
+const initialTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
-        state = action.payload ?? "texte non défini"
-        return state
+        state = action.payload ?? "texte non défini";
+        return state;
     case "hide":
-        state = ""
-        return state
+        state = "";
+        return state;
     }
-    return state
-}
+    return state;
+};
 
 interface FormPostProps {
     classes: string,
@@ -48,38 +48,38 @@ interface FormPostProps {
 
 const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, placeHolder, onPostSubmit, editMode}: FormPostProps) => {
 
-    const authContext = useContext(AuthContext)
-    const [textError, dispatchModal] = useReducer(reducerModal, initialTextError)
-    const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)})
-    const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image)
+    const authContext = useContext(AuthContext);
+    const [textError, dispatchModal] = useReducer(reducerModal, initialTextError);
+    const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)});
+    const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image);
 
     const onSubmitHandler = useCallback(
         (data: IFormValues) => {
             if (post) {
-                modifyPost(data)
+                modifyPost(data);
             } else {
-                createPost(data)
+                createPost(data);
             }
         }, []
-    )
+    );
     const createPost = useCallback(
         async (data: IFormValues) => {
             try {
                 if(!data.content && (!data.photo || data.photo.length == 0)) {
-                    throw "Impossible de publier un message vide"
+                    throw "Impossible de publier un message vide";
                 }
-                const myFormData = new FormData()
-                myFormData.append("content", data.content)
+                const myFormData = new FormData();
+                myFormData.append("content", data.content);
                 if (data.photo) {
-                    myFormData.append("photo", data.photo[0])
+                    myFormData.append("photo", data.photo[0]);
                 }
                 const option = {
                     headers: {
                         "Content-Type":"multipart/form-data",
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const bddPost = await axios.post(`${authContext?.apiUrl}/api/post/`, myFormData, option)
+                };
+                const bddPost = await axios.post(`${authContext?.apiUrl}/api/post/`, myFormData, option);
                 const newPost: OnePost = {
                     ...bddPost.data.post,
                     like: [],
@@ -89,49 +89,49 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                         lastName: authContext?.lastName,
                         avatar: authContext?.avatar
                     }
-                }
-                onPostSubmit(newPost)
-                resetPicture()
-                resetField("content")
-                auto_grow()
+                };
+                onPostSubmit(newPost);
+                resetPicture();
+                resetField("content");
+                auto_grow();
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.message){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.message}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: `${error}`})
+                    dispatchModal({type: "display", payload: `${error}`});
                 }
             }
         }, []
-    )
+    );
 
     const modifyPost = useCallback(
         async (data: IFormValues) => {
             try {
                 if(data.content === "" && (!data.photo || data.photo.length == 0)) {
-                    throw "Impossible de publier un message vide"
+                    throw "Impossible de publier un message vide";
                 }
-                const myFormData = new FormData()
-                myFormData.append("content", data.content)
+                const myFormData = new FormData();
+                myFormData.append("content", data.content);
                 if (pictureUrl) {
-                    const image = pictureUrl
-                    myFormData.append("image", image)
+                    const image = pictureUrl;
+                    myFormData.append("image", image);
                 } else {
-                    myFormData.append("image", "")
+                    myFormData.append("image", "");
                 }
                 if (data.photo) {
-                    myFormData.append("photo", data.photo[0])
+                    myFormData.append("photo", data.photo[0]);
                 }
                 const option = {
                     headers: {
                         "Content-Type":"multipart/form-data",
                         Authorization: `Bearer ${authContext?.token}`
                     }
-                }
-                const bddPost = await axios.put(`http://127.0.0.1:3000/api/post/${post?.id}`, myFormData, option)
+                };
+                const bddPost = await axios.put(`http://127.0.0.1:3000/api/post/${post?.id}`, myFormData, option);
                 const newPost: OnePost = {
                     ...bddPost.data.post,
                     like: [],
@@ -141,43 +141,43 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                         lastName: authContext?.lastName,
                         avatar: authContext?.avatar
                     }
-                }
-                onPostSubmit(newPost)
-                resetPicture()
-                resetField("content")
-                auto_grow()
+                };
+                onPostSubmit(newPost);
+                resetPicture();
+                resetField("content");
+                auto_grow();
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
                     } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`})
+                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
                     }
                 } else {
-                    dispatchModal({type: "display", payload: `${error}`})
+                    dispatchModal({type: "display", payload: `${error}`});
                 }
             }
         }, []
-    )
+    );
 
     const resetPicture = () => {
-        setPictureUrl("")
-        resetField("photo")
-    }
+        setPictureUrl("");
+        resetField("photo");
+    };
 
     const auto_grow = useCallback(() => {
-        const element = document.getElementById(id)!
-        element.style.height = "5px"
-        element.style.height = (element.scrollHeight) + "px"
-    }, [])
+        const element = document.getElementById(id)!;
+        element.style.height = "5px";
+        element.style.height = (element.scrollHeight) + "px";
+    }, []);
 
     useEffect(() => {
         if(getValues("photo")) {
             if (getValues("photo").length > 0) {
-                setPictureUrl(window.URL.createObjectURL([...getValues("photo")][0]))
+                setPictureUrl(window.URL.createObjectURL([...getValues("photo")][0]));
             }
         }
-    }, [watch("photo")])
+    }, [watch("photo")]);
 
     return (
         <>
@@ -201,9 +201,9 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                     </FileInput>
                 </HorizontalContainer>
             </form>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"})}} />}
+            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
-    )
-}
+    );
+};
 
-export default FormPost
+export default FormPost;
