@@ -1,9 +1,9 @@
-import React from "react"
-import { UserProfil } from "../../interface/Index"
-import classNames from "classnames"
-import cn from "./User.module.scss"
-import { UserCircleIcon } from "@heroicons/react/solid"
-import { Link } from "react-router-dom"
+import React from "react";
+import { UserProfil } from "../../interface/Index";
+import classNames from "classnames";
+import cn from "./User.module.scss";
+import { UserCircleIcon } from "@heroicons/react/solid";
+import { Link } from "react-router-dom";
 
 interface UserProps {
     user: UserProfil
@@ -20,7 +20,7 @@ const User = ({user}: UserProps) => {
                 </div>
             </Link>
         </>
-    )
-}
+    );
+};
 
-export default User
+export default User;

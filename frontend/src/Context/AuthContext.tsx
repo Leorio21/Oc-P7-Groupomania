@@ -32,7 +32,7 @@ export const AuthContext = createContext<AuthContextInterface | null>(null);
 const AuthContextProvider = ({children}: PropsWithChildren) => {
 
     const apiUrl = useMemo(() => {
-        return "http://192.172.1.82:3000";
+        return "http://127.0.0.1:3000";
     }, []);
     
     const [textError, dispatchModal] = useReducer(reducerModal, initialTextError);

@@ -131,6 +131,7 @@ const MyProfile = () => {
                 };
                 await axios.put(`${authContext?.apiUrl}/api/auth/${userId}`, myFormData, option);
                 resetUserForm();
+                alert("Modifications enregistrées");
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     if(error.response?.data.error){
