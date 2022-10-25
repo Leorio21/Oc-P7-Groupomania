@@ -1,11 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import React, { useEffect, useReducer, useState } from "react";
 import Modal from "../Components/Modal/Modal";
-import { IFormValues } from "../interface/Index";
+import { IFormValues } from "../interface/Form";
 
 axios.defaults.baseURL = "http://127.0.0.1:3000/api";
 axios.defaults.method = "GET";
-
 
 const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
@@ -20,15 +19,21 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
     return state;
 };
 
-export const useAxios = (params: AxiosRequestConfig) => {
+export const useAxios = <T = unknown>(params: AxiosRequestConfig): {response?: T, isLoading: boolean, axiosFunction: (data?: IFormValues | FormData) => void} => {
     
-    const [response, setResponse] = useState();
+    const [response, setResponse] = useState<T>();
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const fetchData = async () => {
+
+    const axiosFunction = async (data?: IFormValues | FormData) => {
+        setIsLoading(true);
+        if (localStorage.getItem("token")) {
+            const token = JSON.parse(localStorage.getItem("token") ?? "");
+            params.headers = {Authorization: "Bearer " + token};
+        }
         try {
-            const result = await axios(params);
+            const result = await axios({...params, data});
             setResponse(result.data);
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
@@ -53,8 +58,10 @@ export const useAxios = (params: AxiosRequestConfig) => {
     };
 
     useEffect(() => {
-        fetchData();
+        if (localStorage.getItem("token") && !params.method) {
+            axiosFunction();
+        }
     }, []);
-
-    return {response, isLoading};
+    
+    return {response, isLoading, axiosFunction};
 };

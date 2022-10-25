@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
-import axios, { AxiosError } from "axios";
 import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid";
 
 import { OneUser } from "../../interface/Index";
@@ -9,73 +8,38 @@ import { OneUser } from "../../interface/Index";
 import classNames from "classnames";
 import cn from "./Profile.module.scss";
 
-import Modal from "../../Components/Modal/Modal";
 import PostsList from "../../Components/Post/PostsList";
-
-const initilTextError = "";
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-    case "display":
-        state = action.payload ?? "Texte non défini";
-        return state;
-    case "hide":
-        state = "";
-        return state;
-    }
-    return state;
-};
+import { useAxios } from "../../Hooks/Axios";
 
 const Profile = () => {
 
     const params = useParams();
     const authContext = useContext(AuthContext);
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const [userData, setUserData] = useState<OneUser>();
-    const [noPost, setNoPost] = useState(true);
+    const { response, isLoading } = useAxios<{user :OneUser}>({
+        url: `auth/user/${params.userId}`
+    });
 
-    const recupUserData = 
-        async (): Promise<void> => {
-            try {
-                const option = {
-                    headers: {
-                        Authorization: `Bearer ${authContext?.token}`
-                    }
-                };
-                const response = await axios.get(`${authContext?.apiUrl}/api/auth/user/${params.userId}`, option);
-                setUserData(response.data.user);
-                if (response.data.user.post.length !== 0) {
-                    setNoPost(false);
-                }
-            } catch (error: unknown) {
-                if (error instanceof AxiosError) {
-                    if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
-                    } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
-                    }
-                } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
-                }
-            }
-        };
+    if (isLoading) {
+        return (
+            <div>Loading Data...</div>
+        );
+    }
 
-    useEffect(() => {
-        recupUserData();
-    }, [params.userId]);
-    
-    return (
-        <>{userData &&
+    if (response) {
+        return (
             <>
                 <div className={classNames(cn.picture_container)}>
-                    {userData?.background && <img src={userData?.background} alt='image de fond utilisateur' className={classNames(cn.backgroundPicture)} />}
-                    {userData?.avatar ? <img src={userData?.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
+                    {response.user.background && <img src={response.user.background} alt='image de fond utilisateur' className={classNames(cn.backgroundPicture)} />}
+                    {response.user.avatar ? <img src={response.user.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
                 </div>
-                <div className={classNames(cn.name)}>{userData?.firstName} {userData?.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
-                {!noPost ? <PostsList postUser={userData.post}/> : <div className={classNames(cn.noPost)}>Aucune publications</div>}
-                {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+                <div className={classNames(cn.name)}>{response.user.firstName} {response.user.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
+                {!response.user.post.length ? <div className={classNames(cn.noPost)}>Aucune publications</div> : <PostsList postUser={response.user.post}/>}
             </>
-        }
-        </>
+        );
+    }
+
+    return (
+        <div>Aucune Données</div>
     );
 };
 

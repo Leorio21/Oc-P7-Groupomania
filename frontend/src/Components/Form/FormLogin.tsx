@@ -1,33 +1,18 @@
-import React, { useCallback, useReducer } from "react";
-import { IFormValues } from "../../interface/Index";
+import React, { useCallback, useEffect } from "react";
+import { IFormValues, UserToken } from "../../interface/Index";
 import LabeledInput from "./LabeledInput/LabeledInput";
 import Button from "../../Components/Form/Button/Button";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import axios, { AxiosError } from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../../Context/AuthContext";
-import Modal from "../Modal/Modal";
+import { useAxios } from "../../Hooks/Axios";
 
 const schemaLogin = yup.object({
     email: yup.string().required(),
     password: yup.string().required(),
 }).required();
-
-const initilTextError = "";
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-    case "display":
-        state = action.payload ?? "texte non défini";
-        return state;
-    case "hide":
-        state = "";
-        return state;
-    }
-    return state;
-};
-
 interface FormLoginProps {
     classes: string,
     activeForm: string,
@@ -35,30 +20,31 @@ interface FormLoginProps {
 
 const FormLogin = ({classes, activeForm}: FormLoginProps) => {
 
+    const { response, isLoading, axiosFunction } = useAxios<UserToken>({
+        url: "auth/login",
+        method: "POST"
+    });
     const authContext = useContext(AuthContext);
-
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaLogin)});
 
     const onLoginSubmit = useCallback(
         async (data: IFormValues) => {
-            try {
-                const userData = await axios.post(`${authContext?.apiUrl}/api/auth/login`, data);
-                localStorage.setItem("token", JSON.stringify(userData.data.token));
-                authContext?.setConnectHandle(true);
-            } catch (error: unknown) {
-                if (error instanceof AxiosError) {
-                    if(error.response?.data.error){
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data.error}`});
-                    } else if (error.response?.data) {
-                        dispatchModal({type: "display", payload: `Une erreur est survenue :\n${error.response.data}`});
-                    }
-                } else {
-                    dispatchModal({type: "display", payload: "Une erreur est survenue :\nErreur inconnue"});
-                }
-            }
+            axiosFunction(data);
         }, []
     );
+
+    useEffect(() => {
+        if (response) {
+            localStorage.setItem("token", JSON.stringify(response.token));
+            authContext?.setConnectHandle(true);
+        }
+    }, [response]);
+
+    if (isLoading) {
+        return (
+            <div>Loading data...</div>
+        );
+    }
     
     return (
         <>
@@ -92,7 +78,6 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
                     label='Se connecter'
                 />
             </form>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

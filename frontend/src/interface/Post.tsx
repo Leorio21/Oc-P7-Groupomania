@@ -1,4 +1,4 @@
-import { Post, PostLike, Comment } from "../../../backend/node_modules/@prisma/client";
+import { Post, PostLike, Comment, Role } from "../../../backend/node_modules/@prisma/client";
 
 export type OnePost = 
     Post & {
@@ -44,6 +44,7 @@ export type OneUser = {
     lastName: string;
     avatar: string | null;
     background: string | null;
+    role: Role;
     post: (Post & {
         author: {
             id: number,

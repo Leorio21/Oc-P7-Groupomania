@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 
 import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -75,8 +75,20 @@ export const modifyComment = async (
                     updatedBy: authorUpdate,
                 },
             });
+            const updateComment = await prisma.comment.findUnique({
+                where: {
+                    id: +req.params.comId,
+                },
+            });
             return res.status(200).json({
-                updatedBy: authorUpdate,
+                comment: {
+                    ...updateComment,
+                    author: {
+                        firstName: req.auth.firstName,
+                        lastName: req.auth.lastName,
+                        avatar: req.auth.avatar,
+                    },
+                },
                 message: "Commentaire modifié",
             });
         }

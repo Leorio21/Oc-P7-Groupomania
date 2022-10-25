@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../Context/AuthContext";
+import React, { useEffect, useState } from "react";
 import { useAxios } from "../../Hooks/Axios";
 
 import classNames from "classnames";
@@ -15,14 +14,10 @@ interface PostListProps {
 
 const PostsList = ({postUser}:  PostListProps) => {
 
-    const authContext = useContext(AuthContext);
     const [posts, setPosts] = useState<OnePost[]>([]);
 
-    const {response, isLoading} = useAxios({
+    const {response, isLoading} = useAxios<OnePost[]>({
         url: "/post",
-        headers: {
-            Authorization: `Bearer ${authContext?.token}`
-        }
     });
     
     const onPostSubmit = (newPost: OnePost): void => {

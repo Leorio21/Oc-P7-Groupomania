@@ -32,7 +32,7 @@ router.post(
 router.post("/login", userCtrl.login);
 
 router.put(
-    "/:id",
+    "/user/:id",
     auth,
     multer({
         storage: fileStorage,
@@ -45,7 +45,7 @@ router.put(
     userCtrl.modify
 );
 
-router.delete("/:id", auth, userCtrl.deleteUser);
+router.delete("/user/:id", auth, userCtrl.deleteUser);
 
 router.get("/user/:id", auth, userCtrl.getUserProfile);
 

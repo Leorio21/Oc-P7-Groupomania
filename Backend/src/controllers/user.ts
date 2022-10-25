@@ -88,7 +88,7 @@ export const getAllUser = async (
     res: Response
 ) => {
     try {
-        const user = await prisma.user.findMany({
+        const users = await prisma.user.findMany({
             select: {
                 id: true,
                 firstName: true,
@@ -96,7 +96,7 @@ export const getAllUser = async (
                 avatar: true,
             },
         });
-        return res.status(200).json({ user });
+        return res.status(200).json({ users });
     } catch (error) {
         return res.status(404).json({ error });
     }
@@ -111,6 +111,15 @@ export const getUser = async (
             where: {
                 id: req.auth.userId,
             },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatar: true,
+                background: true,
+                role: true,
+            }
         });
         if (!user) {
             throw "Utilisateur introuvable";
@@ -123,11 +132,7 @@ export const getUser = async (
                 process.env.RANDOM_KEY_TOKEN!,
                 { expiresIn: "48h" }
             ),
-            userId: user.id,
-            role: user.role,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            avatar: user.avatar,
+            user: user
         });
     } catch (error) {
         return res.status(404).json({ error });
@@ -256,7 +261,23 @@ export const modify = async (
                     role: user.role,
                 },
             });
-            return res.status(201).json({ message: "Utilisateur modifié !" });
+            const updatedUser = await prisma.user.findUnique({
+                where: {
+                    id: +req.params.id,
+                },
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    avatar: true,
+                    background: true,
+                    role: true,
+                }
+            });
+            return res.status(201).json({
+                user: updatedUser,
+                message: "Utilisateur modifié !"
+            });
         }
         return res.status(403).json({ error: "action non autorisée" });
     } catch (error) {
