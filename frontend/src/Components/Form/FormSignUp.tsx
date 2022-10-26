@@ -44,12 +44,6 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
         }
     }, [response]);
 
-    if (isLoading) {
-        return (
-            <div>Loading data...</div>
-        );
-    }
-    
     return (
         <form className = {classes} onSubmit={handleSubmit(onSignUpSubmit)}>
             <h2>Inscription</h2>
@@ -92,6 +86,7 @@ const FormSignUp = ({classes, activeForm}: FomrSignUpProps) => {
                 tabIndex={activeForm == "signup" ? 0 : -1}
                 type='submit'
                 label="S'inscrire"
+                isLoading={isLoading}
             />
         </form>
     );

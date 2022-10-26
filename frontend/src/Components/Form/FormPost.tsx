@@ -2,16 +2,14 @@ import { PhotographIcon } from "@heroicons/react/outline";
 import { Path, useForm } from "react-hook-form";
 import { IFormValues, OnePost } from "../../interface/Index";
 import { AuthContext } from "../../Context/AuthContext";
-import { AxiosError } from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 
 import PicturePreview from "./PicturePreview/PicturePreview";
 import TextArea from "./TextArea/TextArea";
 import FileInput from "./FileInput/FileInput";
-import Modal from "../Modal/Modal";
 import Button from "./Button/Button";
 import HorizontalContainer from "./HorizontalContainer/HorizontalContainer";
 import { useAxios } from "../../Hooks/Axios";
@@ -20,19 +18,6 @@ const schemaPost = yup.object({
     content: yup.string(),
     photo: yup.mixed()
 }).required();
-
-const initialTextError = "";
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-    case "display":
-        state = action.payload ?? "texte non défini";
-        return state;
-    case "hide":
-        state = "";
-        return state;
-    }
-    return state;
-};
 
 interface FormPostProps {
     classes: string,
@@ -57,35 +42,30 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             "Content-Type":"multipart/form-data"
         }
     });
-    const [textError, dispatchModal] = useReducer(reducerModal, initialTextError);
     const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)});
     const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image);
 
     const onSubmitHandler = useCallback(
         async (data: IFormValues) => {
-            try {
-                if(!data.content && (!data.photo || data.photo.length == 0)) {
-                    throw "Impossible de publier un message vide";
-                }
-                const myFormData = new FormData();
-                if (data.content) {
-                    myFormData.append("content", data.content);
-                } else {
-                    myFormData.append("content", "");
-                }
-                if (pictureUrl) {
-                    const image = pictureUrl;
-                    myFormData.append("image", image);
-                } else {
-                    myFormData.append("image", "");
-                }
-                if (data.photo) {
-                    myFormData.append("photo", data.photo[0]);
-                }
-                axiosFunction(myFormData);
-            } catch (error: unknown) {
-                dispatchModal({type: "display", payload: `${error}`});
+            if(!data.content && (!data.photo || data.photo.length == 0)) {
+                throw "Impossible de publier un message vide";
             }
+            const myFormData = new FormData();
+            if (data.content) {
+                myFormData.append("content", data.content);
+            } else {
+                myFormData.append("content", "");
+            }
+            if (pictureUrl) {
+                const image = pictureUrl;
+                myFormData.append("image", image);
+            } else {
+                myFormData.append("image", "");
+            }
+            if (data.photo) {
+                myFormData.append("photo", data.photo[0]);
+            }
+            axiosFunction(myFormData);
         }, [pictureUrl]
     );
 
@@ -128,36 +108,27 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
         }
     }, [response]);
 
-    if (isLoading) {
-        return (
-            <div>Loading Data...</div>
-        );
-    }
-
     return (
-        <>
-            <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
-                {pictureUrl !== "" && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} />}
-                <TextArea
-                    tabIndex={tabIndex}
-                    id={id}
-                    name={name}
-                    placeHolder={placeHolder}
-                    register={register}
-                    value={post?.content}
-                    onSubmitComment={handleSubmit(onSubmitHandler)}
-                    postForm
-                    editMode={editMode}
-                />
-                <HorizontalContainer>
-                    <Button tabIndex={0} type={"submit"} label={buttonLabel} color="green"/>
-                    <FileInput id={`picture${post?.id}`} name='photo' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                        <PhotographIcon className={classesIcon} />Photo
-                    </FileInput>
-                </HorizontalContainer>
-            </form>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
-        </>
+        <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
+            {pictureUrl !== "" && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} />}
+            <TextArea
+                tabIndex={tabIndex}
+                id={id}
+                name={name}
+                placeHolder={placeHolder}
+                register={register}
+                value={post?.content}
+                onSubmitComment={handleSubmit(onSubmitHandler)}
+                postForm
+                editMode={editMode}
+            />
+            <HorizontalContainer>
+                <Button tabIndex={0} type={"submit"} label={buttonLabel} isLoading={isLoading} color="green"/>
+                <FileInput id={`picture${post?.id}`} name='photo' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+                    <PhotographIcon className={classesIcon} />Photo
+                </FileInput>
+            </HorizontalContainer>
+        </form>
     );
 };
 

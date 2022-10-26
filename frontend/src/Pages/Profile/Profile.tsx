@@ -10,6 +10,7 @@ import cn from "./Profile.module.scss";
 
 import PostsList from "../../Components/Post/PostsList";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../../Components/Loader/Loader";
 
 const Profile = () => {
 
@@ -21,7 +22,7 @@ const Profile = () => {
 
     if (isLoading) {
         return (
-            <div>Loading Data...</div>
+            <Loader color={"#FFFFFF"} isLoading size={50} />
         );
     }
 

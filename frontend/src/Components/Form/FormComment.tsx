@@ -7,6 +7,7 @@ import { Role } from "../../../../backend/node_modules/@prisma/client";
 import TextArea from "./TextArea/TextArea";
 import React, { useEffect } from "react";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../Loader/Loader";
 
 const schemaComment = yup.object({
     content: yup.string().required("Ce champ ne peut être vide"),
@@ -50,7 +51,7 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
 
     if (isLoading) {
         return (
-            <div>Loading Data...</div>
+            <Loader color={"#FFFFFF"} isLoading size={50} />
         );
     }
 

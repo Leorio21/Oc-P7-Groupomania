@@ -1,14 +1,13 @@
 import { ThumbUpIcon } from "@heroicons/react/outline";
 import { ThumbUpIcon as ThumbUpIconSolid } from "@heroicons/react/solid";
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import classNames from "classnames";
 import cn from "./Like.module.scss";
-import Modal from "../Modal/Modal";
-import axios from "axios";
 import { OnePostLike } from "../../interface/Index";
 import { AuthContext } from "../../Context/AuthContext";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../Loader/Loader";
 
 interface LikeProps {
     likeData: OnePostLike[],
@@ -54,7 +53,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
 
     if (isLoading) {
         return (
-            <div>Loading Data...</div>
+            <Loader color="#ffffff" isLoading={isLoading} size={25} />
         );
     }
 

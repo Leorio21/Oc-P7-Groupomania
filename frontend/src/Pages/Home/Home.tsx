@@ -1,7 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
+import Loader from "../../Components/Loader/Loader";
 
 import PostsList from "../../Components/Post/PostsList";
 import { AuthContext } from "../../Context/AuthContext";
+
+import classNames from "classnames";
+import cn from "./Home.module.scss";
 
 
 const Home = () => {
@@ -16,7 +20,7 @@ const Home = () => {
 
     return (
         <>
-            {isConnected ? <PostsList /> : "Chargement en cours ..."}
+            {isConnected ? <PostsList /> : <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
         </>
     );
 };

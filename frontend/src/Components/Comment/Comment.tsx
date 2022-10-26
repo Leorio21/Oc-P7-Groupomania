@@ -11,6 +11,7 @@ import { AuthContext } from "../../Context/AuthContext";
 import FormComment from "../Form/FormComment";
 import { Link } from "react-router-dom";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../Loader/Loader";
 interface CommentProps {
     comment: OnePostComment,
     postId: number,
@@ -58,14 +59,9 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         }
     }, [response]);
     
-    if (isLoading) {
-        return (
-            <div>Loading Data...</div>
-        );
-    }
-
     return (
         <div className={classNames(cn.container)}>
+            {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
             <div className={classNames(cn.avatar)}>{comment.author.avatar ? <img src={`${comment.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
             <div className={classNames(cn["comment-container"])}>
                 <div className={classNames(cn.title)}>

@@ -15,6 +15,7 @@ import AdminMenu from "../AdminMenu/AdminMenu";
 import FormPost from "../Form/FormPost";
 import { Link } from "react-router-dom";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../Loader/Loader";
 interface PostProps {
     post: OnePost,
     onDeletePost: (postToDelete: number) => void
@@ -109,6 +110,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
 
     return (
         <article className={classNames(cn.post)} tabIndex={0}>
+            {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
             <div className={classNames(cn.header)}>
                 <div className={classNames(cn.header_title)}>
                     <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>

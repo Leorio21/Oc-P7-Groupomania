@@ -40,12 +40,6 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
         }
     }, [response]);
 
-    if (isLoading) {
-        return (
-            <div>Loading data...</div>
-        );
-    }
-    
     return (
         <>
             <form className = {classes} onSubmit={handleSubmit(onLoginSubmit)}>
@@ -76,6 +70,7 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
                     tabIndex={activeForm == "login" ? 0 : -1}
                     type='submit'
                     label='Se connecter'
+                    isLoading={isLoading}
                 />
             </form>
         </>

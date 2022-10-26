@@ -1,22 +1,8 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/solid";
 
 import classNames from "classnames";
-import React, { KeyboardEvent, useReducer } from "react";
-import Modal from "../Modal/Modal";
+import React, { KeyboardEvent } from "react";
 import cn from "./AdminMenu.module.scss";
-
-const initilTextError = "";
-const reducerModal = (state: string, action: { type: string; payload: string; }) => {
-    switch(action.type) {
-    case "display":
-        state = action.payload;
-        return state;
-    case "hide":
-        state = "";
-        return state;
-    }
-    return state;
-};
 
 interface AdminMenuProps {
     onModifyClick: () => void,
@@ -25,7 +11,6 @@ interface AdminMenuProps {
 
 const AdminMenu = ({ onModifyClick, onDeleteClick}: AdminMenuProps) => {
     
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     
     const onModifyKeyDownHandler = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
@@ -51,7 +36,6 @@ const AdminMenu = ({ onModifyClick, onDeleteClick}: AdminMenuProps) => {
         <>
             <PencilIcon tabIndex={0} onKeyDown={onModifyKeyDownHandler} onClick={onModifyHandler} className={classNames(cn["menu-icone"])} />
             <TrashIcon tabIndex={0} onKeyDown={onDeleteKeyDownHandler} onClick={onDeleteHandler} className={classNames(cn["menu-icone"])} />
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide", payload: ""});}} />}
         </>
     );
 };

@@ -4,6 +4,7 @@ import React from "react";
 import User from "../../Components/User/User";
 import { UserProfil } from "../../interface/Index";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../../Components/Loader/Loader";
 
 const Members = () => {
 
@@ -13,7 +14,9 @@ const Members = () => {
 
     if (isLoading) {
         return (
-            <div>Chargement en cours....</div>
+            <div className={classNames(cn.loader)}>
+                <Loader color={"#FFFFFF"} isLoading size={50} />
+            </div>
         );
     }
     

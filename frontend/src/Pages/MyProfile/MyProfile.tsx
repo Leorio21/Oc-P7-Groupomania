@@ -1,8 +1,7 @@
 import axios from "axios";
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import Modal from "../../Components/Modal/Modal";
 import { AuthContext } from "../../Context/AuthContext";
 import { IFormValues, OneUser } from "../../interface/Index";
 
@@ -18,6 +17,7 @@ import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfi
 import { useParams, useNavigate } from "react-router-dom";
 import LabeledSelect from "../../Components/Form/LabeledSelect/LabeledSelect";
 import { useAxios } from "../../Hooks/Axios";
+import Loader from "../../Components/Loader/Loader";
 
 const schemaProfile = yup.object({
     firstName: yup.string(),
@@ -29,19 +29,6 @@ const schemaProfile = yup.object({
     bgPicture: yup.mixed()
 }).required();
 
-const initilTextError = "";
-const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
-    switch(action.type) {
-    case "display":
-        state = action.payload ?? "Texte non défini";
-        return state;
-    case "hide":
-        state = "";
-        return state;
-    }
-    return state;
-};
-
 const MyProfile = () => {
     
     const params = useParams();
@@ -50,7 +37,6 @@ const MyProfile = () => {
 
     const userId = params.userId ? params.userId : authContext?.userId;
     const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
-    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const [userFirstName, setUserFirstName] = useState("");
     const [userLastName, setUserLastName] = useState("");
     const [userEmail, setUserEmail] = useState("");
@@ -167,146 +153,145 @@ const MyProfile = () => {
 
     if (isLoading) {
         return (
-            <div>Loading Data...</div>
+            <div className={classNames(cn.loader)}>
+                <Loader color={"#FFFFFF"} isLoading size={50} />
+            </div>
         );
     }
 
     return (
-        <>
-            <form className={classNames(cn.form)} onSubmit={handleSubmit(onFormSubmit)}>
-                <div className={classNames(cn.bg_container)} tabIndex={0}>
-                    {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
-                    <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
-                        <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+        <form className={classNames(cn.form)} onSubmit={handleSubmit(onFormSubmit)}>
+            <div className={classNames(cn.bg_container)} tabIndex={0}>
+                {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
+                <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
+                    <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+                        <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
+                    </FileInput>
+                    <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
+                </div>
+            </div>
+            <div className={classNames(cn.profil_container)} >
+                <div className={classNames(cn.avatar_container)}>
+                    {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
+                    <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
+                        <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
                             <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
                         </FileInput>
-                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
+                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
                     </div>
                 </div>
-                <div className={classNames(cn.profil_container)} >
-                    <div className={classNames(cn.avatar_container)}>
-                        {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
-                        <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
-                            <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                                <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
-                            </FileInput>
-                            <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
-                        </div>
-                    </div>
                     
-                    <div className={classNames(cn.profil)} >
-                        {authContext?.role === "ADMIN" ?
-                            <>
-                                <LabeledInput
-                                    tabIndex={0}
-                                    type="text"
-                                    id="firstName"
-                                    name="firstName"
-                                    label={"Prénom :"}
-                                    placeHolder={"Prénom"}
-                                    register={register}
-                                    required={false}
-                                />
-                                <LabeledInput
-                                    tabIndex={0}
-                                    type="text"
-                                    id="lastName"
-                                    name="lastName"
-                                    label={"Nom :"}
-                                    placeHolder={"Nom"}
-                                    register={register}
-                                    required={false}
-                                />
-                                <LabeledInput
-                                    tabIndex={0}
-                                    type="text"
-                                    id="email"
-                                    name="email"
-                                    label={"Email :"}
-                                    placeHolder={"Email"}
-                                    register={register}
-                                    required={false}
-                                />
-                                <LabeledSelect
-                                    tabIndex={0}
-                                    name="role"
-                                    label="Rôle :"
-                                    id="role"
-                                    role={userRole}
-                                    register={register}
-                                    options={["USER", "MODERATOR", "ADMIN"]} />
-                            </>
-                            :
-                            <div className={classNames(cn.personnal_info)} >
-                                <div className={classNames(cn.name)}>
-                                    <p className={classNames(cn.userName)} >{userFirstName}</p>
-                                    <p className={classNames(cn.userName)} >{userLastName}</p>
-                                </div>
-                                <div className={classNames(cn.mail)} >{userEmail}</div>
-                                <div className={classNames(cn.role)} >Role : {userRole}</div>
+                <div className={classNames(cn.profil)} >
+                    {authContext?.role === "ADMIN" ?
+                        <>
+                            <LabeledInput
+                                tabIndex={0}
+                                type="text"
+                                id="firstName"
+                                name="firstName"
+                                label={"Prénom :"}
+                                placeHolder={"Prénom"}
+                                register={register}
+                                required={false}
+                            />
+                            <LabeledInput
+                                tabIndex={0}
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                label={"Nom :"}
+                                placeHolder={"Nom"}
+                                register={register}
+                                required={false}
+                            />
+                            <LabeledInput
+                                tabIndex={0}
+                                type="text"
+                                id="email"
+                                name="email"
+                                label={"Email :"}
+                                placeHolder={"Email"}
+                                register={register}
+                                required={false}
+                            />
+                            <LabeledSelect
+                                tabIndex={0}
+                                name="role"
+                                label="Rôle :"
+                                id="role"
+                                role={userRole}
+                                register={register}
+                                options={["USER", "MODERATOR", "ADMIN"]} />
+                        </>
+                        :
+                        <div className={classNames(cn.personnal_info)} >
+                            <div className={classNames(cn.name)}>
+                                <p className={classNames(cn.userName)} >{userFirstName}</p>
+                                <p className={classNames(cn.userName)} >{userLastName}</p>
                             </div>
-                        }
-                        <div className={classNames(cn.newPassword_container)} >
-                            <div className={classNames(cn.newPassword)} >
-                                <LabeledInput
-                                    tabIndex={0}
-                                    type="password"
-                                    id="newPassword"
-                                    name="newPassword"
-                                    label={"Nouveau mot de passe :"}
-                                    placeHolder={"Nouveau mot de passe"}
-                                    register={register}
-                                    required={false}
-                                />
-                                <PasswordCheck control={control} name='newPassword'/>
-                                <LabeledInput
-                                    tabIndex={0}
-                                    type="password"
-                                    id="confirmNewPassword"
-                                    name="confirmNewPassword"
-                                    label={"Confirmer mot de passe :"}
-                                    placeHolder={"Confirmer mot de passe"}
-                                    register={register}
-                                    required={false}
-                                />
-                                <PasswordConfirm control={control}  name='newPassword' nameConfirm='confirmNewPassword' />
-                            </div>
+                            <div className={classNames(cn.mail)} >{userEmail}</div>
+                            <div className={classNames(cn.role)} >Role : {userRole}</div>
+                        </div>
+                    }
+                    <div className={classNames(cn.newPassword_container)} >
+                        <div className={classNames(cn.newPassword)} >
+                            <LabeledInput
+                                tabIndex={0}
+                                type="password"
+                                id="newPassword"
+                                name="newPassword"
+                                label={"Nouveau mot de passe :"}
+                                placeHolder={"Nouveau mot de passe"}
+                                register={register}
+                                required={false}
+                            />
+                            <PasswordCheck control={control} name='newPassword'/>
+                            <LabeledInput
+                                tabIndex={0}
+                                type="password"
+                                id="confirmNewPassword"
+                                name="confirmNewPassword"
+                                label={"Confirmer mot de passe :"}
+                                placeHolder={"Confirmer mot de passe"}
+                                register={register}
+                                required={false}
+                            />
+                            <PasswordConfirm control={control}  name='newPassword' nameConfirm='confirmNewPassword' />
                         </div>
                     </div>
                 </div>
-                <div className={classNames(cn.validation_container)} >
-                    <div className={classNames(cn.current_password)} >
-                        <LabeledInput
-                            tabIndex={0}
-                            type="password"
-                            id="password"
-                            name="password"
-                            label={"Votre mot de passe :"}
-                            placeHolder={"Votre mot de passe"}
-                            register={register}
-                            required
-                        />
-                    </div>
-                    <p>{errors.password?.message && "Veuillez saisir votre mot de passe"}</p>
-                    <div className={classNames(cn.validation)} >
-                        <Button 
-                            tabIndex={0}
-                            type='button'
-                            label="Supprimer mon compte"
-                            onClickHandler={handleSubmit(deleteAccount)}
-                            color="red"
-                        />
-                        <Button 
-                            tabIndex={0}
-                            type='submit'
-                            label="Enregistrer"
-                            color="green"
-                        />
-                    </div>
+            </div>
+            <div className={classNames(cn.validation_container)} >
+                <div className={classNames(cn.current_password)} >
+                    <LabeledInput
+                        tabIndex={0}
+                        type="password"
+                        id="password"
+                        name="password"
+                        label={"Votre mot de passe :"}
+                        placeHolder={"Votre mot de passe"}
+                        register={register}
+                        required
+                    />
                 </div>
-            </form>
-            {textError !== "" && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
-        </>
+                <p>{errors.password?.message && "Veuillez saisir votre mot de passe"}</p>
+                <div className={classNames(cn.validation)} >
+                    <Button 
+                        tabIndex={0}
+                        type='button'
+                        label="Supprimer mon compte"
+                        onClickHandler={handleSubmit(deleteAccount)}
+                        color="red"
+                    />
+                    <Button 
+                        tabIndex={0}
+                        type='submit'
+                        label="Enregistrer"
+                        color="green"
+                    />
+                </div>
+            </div>
+        </form>
     );
 };
 

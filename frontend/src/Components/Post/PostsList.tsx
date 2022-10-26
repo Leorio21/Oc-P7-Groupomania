@@ -7,6 +7,7 @@ import cn from "./PostsList.module.scss";
 import Post from "./Post";
 import { OnePost } from "../../interface/Index";
 import FormPost from "../Form/FormPost";
+import Loader from "../Loader/Loader";
 
 interface PostListProps {
     postUser?: OnePost[]
@@ -62,7 +63,7 @@ const PostsList = ({postUser}:  PostListProps) => {
                         onPostSubmit={onPostSubmit}
                     />
                 }
-                {isLoading && <div>Chargement en cours....</div>}
+                {isLoading && <Loader color={"#FFFFFF"} isLoading size={50} />}
                 {response &&
                     <>
                         {posts && posts?.map((post:OnePost) => {
