@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { UserCircleIcon } from "@heroicons/react/solid";
 import { OnePostComment } from "../../interface/Index";
 import { Role } from "../../../../backend/node_modules/@prisma/client";
@@ -12,6 +12,21 @@ import FormComment from "../Form/FormComment";
 import { Link } from "react-router-dom";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../Loader/Loader";
+import Modal from "../Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
+
 interface CommentProps {
     comment: OnePostComment,
     postId: number,
@@ -24,7 +39,8 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     const authContext = useContext(AuthContext);
     const [updatedBy, setUpdatedBy] = useState(comment.updatedBy);
     const [editMode, setEditMode] = useState(false);
-    const { response, isLoading, axiosFunction } = useAxios({
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const { response, isLoading, error, axiosFunction } = useAxios({
         url : `/post/${postId}/comment/${comment.id}`,
         method: "DELETE"
     });
@@ -57,29 +73,35 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
         if (response) {
             onDeleteComment(comment.id);
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
     
     return (
-        <div className={classNames(cn.container)}>
-            {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
-            <div className={classNames(cn.avatar)}>{comment.author.avatar ? <img src={`${comment.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
-            <div className={classNames(cn["comment-container"])}>
-                <div className={classNames(cn.title)}>
-                    <Link to={`/profile/${comment.authorId}`} className={classNames(cn.nav__link)}>
-                        <div className={classNames(cn.author)}>
-                            {comment.author.firstName} {comment.author.lastName}
+        <>
+            <div className={classNames(cn.container)}>
+                {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
+                <div className={classNames(cn.avatar)}>{comment.author.avatar ? <img src={`${comment.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                <div className={classNames(cn["comment-container"])}>
+                    <div className={classNames(cn.title)}>
+                        <Link to={`/profile/${comment.authorId}`} className={classNames(cn.nav__link)}>
+                            <div className={classNames(cn.author)}>
+                                {comment.author.firstName} {comment.author.lastName}
+                            </div>
+                        </Link>
+                        <div className={classNames(cn.menu)}>
+                            {(authContext?.userId == comment.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                         </div>
-                    </Link>
-                    <div className={classNames(cn.menu)}>
-                        {(authContext?.userId == comment.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler}/>}
                     </div>
+                    {editMode ?
+                        <FormComment classes={classNames(cn.form_comment)} tabIndex={0} comment={comment} postId={postId} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onModifyForm={onModifyCommentHandler} editMode />
+                        :
+                        <div className={classNames(cn.content)}>{comment.content}{updatedBy && ("\n" + modifyAuthor)}</div>}
                 </div>
-                {editMode ?
-                    <FormComment classes={classNames(cn.form_comment)} tabIndex={0} comment={comment} postId={postId} id={`editCom${postId}`} name='content' placeHolder='Ecrivez un commentaire ...' onModifyForm={onModifyCommentHandler} editMode />
-                    :
-                    <div className={classNames(cn.content)}>{comment.content}{updatedBy && ("\n" + modifyAuthor)}</div>}
             </div>
-        </div>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 

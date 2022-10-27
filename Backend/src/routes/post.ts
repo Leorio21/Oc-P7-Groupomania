@@ -13,15 +13,15 @@ import * as commentCtrl from "../controllers/comment";
 import * as likeCtrl from "../controllers/like";
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 60 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 10 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 const limiterPost = rateLimit({
-    windowMs: 60 * 60 * 1000, // 60 minutes
-    max: 15, // Limit each IP to 15 requests per `window` (here, per 60 minutes)
+    windowMs: 30 * 60 * 1000, // 30 minutes
+    max: 15, // Limit each IP to 15 requests per `window` (here, per 30 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });

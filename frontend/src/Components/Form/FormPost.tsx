@@ -4,7 +4,7 @@ import { IFormValues, OnePost } from "../../interface/Index";
 import { AuthContext } from "../../Context/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
 
 
 import PicturePreview from "./PicturePreview/PicturePreview";
@@ -13,6 +13,7 @@ import FileInput from "./FileInput/FileInput";
 import Button from "./Button/Button";
 import HorizontalContainer from "./HorizontalContainer/HorizontalContainer";
 import { useAxios } from "../../Hooks/Axios";
+import Modal from "../Modal/Modal";
 
 const schemaPost = yup.object({
     content: yup.string(),
@@ -32,10 +33,23 @@ interface FormPostProps {
     editMode?: boolean,
 }
 
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
+
 const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, placeHolder, onPostSubmit, editMode}: FormPostProps) => {
 
     const authContext = useContext(AuthContext);
-    const { response, isLoading, axiosFunction } = useAxios<{message: string, post: OnePost}>({
+    const { response, isLoading, error, axiosFunction } = useAxios<{message: string, post: OnePost}>({
         url: post ? `/post/${post?.id}` : "/post",
         method: post ? "PUT" : "POST",
         headers: {
@@ -44,6 +58,7 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
     });
     const { register, handleSubmit, getValues, resetField, watch } = useForm<IFormValues>({defaultValues: { photo: undefined }, resolver: yupResolver(schemaPost)});
     const [ pictureUrl, setPictureUrl ] = useState<string | null | undefined>(post?.image);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const onSubmitHandler = useCallback(
         async (data: IFormValues) => {
@@ -106,29 +121,35 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             resetField("content");
             auto_grow();
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     return (
-        <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
-            {pictureUrl !== "" && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} />}
-            <TextArea
-                tabIndex={tabIndex}
-                id={id}
-                name={name}
-                placeHolder={placeHolder}
-                register={register}
-                value={post?.content}
-                onSubmitComment={handleSubmit(onSubmitHandler)}
-                postForm
-                editMode={editMode}
-            />
-            <HorizontalContainer>
-                <Button tabIndex={0} type={"submit"} label={buttonLabel} isLoading={isLoading} color="green"/>
-                <FileInput id={`picture${post?.id}`} name='photo' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                    <PhotographIcon className={classesIcon} />Photo
-                </FileInput>
-            </HorizontalContainer>
-        </form>
+        <>
+            <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
+                {pictureUrl !== "" && <PicturePreview pictureUrl={pictureUrl} resetPicture={resetPicture} />}
+                <TextArea
+                    tabIndex={tabIndex}
+                    id={id}
+                    name={name}
+                    placeHolder={placeHolder}
+                    register={register}
+                    value={post?.content}
+                    onSubmitComment={handleSubmit(onSubmitHandler)}
+                    postForm
+                    editMode={editMode}
+                />
+                <HorizontalContainer>
+                    <Button tabIndex={0} type={"submit"} label={buttonLabel} isLoading={isLoading} color="green"/>
+                    <FileInput id={`picture${post?.id}`} name='photo' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
+                        <PhotographIcon className={classesIcon} />Photo
+                    </FileInput>
+                </HorizontalContainer>
+            </form>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 

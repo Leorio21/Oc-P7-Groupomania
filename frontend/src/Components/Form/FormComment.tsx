@@ -5,9 +5,10 @@ import * as yup from "yup";
 
 import { Role } from "../../../../backend/node_modules/@prisma/client";
 import TextArea from "./TextArea/TextArea";
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../Loader/Loader";
+import Modal from "../Modal/Modal";
 
 const schemaComment = yup.object({
     content: yup.string().required("Ce champ ne peut être vide"),
@@ -25,10 +26,24 @@ interface FormCommentProps {
     editMode?: boolean
 }
 
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
+
 const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment, onCreateForm, onModifyForm}: FormCommentProps) => {
     
     const { register, handleSubmit, resetField, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaComment)});
-    const { response, isLoading, axiosFunction } = useAxios<{comment: OnePostComment}>({
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const { response, isLoading, error, axiosFunction } = useAxios<{comment: OnePostComment}>({
         url: comment ? `post/${postId}/comment/${comment?.id}` : `post/${postId}/comment`,
         method: comment ? "PUT" : "POST"
     });
@@ -47,7 +62,10 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
             }
             resetField("content");
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     if (isLoading) {
         return (
@@ -56,18 +74,21 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
     }
 
     return (
-        <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
-            <TextArea
-                tabIndex={tabIndex}
-                id={id}
-                name={name}
-                placeHolder={placeHolder}
-                register={register}
-                value={comment?.content}
-                onSubmitComment={handleSubmit(onSubmitHandler)}
-            />
-            <p>{errors.content?.message}</p>
-        </form>
+        <>
+            <form className = {classes} onSubmit={handleSubmit(onSubmitHandler)}>
+                <TextArea
+                    tabIndex={tabIndex}
+                    id={id}
+                    name={name}
+                    placeHolder={placeHolder}
+                    register={register}
+                    value={comment?.content}
+                    onSubmitComment={handleSubmit(onSubmitHandler)}
+                />
+                <p>{errors.content?.message}</p>
+            </form>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 

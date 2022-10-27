@@ -17,7 +17,7 @@ const PasswordConfirm = <T extends FieldValues>({name, nameConfirm, control}: Pa
 
     return (
         <div className={classNames(cn.container)}>
-            {password === passwordConfirm ? <span><CheckIcon className={classNames(cn.icon, cn.iconCheck)} /> Les mots de passe sont identique</span>:<span><XIcon className={classNames(cn.icon, cn.iconX)} /> Les mots de passe ne sont pas identique</span>}
+            {password === passwordConfirm ? <span><CheckIcon className={classNames(cn.icon, cn.iconCheck)} /> Les mots de passe sont identiques</span>:<span><XIcon className={classNames(cn.icon, cn.iconX)} /> Les mots de passe ne sont pas identiques</span>}
             
         </div>
     );

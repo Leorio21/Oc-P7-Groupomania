@@ -1,6 +1,6 @@
 import { ThumbUpIcon } from "@heroicons/react/outline";
 import { ThumbUpIcon as ThumbUpIconSolid } from "@heroicons/react/solid";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 
 import classNames from "classnames";
 import cn from "./Like.module.scss";
@@ -8,6 +8,20 @@ import { OnePostLike } from "../../interface/Index";
 import { AuthContext } from "../../Context/AuthContext";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../Loader/Loader";
+import Modal from "../Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
 
 interface LikeProps {
     likeData: OnePostLike[],
@@ -20,7 +34,8 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
 
     const authContext = useContext(AuthContext);
     const [postLike, setPostLike] = useState(likeData);
-    const { response, isLoading, axiosFunction } = useAxios<{like: OnePostLike}>({
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const { response, isLoading, error, axiosFunction } = useAxios<{like: OnePostLike}>({
         url: `/post/${postId}/like`,
         method: "POST"
     });
@@ -49,7 +64,10 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             }
             onClickLike();
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     if (isLoading) {
         return (
@@ -58,9 +76,12 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     }
 
     return (
-        <div>
-            <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
-        </div>
+        <>
+            <div>
+                <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
+            </div>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useAxios } from "../../Hooks/Axios";
 
 import classNames from "classnames";
@@ -8,6 +8,20 @@ import Post from "./Post";
 import { OnePost } from "../../interface/Index";
 import FormPost from "../Form/FormPost";
 import Loader from "../Loader/Loader";
+import Modal from "../Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
 
 interface PostListProps {
     postUser?: OnePost[]
@@ -16,8 +30,8 @@ interface PostListProps {
 const PostsList = ({postUser}:  PostListProps) => {
 
     const [posts, setPosts] = useState<OnePost[]>([]);
-
-    const {response, isLoading} = useAxios<OnePost[]>({
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const {response, isLoading, error} = useAxios<OnePost[]>({
         url: "/post",
     });
     
@@ -46,7 +60,10 @@ const PostsList = ({postUser}:  PostListProps) => {
         if (response && !postUser) {
             setPosts(response);
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     return (
         <>
@@ -78,6 +95,7 @@ const PostsList = ({postUser}:  PostListProps) => {
                     </>
                 }
             </div>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

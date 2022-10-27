@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import { IFormValues, UserToken } from "../../interface/Index";
 import LabeledInput from "./LabeledInput/LabeledInput";
 import Button from "../../Components/Form/Button/Button";
@@ -8,6 +8,20 @@ import * as yup from "yup";
 import { useContext } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import { useAxios } from "../../Hooks/Axios";
+import Modal from "../../Components/Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
 
 const schemaLogin = yup.object({
     email: yup.string().required(),
@@ -20,12 +34,13 @@ interface FormLoginProps {
 
 const FormLogin = ({classes, activeForm}: FormLoginProps) => {
 
-    const { response, isLoading, axiosFunction } = useAxios<UserToken>({
+    const { response, isLoading, error, axiosFunction } = useAxios<UserToken>({
         url: "auth/login",
         method: "POST"
     });
     const authContext = useContext(AuthContext);
     const { register, handleSubmit, formState: { errors } } = useForm<IFormValues>({resolver: yupResolver(schemaLogin)});
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
 
     const onLoginSubmit = useCallback(
         async (data: IFormValues) => {
@@ -38,7 +53,10 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
             localStorage.setItem("token", JSON.stringify(response.token));
             authContext?.setConnectHandle(true);
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     return (
         <>
@@ -73,6 +91,7 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
                     isLoading={isLoading}
                 />
             </form>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

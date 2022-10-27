@@ -49,7 +49,7 @@ const Connect = () => {
                 </div>
                 <div>
                     {activeForm === "login" ? 
-                        <span className={classNames(cn.navLink)} onKeyDown ={onKeyDownHandler} onClick={toggleForm} id='signup' tabIndex={0}>Pas encore compte ? Créez un compte</span>
+                        <span className={classNames(cn.navLink)} onKeyDown ={onKeyDownHandler} onClick={toggleForm} id='signup' tabIndex={0}>Pas encore de compte ? Créez un compte</span>
                         :
                         <span className={classNames(cn.navLink)} onKeyDown={onKeyDownHandler} onClick={toggleForm} tabIndex={0} id='login'>Déjà inscrit ? Connectez-vous</span>
                     }

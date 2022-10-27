@@ -4,13 +4,13 @@ import { UserProfil } from "../interface/Index";
 
 interface AuthContextInterface {
     userId: number
-    token: string
     role: string
     firstName: string
     lastName: string
     avatar: string
     connected: boolean
     setConnectHandle: (isConnected: boolean) => void
+    setModifyProfileHandle: (isModify: boolean) => void 
 }
 
 export const AuthContext = createContext<AuthContextInterface | null>(null);
@@ -22,15 +22,19 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
 
     });
     const [userId, setUserId] = useState(-1);
-    const [token, setToken] = useState("");
     const [role, setRole] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [avatar, setAvatar] = useState("");
     const [connected, setConnected] = useState(false);
+    const [modifyProfile, setModifyProfile] = useState(false);
 
     const setConnectHandle = (isConnected: boolean): void => {
         setConnected(isConnected);
+    };
+
+    const setModifyProfileHandle = (isModify: boolean): void => {
+        setModifyProfile(isModify);
     };
 
     const getUserData = async () => {
@@ -40,13 +44,14 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
     const contextValues = useMemo(() => {
         return {
             userId,
-            token,
             role,
             firstName,
             lastName,
             avatar,
-            connected, setConnectHandle};
-    }, [ userId, token, role, firstName, lastName, avatar, connected ]);
+            connected, setConnectHandle,
+            setModifyProfileHandle
+        };
+    }, [ userId, role, firstName, lastName, avatar, connected ]);
 
     useEffect(() => {
         if(localStorage.getItem("token")) {
@@ -57,10 +62,10 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             setFirstName("");
             setLastName("");
             setAvatar("");
-            setToken("");
             setRole("");
         }
-    }, [connected]);
+        setModifyProfile(false);
+    }, [connected, modifyProfile]);
 
     useEffect(() => {
         if (response) {
@@ -69,7 +74,6 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             setFirstName(response.user.firstName);
             setLastName(response.user.lastName);
             setAvatar(response.user.avatar);
-            setToken(response.user.token);
             setRole(response.user.role);
         }
     }, [response]);

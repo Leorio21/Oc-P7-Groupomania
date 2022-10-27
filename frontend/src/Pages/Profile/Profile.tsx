@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
 import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid";
@@ -11,14 +11,35 @@ import cn from "./Profile.module.scss";
 import PostsList from "../../Components/Post/PostsList";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../../Components/Loader/Loader";
+import Modal from "../../Components/Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
 
 const Profile = () => {
 
     const params = useParams();
     const authContext = useContext(AuthContext);
-    const { response, isLoading } = useAxios<{user :OneUser}>({
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
+    const { response, isLoading, error } = useAxios<{user :OneUser}>({
         url: `auth/user/${params.userId}`
     });
+
+    useEffect(() => {
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [error]);
 
     if (isLoading) {
         return (
@@ -40,7 +61,10 @@ const Profile = () => {
     }
 
     return (
-        <div>Aucune Données</div>
+        <>
+            <div>Aucune Données</div>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 

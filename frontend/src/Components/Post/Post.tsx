@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/fr";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AuthContext } from "../../Context/AuthContext";
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { UserCircleIcon } from "@heroicons/react/solid";
 import { OnePost } from "../../interface/Index";
 
@@ -16,6 +16,21 @@ import FormPost from "../Form/FormPost";
 import { Link } from "react-router-dom";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../Loader/Loader";
+import Modal from "../Modal/Modal";
+
+const initilTextError = "";
+const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
+    switch(action.type) {
+    case "display":
+        state = action.payload ?? "Texte non defini";
+        return state;
+    case "hide":
+        state = "";
+        return state;
+    }
+    return state;
+};
+
 interface PostProps {
     post: OnePost,
     onDeletePost: (postToDelete: number) => void
@@ -31,10 +46,11 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
 
     const [postData, setPostData] = useState(post);
     const [userLikePost, setUserLikePost] = useState(post.like.find((like) => like.userId == authContext?.userId) ? true : false);
+    const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const [countComm, setCountComm] = useState(post.comment.length);
     const [editMode, setEditMode] = useState(false);
     const [postedAt, setPostedAt] = useState(dayjs(postData.createdAt).fromNow(true));
-    const { response, isLoading, axiosFunction } = useAxios({
+    const { response, isLoading, error, axiosFunction } = useAxios({
         url: `post/${postData.id}`,
         method: "DELETE"
     });
@@ -106,55 +122,61 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
         if (response) {
             onDeletePost(postData.id);
         }
-    }, [response]);
+        if (error) {
+            dispatchModal({type: "display", payload: error});
+        }
+    }, [response, error]);
 
     return (
-        <article className={classNames(cn.post)} tabIndex={0}>
-            {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
-            <div className={classNames(cn.header)}>
-                <div className={classNames(cn.header_title)}>
-                    <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
-                    <div className={classNames(cn.author_container)}>
-                        <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
-                        <span>Il y a {postedAt}</span>
+        <>
+            <article className={classNames(cn.post)} tabIndex={0}>
+                {isLoading && <div className={classNames(cn.loader)}><Loader color={"#FFFFFF"} isLoading size={50} /></div>}
+                <div className={classNames(cn.header)}>
+                    <div className={classNames(cn.header_title)}>
+                        <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
+                        <div className={classNames(cn.author_container)}>
+                            <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
+                            <span>Il y a {postedAt}</span>
+                        </div>
+                    </div>
+                    <div className={classNames(cn.menu)}>
+                        {(authContext?.userId == postData.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler} />}
                     </div>
                 </div>
-                <div className={classNames(cn.menu)}>
-                    {(authContext?.userId == postData.authorId || authContext?.role == "ADMIN" || authContext?.role == "MODERATOR") && <AdminMenu onModifyClick={onModifyHandler} onDeleteClick={onDeleteHandler} />}
-                </div>
-            </div>
-            {editMode ?
-                <FormPost
-                    classes={classNames(cn.form_container)}
-                    classesIcon={classNames(cn.iconPicture)}
-                    buttonLabel='Enregistrer'
-                    tabIndex={0}
-                    id={`content${postData.id}`}
-                    name='content'
-                    placeHolder='Publiez quelque chose ...'
-                    onPostSubmit={onPostSubmitHandler}
-                    post={postData}
-                    editMode={editMode}
-                />
-                :
-                <div className={classNames(cn.content)}>
-                    {postData.image && <img src={postData.image} alt={"image d'illustration"} />}
-                    {postData.content &&
+                {editMode ?
+                    <FormPost
+                        classes={classNames(cn.form_container)}
+                        classesIcon={classNames(cn.iconPicture)}
+                        buttonLabel='Enregistrer'
+                        tabIndex={0}
+                        id={`content${postData.id}`}
+                        name='content'
+                        placeHolder='Publiez quelque chose ...'
+                        onPostSubmit={onPostSubmitHandler}
+                        post={postData}
+                        editMode={editMode}
+                    />
+                    :
+                    <div className={classNames(cn.content)}>
+                        {postData.image && <img src={postData.image} alt={"image d'illustration"} />}
+                        {postData.content &&
                         <div className={classNames(cn.text)}>
                             {postData.content}
                         </div>
-                    }
-                    {postData.updatedBy && <div className={classNames(cn.modifyBy)}>{modifyAuthor}</div>}
+                        }
+                        {postData.updatedBy && <div className={classNames(cn.modifyBy)}>{modifyAuthor}</div>}
+                    </div>
+                }
+                <div className={classNames(cn.footer)}>
+                    <div className={classNames(cn.likeComment)}>
+                        <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost} />
+                        <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && "s"}</div>
+                    </div>
+                    <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
                 </div>
-            }
-            <div className={classNames(cn.footer)}>
-                <div className={classNames(cn.likeComment)}>
-                    <Like likeData={post.like} postId={post.id} userLikePost={userLikePost} onClickLike={changeLikePost} />
-                    <div className={classNames(cn.nbComm)}>{countComm} Commentaire{countComm > 1 && "s"}</div>
-                </div>
-                <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
-            </div>
-        </article>
+            </article>
+            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+        </>
     );
 };
 
