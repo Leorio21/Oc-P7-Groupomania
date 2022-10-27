@@ -61,7 +61,7 @@ export const createPost = async (
     let newImage = false;
     try {
         if (!files["photo"] && req.body.content === "") {
-            throw "Impossible de créer un post vide";
+            throw "Impossible de publier un post vide";
         }
         if (files["photo"]) {
             imageName = files["photo"][0].filename.split(".")[0] + ".webp";
@@ -108,6 +108,9 @@ export const modifyPost = async (
     let oldImage: string | null = "";
     let newImage = false;
     try {
+        if (!files["photo"] && req.body.content === "") {
+            throw "Impossible de publier un post vide";
+        }
         let authorUpdate: Role = "USER";
         const post = await prisma.post.findUnique({
             where: {
