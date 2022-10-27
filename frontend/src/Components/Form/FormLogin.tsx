@@ -91,7 +91,7 @@ const FormLogin = ({classes, activeForm}: FormLoginProps) => {
                     isLoading={isLoading}
                 />
             </form>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

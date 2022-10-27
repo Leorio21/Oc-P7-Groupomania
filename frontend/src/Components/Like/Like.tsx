@@ -80,7 +80,7 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             <div>
                 <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
             </div>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

@@ -87,7 +87,7 @@ const FormComment = ({classes, tabIndex, id, postId, name, placeHolder, comment,
                 />
                 <p>{errors.content?.message}</p>
             </form>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

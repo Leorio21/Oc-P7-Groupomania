@@ -100,7 +100,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                         <div className={classNames(cn.content)}>{comment.content}{updatedBy && ("\n" + modifyAuthor)}</div>}
                 </div>
             </div>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

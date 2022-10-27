@@ -54,7 +54,7 @@ const Members = () => {
                     return <User key={`user${user.id}`} user={user} />;
                 })}
             </div>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

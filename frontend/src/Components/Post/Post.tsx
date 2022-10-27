@@ -175,7 +175,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                     <CommentList arrayComment={post.comment} postId={post.id} changeCountComm={changeCountComm} />
                 </div>
             </article>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

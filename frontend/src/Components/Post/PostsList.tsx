@@ -95,7 +95,7 @@ const PostsList = ({postUser}:  PostListProps) => {
                     </>
                 }
             </div>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };

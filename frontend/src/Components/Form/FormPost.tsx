@@ -37,6 +37,7 @@ const initilTextError = "";
 const reducerModal = (state: string, action: { type: string; payload?: string; }) => {
     switch(action.type) {
     case "display":
+        console.log(action.payload);
         state = action.payload ?? "Texte non defini";
         return state;
     case "hide":
@@ -62,25 +63,34 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
 
     const onSubmitHandler = useCallback(
         async (data: IFormValues) => {
-            if(!data.content && (!data.photo || data.photo.length == 0)) {
-                throw "Impossible de publier un message vide";
+            try {
+                if(!data.content && (!data.photo || data.photo.length == 0)) {
+                    throw "Impossible de publier un message vide";
+                }
+                const myFormData = new FormData();
+                if (data.content) {
+                    myFormData.append("content", data.content);
+                } else {
+                    myFormData.append("content", "");
+                }
+                if (pictureUrl) {
+                    const image = pictureUrl;
+                    myFormData.append("image", image);
+                } else {
+                    myFormData.append("image", "");
+                }
+                if (data.photo) {
+                    myFormData.append("photo", data.photo[0]);
+                }
+                axiosFunction(myFormData);
+            } catch (postError: unknown) {
+                if (typeof(postError) === "string") {
+                    console.log(postError);
+                    dispatchModal({type: "display", payload: postError});
+                } else {
+                    dispatchModal({type: "display", payload: "Une erreur est survenue"});
+                }
             }
-            const myFormData = new FormData();
-            if (data.content) {
-                myFormData.append("content", data.content);
-            } else {
-                myFormData.append("content", "");
-            }
-            if (pictureUrl) {
-                const image = pictureUrl;
-                myFormData.append("image", image);
-            } else {
-                myFormData.append("image", "");
-            }
-            if (data.photo) {
-                myFormData.append("photo", data.photo[0]);
-            }
-            axiosFunction(myFormData);
         }, [pictureUrl]
     );
 
@@ -148,7 +158,7 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                     </FileInput>
                 </HorizontalContainer>
             </form>
-            {textError && <Modal text={error} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
+            {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>
     );
 };
