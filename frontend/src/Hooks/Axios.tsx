@@ -2,10 +2,8 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import React, { useEffect, useState } from "react";
 import { IFormValues } from "../interface/Form";
 
-axios.defaults.baseURL = "http://127.0.0.1:3000/api";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.method = "GET";
-
-
 
 export const useAxios = <T = unknown>(params: AxiosRequestConfig): {response?: T, isLoading: boolean, error: string, axiosFunction: (data?: IFormValues | FormData) => void} => {
     

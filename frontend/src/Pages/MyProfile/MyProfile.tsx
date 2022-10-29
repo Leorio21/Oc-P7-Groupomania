@@ -50,7 +50,7 @@ const MyProfile = () => {
     const navigate = useNavigate();
 
     const userId = params.userId ? params.userId : authContext?.userId;
-    const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
+    const { register, handleSubmit, formState: { errors }, control, getValues, setValue, reset, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
     const [userFirstName, setUserFirstName] = useState("");
     const [userLastName, setUserLastName] = useState("");
     const [userEmail, setUserEmail] = useState("");
@@ -81,11 +81,7 @@ const MyProfile = () => {
     };
 
     const resetUserForm = ():void => {
-        resetField("avatar");
-        resetField("bgPicture");
-        resetField("password");
-        resetField("newPassword");
-        resetField("confirmNewPassword");
+        reset();
     };
 
     const onFormSubmit = useCallback(
