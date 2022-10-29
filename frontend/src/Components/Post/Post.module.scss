@@ -148,6 +148,10 @@
             background-color: vars.$color-dark;
         }
     }
+    & p {
+        color: vars.$color-primary;
+        font-weight: bold;
+    }
 }
 
 .modifyBy {

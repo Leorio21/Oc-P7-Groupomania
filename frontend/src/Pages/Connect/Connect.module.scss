@@ -65,6 +65,10 @@
             border: 2px inset vars.$color-dark;
         }
     }
+    & p {
+        color: vars.$color-primary;
+        font-weight: bold;
+    }
 }
 
 .form_login {

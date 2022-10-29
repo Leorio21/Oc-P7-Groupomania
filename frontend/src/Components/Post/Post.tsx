@@ -91,7 +91,10 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
      */
     const onDeleteHandler = useCallback(
         async (): Promise<void> => {
-            axiosFunction();
+            const confirmDelete = confirm("Êtes-vous sur de vouloir supprimer ce post ?");
+            if (confirmDelete) {
+                axiosFunction();
+            }
         }, [postData.id]
     );
 

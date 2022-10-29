@@ -11,4 +11,8 @@
 .form_comment {
     padding: 5px;
     width: 100%;
+    & p {
+        color: vars.$color-primary;
+        font-weight: bold;
+    }
 }

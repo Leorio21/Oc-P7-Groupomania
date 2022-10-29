@@ -56,7 +56,10 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
     };
 
     const onDeleteHandler = (): void => {
-        axiosFunction();
+        const confirmDelete = confirm("Êtes-vous sur de vouloir supprimer ce commentaire ?");
+        if (confirmDelete) {
+            axiosFunction();
+        }
     };
 
     const modifyAuthor: string = useMemo(() => {

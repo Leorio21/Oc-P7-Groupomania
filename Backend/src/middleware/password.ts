@@ -21,5 +21,5 @@ export default (req: Request, res: Response, next: NextFunction) => {
     }
     return res
         .status(400)
-        .json({ message: "Le mot de passe n'est pas assez sécurisé" });
+        .json({ error: "Le mot de passe n'est pas assez sécurisé" });
 };
