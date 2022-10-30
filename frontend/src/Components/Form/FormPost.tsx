@@ -85,7 +85,6 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
                 axiosFunction(myFormData);
             } catch (postError: unknown) {
                 if (typeof(postError) === "string") {
-                    console.log(postError);
                     dispatchModal({type: "display", payload: postError});
                 } else {
                     dispatchModal({type: "display", payload: "Une erreur est survenue"});

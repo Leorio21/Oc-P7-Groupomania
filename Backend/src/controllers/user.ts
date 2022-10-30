@@ -145,20 +145,22 @@ export const modify = async (
 ) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     let bgImageName: string = req.body.userBg;
+    let bgImageExt: string | null = null;
     let oldBgImage: string | null = "";
     let newBgImage = false;
     let avatarImageName: string = req.body.userAvatar;
+    let avatarImageExt: string | null = null;
     let oldAvatarImage: string | null = "";
     let newAvatarImage = false;
-    if (req.body.newPassword) {
-        if (!passwordSchema.validate(req.body.newPassword)) {
-            throw "Le mot de passe n'est pas assez sécurisé";
-        }
-        if (req.body.newPassword !== req.body.confirmNewPassword) {
-            throw "Les mots de passe ne correspondent pas";
-        }
-    }
     try {
+        if (req.body.newPassword) {
+            if (!passwordSchema.validate(req.body.newPassword)) {
+                throw "Le mot de passe n'est pas assez sécurisé";
+            }
+            if (req.body.newPassword !== req.body.confirmNewPassword) {
+                throw "Les mots de passe ne correspondent pas";
+            }
+        }
         let adminUser: User | null;
         let validAdmin = false;
         const user = await prisma.user.findUnique({
@@ -193,16 +195,19 @@ export const modify = async (
             }
             oldAvatarImage = user.avatar;
             if (files["avatar"]) {
-                avatarImageName =
-                    files["avatar"][0].filename.split(".")[0] + ".webp";
-                try {
-                    await sharp(
-                        `./images/${files["avatar"][0].filename}`
-                    ).toFile(`images/${avatarImageName}`);
-                    newAvatarImage = true;
-                } catch {
-                    throw "Erreur traitement image avatar";
+                avatarImageExt = files["avatar"][0].filename.split(".")[1];
+                avatarImageName = files["avatar"][0].filename;
+                if (avatarImageExt !== "gif") {
+                    avatarImageName = files["avatar"][0].filename.split(".")[0] + ".webp";
+                    try {
+                        await sharp(
+                            `./images/${files["avatar"][0].filename}`
+                        ).toFile(`images/${avatarImageName}`);
+                    } catch {
+                        throw "Erreur traitement image avatar";
+                    }
                 }
+                newAvatarImage = true;
             }
             if (
                 (newAvatarImage && oldAvatarImage) ||
@@ -216,16 +221,19 @@ export const modify = async (
             }
             oldBgImage = user.background;
             if (files["bgPicture"]) {
-                bgImageName =
-                    files["bgPicture"][0].filename.split(".")[0] + ".webp";
-                try {
-                    await sharp(
-                        `./images/${files["bgPicture"][0].filename}`
-                    ).toFile(`images/${bgImageName}`);
-                    newBgImage = true;
-                } catch {
-                    throw "Erreur traitement image de fond";
+                bgImageExt = files["bgPicture"][0].filename.split(".")[1];
+                bgImageName = files["bgPicture"][0].filename;
+                if (bgImageExt !== "gif") {
+                    bgImageName = files["bgPicture"][0].filename.split(".")[0] + ".webp";
+                    try {
+                        await sharp(
+                            `./images/${files["bgPicture"][0].filename}`
+                        ).toFile(`images/${bgImageName}`);
+                    } catch {
+                        throw "Erreur traitement image de fond";
+                    }
                 }
+                newBgImage = true;
             }
             if (
                 (newBgImage && oldBgImage) ||
@@ -283,11 +291,11 @@ export const modify = async (
     } catch (error) {
         return res.status(403).json({ error });
     } finally {
-        if (files["avatar"]) {
-            await fs.unlink(`images/${files!["avatar"][0].filename}`);
+        if (files["avatar"] && avatarImageExt !== "gif") {
+            await fs.unlink(`images/${files["avatar"][0].filename}`);
         }
-        if (files!["bgPicture"]) {
-            await fs.unlink(`images/${files!["bgPicture"][0].filename}`);
+        if (files["bgPicture"] && bgImageExt !== "gif") {
+            await fs.unlink(`images/${files["bgPicture"][0].filename}`);
         }
     }
 };

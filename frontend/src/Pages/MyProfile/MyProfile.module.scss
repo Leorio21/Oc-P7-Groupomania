@@ -20,7 +20,7 @@
     height: 250px;
     border-radius: 25px;
     background: vars.$color-dark;
-    &:hover .menuImg, :focus-within .menuImg {
+    &:hover .menuImg {
         visibility: visible;
     }
     & img {
@@ -82,7 +82,7 @@
     height: 200px;
     border-radius: 50%;
     background: vars.$color-dark;
-    &:hover .menuImg {
+    &:hover > .menuImg {
         visibility: visible;
     }
     & img {

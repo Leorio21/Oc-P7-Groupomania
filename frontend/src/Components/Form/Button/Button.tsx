@@ -16,7 +16,7 @@ interface ButtonProps {
 const Button = ({tabIndex, type, onClickHandler, label, color, isLoading}: ButtonProps) => {
 
     return (
-        <button className={color && classNames(cn[color])} tabIndex={tabIndex} type={type} onClick={onClickHandler}>
+        <button className={color && classNames(cn[color])} tabIndex={tabIndex} type={type} onClick={onClickHandler} disabled={isLoading}>
             {isLoading ?
                 <div>
                     <Loader color="#ffffff" isLoading size={25} />

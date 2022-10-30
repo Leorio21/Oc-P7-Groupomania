@@ -58,21 +58,26 @@ export const createPost = async (
 ) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     let imageName: string | null = null;
+    let imageExt: string | null = null;
     let newImage = false;
     try {
         if (!files["photo"] && req.body.content === "") {
             throw "Impossible de publier un post vide";
         }
         if (files["photo"]) {
-            imageName = files["photo"][0].filename.split(".")[0] + ".webp";
-            try {
-                await sharp(`./images/${files["photo"][0].filename}`).toFile(
-                    `images/${imageName}`
-                );
-                newImage = true;
-            } catch {
-                throw "Erreur traiement image";
+            imageExt = files["photo"][0].filename.split(".")[1];
+            imageName = files["photo"][0].filename;
+            if (imageExt !== "gif") {
+                imageName = files["photo"][0].filename.split(".")[0] + ".webp";
+                try {
+                    await sharp(`./images/${files["photo"][0].filename}`).toFile(
+                        `images/${imageName}`
+                    );
+                } catch {
+                    throw "Erreur traiement image";
+                }
             }
+            newImage = true;
         }
         const newPost = await prisma.post.create({
             data: {
@@ -93,7 +98,7 @@ export const createPost = async (
         }
         return res.status(400).json({ error });
     } finally {
-        if (files["photo"]) {
+        if (files["photo"] && imageExt !== "gif") {
             await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }
@@ -105,6 +110,7 @@ export const modifyPost = async (
 ) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     let imageName: string = req.body.image;
+    let imageExt: string | null = null;
     let oldImage: string | null = "";
     let newImage = false;
     try {
@@ -130,15 +136,19 @@ export const modifyPost = async (
             }
             oldImage = post.image;
             if (files["photo"]) {
-                imageName = files["photo"][0].filename.split(".")[0] + ".webp";
-                try {
-                    await sharp(
-                        `./images/${files["photo"][0].filename}`
-                    ).toFile(`images/${imageName}`);
-                    newImage = true;
-                } catch {
-                    throw "Erreur traiement image";
+                imageExt = files["photo"][0].filename.split(".")[1];
+                imageName = files["photo"][0].filename;
+                if (imageExt !== "gif") {
+                    imageName = files["photo"][0].filename.split(".")[0] + ".webp";
+                    try {
+                        await sharp(
+                            `./images/${files["photo"][0].filename}`
+                        ).toFile(`images/${imageName}`);
+                    } catch {
+                        throw "Erreur traiement image";
+                    }
                 }
+                newImage = true;
             }
             if (
                 (newImage && oldImage) ||
@@ -182,7 +192,7 @@ export const modifyPost = async (
         }
         return res.status(400).json({ error });
     } finally {
-        if (files["photo"]) {
+        if (files["photo"] && imageExt !== "gif") {
             await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }

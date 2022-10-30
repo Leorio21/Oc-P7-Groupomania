@@ -36,6 +36,6 @@ export const multerFileFilter = (
     if (MIME_TYPES.get(file.mimetype)) {
         callback(null, true);
     } else {
-        callback(null, false);
+        callback(new Error("Format d'image incorrect"));
     }
 };

@@ -192,19 +192,19 @@ const MyProfile = () => {
                     {userBgPictureUrl && <img src={userBgPictureUrl} alt="Image utilisateur" />}
                     <div className={classNames(cn.menuImg, cn["menuImg--bg"])}>
                         <FileInput id={"picture"} name='bgPicture' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                            <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
+                            <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} tabIndex={0} />
                         </FileInput>
-                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture}/>
+                        <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteBgPicture} tabIndex={0} />
                     </div>
                 </div>
                 <div className={classNames(cn.profil_container)} >
-                    <div className={classNames(cn.avatar_container)}>
+                    <div className={classNames(cn.avatar_container)} tabIndex={0}>
                         {userAvatarUrl && <img src={userAvatarUrl} alt="Image utilisateur" />}
                         <div className={classNames(cn.menuImg, cn["menuImg--avatar"])}>
                             <FileInput id={"avatar"} name='avatar' accept={"image/jpeg, image/png, image/gif, image/webp"} multiple={false} register={register}>
-                                <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} />
+                                <PencilIcon className={classNames(cn.icon, cn["icon--pencil"])} tabIndex={0} />
                             </FileInput>
-                            <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture}/>
+                            <TrashIcon className={classNames(cn.icon, cn["icon--trash"])} onClick={onDeleteAvatarPicture} tabIndex={0} />
                         </div>
                     </div>
                     

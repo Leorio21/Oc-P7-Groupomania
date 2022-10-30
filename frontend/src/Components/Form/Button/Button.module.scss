@@ -7,6 +7,9 @@ button {
     border: none;
     height: 40px;
     margin: 0px auto;
+    &:disabled {
+        background-color: vars.$dark-shadow-color;
+    }
 }
 
 .red {
