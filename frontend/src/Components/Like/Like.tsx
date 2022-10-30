@@ -27,7 +27,7 @@ interface LikeProps {
     likeData: OnePostLike[],
     userLikePost: boolean,
     postId: number,
-    onClickLike: () => void
+    onClickLike: (userLikePost: boolean, idLike?: number) => void
 }
 
 const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
@@ -56,13 +56,14 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             if (userLikePost) {
                 const newLikeArray = postLike.filter((like) => like.userId !== authContext?.userId);
                 setPostLike(newLikeArray);
+                onClickLike(!userLikePost);
             } else {
                 const newLike: OnePostLike = { ...response.like };
                 const newLikeArray = [...postLike];
                 newLikeArray.push(newLike);
                 setPostLike(newLikeArray);
+                onClickLike(!userLikePost, response.like.id);
             }
-            onClickLike();
         }
         if (error) {
             dispatchModal({type: "display", payload: error});
@@ -74,11 +75,19 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
             <Loader color="#ffffff" isLoading={isLoading} size={25} />
         );
     }
-
+    
     return (
         <>
-            <div>
-                <span className={classNames(cn.nbLike)}>{postLike.length}</span>{userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
+            <div className={classNames(cn.like_container)}>
+                <span className={classNames(cn.nbLike)}>{postLike.length}</span>
+                {postLike.length > 0 && <div className={classNames(cn.liker_list)}>{
+                    likeData.map((like) => {
+                        return (
+                            <div key={like.id}>{like.user.firstName} {like.user.lastName}</div>
+                        );
+                    })
+                }</div>}
+                {userLikePost ? <ThumbUpIconSolid onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)} tabIndex={0} /> :  <ThumbUpIcon onClick={onClickLikeHandler} onKeyDown={onKeyDownHandler} className={classNames(cn.icon)}  tabIndex={0} />}
             </div>
             {textError && <Modal text={textError} onCloseModal={() => {dispatchModal({type: "hide"});}} />}
         </>

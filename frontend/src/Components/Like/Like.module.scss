@@ -1,7 +1,37 @@
+.like_container {
+    position: relative;
+    &:hover .liker_list {
+        visibility: visible;
+    }
+}
+
+.liker_list {
+    position: absolute;
+    top: 40px;
+    left: -10px;
+    min-width: 150px;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    visibility: hidden;
+    z-index: 10;
+    &::after {
+        content: ' ';
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        top: -20px;
+        border: 7px solid transparent;
+        border-bottom: 15px solid rgba(0, 0, 0, 0.7);
+        z-index: 10;
+    }
+}
+
+
 .icon {
     width: 20px;
 }
 
 .nbLike {
     margin-right: 5px;
+    
 }

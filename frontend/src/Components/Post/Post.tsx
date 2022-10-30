@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 import dayjs from "dayjs";
 import "dayjs/locale/fr";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -59,8 +62,29 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
         setCountComm(newCounterComm);
     };
 
-    const changeLikePost = (): void => {
+    const changeLikePost = (like: boolean, id?: number): void => {
         setUserLikePost(!userLikePost);
+        if(like) {
+            setPostData((prevState) => {
+                const newPostState = prevState;
+                newPostState.like.push({
+                    id: id!,
+                    postId: postData.id,
+                    user: {
+                        firstName: authContext?.firstName!,
+                        lastName: authContext?.lastName!
+                    },
+                    userId: authContext?.userId!
+                });
+                return newPostState;
+            });
+        } else {
+            setPostData((prevState) => {
+                prevState.like = prevState.like.filter(userLike => userLike.userId !== authContext?.userId);
+                const newPostData = prevState;
+                return newPostData;
+            });
+        }
     };
 
     const onModifyHandler = (): void => {
@@ -125,10 +149,13 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
         if (response) {
             onDeletePost(postData.id);
         }
+    }, [response]);
+
+    useEffect(() => {
         if (error) {
             dispatchModal({type: "display", payload: error});
         }
-    }, [response, error]);
+    }, [error]);
 
     return (
         <>

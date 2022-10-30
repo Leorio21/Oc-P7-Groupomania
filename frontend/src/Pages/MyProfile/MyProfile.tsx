@@ -81,7 +81,11 @@ const MyProfile = () => {
     };
 
     const resetUserForm = ():void => {
-        reset();
+        resetField("avatar");
+        resetField("bgPicture");
+        resetField("password");
+        resetField("newPassword");
+        resetField("confirmNewPassword");
     };
 
     const onFormSubmit = useCallback(
