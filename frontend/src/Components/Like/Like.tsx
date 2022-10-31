@@ -54,14 +54,18 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     useEffect(() => {
         if (response) {
             if (userLikePost) {
-                const newLikeArray = postLike.filter((like) => like.userId !== authContext?.userId);
-                setPostLike(newLikeArray);
+                setPostLike((prevState) => {
+                    const newLikeArray = prevState.filter((like) => like.userId !== authContext?.userId);
+                    return newLikeArray;
+                });
                 onClickLike(!userLikePost);
             } else {
                 const newLike: OnePostLike = { ...response.like };
-                const newLikeArray = [...postLike];
-                newLikeArray.push(newLike);
-                setPostLike(newLikeArray);
+                setPostLike((prevState) => {
+                    const newLikeArray = [...prevState];
+                    newLikeArray.push(newLike);
+                    return newLikeArray;
+                });
                 onClickLike(!userLikePost, response.like.id);
             }
         }
