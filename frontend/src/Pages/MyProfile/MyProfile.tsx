@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import axios from "axios";
 import React, { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { AuthContext } from "../../Context/AuthContext";
-import { IFormValues, OneUser } from "../../interface/Index";
+import { IFormValues, LocationProps, OneUser } from "../../interface/Index";
 
 import classNames from "classnames";
 import cn from "./MyProfile.module.scss";
@@ -14,7 +15,7 @@ import Button from "../../Components/Form/Button/Button";
 import LabeledInput from "../../Components/Form/LabeledInput/LabeledInput";
 import PasswordCheck from "../../Components/Form/PasswordCheck/PasswordCheck";
 import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfirm";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import LabeledSelect from "../../Components/Form/LabeledSelect/LabeledSelect";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../../Components/Loader/Loader";
@@ -45,12 +46,15 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 
 const MyProfile = () => {
     
-    const params = useParams();
     const authContext = useContext(AuthContext);
+    const params = useParams();const location = useLocation();
+    let { userId } = location.state as LocationProps;
+    if (!userId) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        userId = authContext?.userId!;
+    }
     const navigate = useNavigate();
-
-    const userId = params.userId ? params.userId : authContext?.userId;
-    const { register, handleSubmit, formState: { errors }, control, getValues, setValue, reset, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
+    const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
     const [userFirstName, setUserFirstName] = useState("");
     const [userLastName, setUserLastName] = useState("");
     const [userEmail, setUserEmail] = useState("");

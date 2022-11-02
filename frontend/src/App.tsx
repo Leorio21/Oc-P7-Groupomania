@@ -33,7 +33,7 @@ function App() {
             <Routes>
                 <Route path='/' element={<Connect />} />
                 <Route element={<ProtectedRoute connected={authContext?.connected} />}>
-                    <Route path='/profile/:userId' element={<Profile />} />
+                    <Route path='/profile' element={<Profile />} />
                     <Route path='/myProfile' element={<MyProfile />} />
                     <Route path='/myProfile/:userId' element={<MyProfile />} />
                     <Route path='/home' element={<Home />} />

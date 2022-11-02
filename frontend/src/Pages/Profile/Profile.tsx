@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useReducer } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
 import { PencilIcon, UserCircleIcon } from "@heroicons/react/solid";
 
-import { OneUser } from "../../interface/Index";
+import { LocationProps, OneUser } from "../../interface/Index";
 
 import classNames from "classnames";
 import cn from "./Profile.module.scss";
@@ -28,13 +28,14 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 
 const Profile = () => {
 
-    const params = useParams();
+    const location = useLocation();
+    const { userId } = location.state as LocationProps;
     const authContext = useContext(AuthContext);
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const { response, isLoading, error } = useAxios<{user :OneUser}>({
-        url: `auth/user/${params.userId}`
+        url: `auth/user/${userId}`
     });
-
+    
     useEffect(() => {
         if (error) {
             dispatchModal({type: "display", payload: error});
@@ -54,7 +55,7 @@ const Profile = () => {
                     {response.user.background && <img src={response.user.background} alt='image de fond utilisateur' className={classNames(cn.backgroundPicture)} />}
                     {response.user.avatar ? <img src={response.user.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
                 </div>
-                <div className={classNames(cn.name)}>{response.user.firstName} {response.user.lastName}{authContext?.role === "ADMIN" && <Link to={`/myprofile/${params.userId}`} className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
+                <div className={classNames(cn.name)}>{response.user.firstName} {response.user.lastName}{authContext?.role === "ADMIN" && <Link to={"/myprofile"} state={{ userId: userId }}className={classNames(cn.link)}><PencilIcon tabIndex={0} className={classNames(cn["menu-icone"])} /></Link>}</div>
                 {!response.user.post.length ? <div className={classNames(cn.noPost)}>Aucune publications</div> : <PostsList postUser={response.user.post}/>}
             </>
         );

@@ -13,3 +13,7 @@ export interface UserProfil {
 export interface UserToken {
     token: string
 }
+
+export interface LocationProps extends Location {
+    userId: number
+}

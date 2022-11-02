@@ -20,7 +20,7 @@ const NavBar = () => {
 
     return (
         <nav className={classNames(cn.nav)}>
-            <Link to="/myprofile" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserCircleIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Mon Profil</span></Link>
+            <Link to="/myprofile" state={{ userId: authContext?.userId}} className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserCircleIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Mon Profil</span></Link>
             <Link to="/home" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><HomeIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Accueil</span></Link>
             <Link to="/members" className={classNames(cn.link)}><span className={classNames(cn.icon_container)}><UserGroupIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Membres</span></Link>
             <Link to="/" className={classNames(cn.link)} onClick={onLogOutHandler}><span className={classNames(cn.icon_container)}><LogoutIcon className={classNames(cn.icon)} /></span><span className={classNames(cn.linkText)}>Déconnexion</span></Link>

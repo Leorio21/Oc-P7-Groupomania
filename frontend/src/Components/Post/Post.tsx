@@ -165,7 +165,7 @@ const Post = ({ post, onDeletePost }: PostProps): JSX.Element => {
                     <div className={classNames(cn.header_title)}>
                         <div className={classNames(cn.avatar)}>{postData.author.avatar ? <img src={`${postData.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                         <div className={classNames(cn.author_container)}>
-                            <Link to={`/profile/${postData.authorId}`} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
+                            <Link to={"/profile"} state={{userId: postData.authorId }} className={classNames(cn.nav__link)}><span className={classNames(cn.author)}>{postData.author.firstName + " " + postData.author.lastName}</span></Link>
                             <span>Il y a {postedAt}</span>
                         </div>
                     </div>

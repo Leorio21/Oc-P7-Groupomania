@@ -88,7 +88,7 @@ const Comment = ({comment, postId, onModifyComment, onDeleteComment}: CommentPro
                 <div className={classNames(cn.avatar)}>{comment.author.avatar ? <img src={`${comment.author.avatar}`} alt={"Image de l'utilisateur"} /> : <UserCircleIcon className={classNames(cn.icone)} />}</div>
                 <div className={classNames(cn["comment-container"])}>
                     <div className={classNames(cn.title)}>
-                        <Link to={`/profile/${comment.authorId}`} className={classNames(cn.nav__link)}>
+                        <Link to={"/profile"} state={{ userId: comment.authorId }} className={classNames(cn.nav__link)}>
                             <div className={classNames(cn.author)}>
                                 {comment.author.firstName} {comment.author.lastName}
                             </div>

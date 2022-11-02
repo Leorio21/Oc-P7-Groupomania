@@ -58,7 +58,7 @@ router.delete("/:id", limiter, postCtrl.deletePost);
 
 router.post("/:id/like", limiter, likeCtrl.likePost);
 
-router.post("/:id/comment", limiter, commentCtrl.createComment);
+router.post("/:id/comment", limiterPost, commentCtrl.createComment);
 
 router.put("/:id/comment/:comId", limiter, commentCtrl.modifyComment);
 
