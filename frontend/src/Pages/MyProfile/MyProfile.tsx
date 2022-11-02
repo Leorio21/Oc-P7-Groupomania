@@ -15,7 +15,7 @@ import Button from "../../Components/Form/Button/Button";
 import LabeledInput from "../../Components/Form/LabeledInput/LabeledInput";
 import PasswordCheck from "../../Components/Form/PasswordCheck/PasswordCheck";
 import PasswordConfirm from "../../Components/Form/PasswordConfirm/PasswordConfirm";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import LabeledSelect from "../../Components/Form/LabeledSelect/LabeledSelect";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../../Components/Loader/Loader";
@@ -47,11 +47,13 @@ const reducerModal = (state: string, action: { type: string; payload?: string; }
 const MyProfile = () => {
     
     const authContext = useContext(AuthContext);
-    const params = useParams();const location = useLocation();
+    const location = useLocation();
     let { userId } = location.state as LocationProps;
+    let isMyProfile = false;
     if (!userId) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         userId = authContext?.userId!;
+        isMyProfile = true;
     }
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, control, getValues, setValue, resetField, watch } = useForm<IFormValues>({defaultValues: { password: "", newPassword: "", confirmNewPassword: "", bgPicture: undefined, avatar: undefined }, resolver: yupResolver(schemaProfile)});
@@ -119,10 +121,10 @@ const MyProfile = () => {
     const deleteAccount = useCallback(
         async (data: IFormValues): Promise<void> => {
             setDelete(true);
-            const deleteAccount = params.userId ?
-                confirm("Êtes-vous sûr de vouloir supprimer le compte ??\nToutes les données et messages seront supprimés")
+            const deleteAccount = isMyProfile ?
+                confirm("Êtes-vous sûr de vouloir supprimer votre compte ??\nToutes vos données et messages seront supprimés")
                 :
-                confirm("Êtes-vous sûr de vouloir supprimer votre compte ??\nToutes vos données et messages seront supprimés");
+                confirm("Êtes-vous sûr de vouloir supprimer le compte ??\nToutes les données et messages seront supprimés");
             if (deleteAccount) {
                 const myInterceptor = axios.interceptors.request.use((config) => {
                     config.method = "DELETE";
@@ -131,7 +133,7 @@ const MyProfile = () => {
                 });
                 axiosFunction();
                 axios.interceptors.request.eject(myInterceptor);
-                if(!params.userId) {
+                if(isMyProfile) {
                     localStorage.removeItem("token");
                     authContext?.setConnectHandle(false);
                 }
@@ -154,7 +156,7 @@ const MyProfile = () => {
 
     useEffect(() => {
         recupUserData();
-    }, [params.userId]);
+    }, [userId]);
 
     useEffect(()=>{
         if (error) {

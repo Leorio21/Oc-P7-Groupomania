@@ -13,7 +13,7 @@ const User = ({user}: UserProps) => {
     
     return (
         <>
-            <Link to={"/profile/"} state={{userId: user.id}} className={classNames(cn.nav__link)}>
+            <Link to={"/profile"} state={{userId: user.id}} className={classNames(cn.nav__link)}>
                 <div className={classNames(cn.user_container)}>
                     {user?.avatar ? <img src={user?.avatar} alt="avatar de l'utilisteur utilisateur" className={classNames(cn.avatarPicture)} /> : <UserCircleIcon className={classNames(cn.avatarPicture)} />}
                     <div className={classNames(cn.name)}>{user?.firstName} {user?.lastName}</div>

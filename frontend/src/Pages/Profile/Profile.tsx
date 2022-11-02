@@ -32,7 +32,7 @@ const Profile = () => {
     const { userId } = location.state as LocationProps;
     const authContext = useContext(AuthContext);
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
-    const { response, isLoading, error } = useAxios<{user :OneUser}>({
+    const { response, isLoading, error, axiosFunction } = useAxios<{user :OneUser}>({
         url: `auth/user/${userId}`
     });
     
@@ -41,6 +41,10 @@ const Profile = () => {
             dispatchModal({type: "display", payload: error});
         }
     }, [error]);
+
+    useEffect(() => {
+        axiosFunction();
+    }, [userId]);
 
     if (isLoading) {
         return (

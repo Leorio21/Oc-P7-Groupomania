@@ -17,14 +17,13 @@ interface LabeledSelectProps extends PropsWithChildren {
 const LabeledSelect = ({tabIndex, name, label, id, role, register, options}: LabeledSelectProps) => {
     
     const selectOptions = options.map((option, key) => {
-        const isSelected = role.includes(option);
-        return (<option value={option} key={key} selected={isSelected}>{option}</option>);
+        return (<option value={option} key={key} >{option}</option>);
     });
 
     return (
         <div className={classNames(cn.selectContainer)}>
             <label>{label}</label>
-            <select {...register(name)}  id={id} tabIndex={tabIndex}>
+            <select {...register(name)} value={role} id={id} tabIndex={tabIndex}>
                 {selectOptions}
             </select>
         </div>
