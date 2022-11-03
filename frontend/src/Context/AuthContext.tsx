@@ -17,7 +17,7 @@ export const AuthContext = createContext<AuthContextInterface | null>(null);
 
 const AuthContextProvider = ({children}: PropsWithChildren) => {
 
-    const {response, axiosFunction} = useAxios<{token: string, user: UserProfil}>({
+    const {response, error, axiosFunction} = useAxios<{token: string, user: UserProfil}>({
         url: "/auth/connect",
 
     });
@@ -77,6 +77,13 @@ const AuthContextProvider = ({children}: PropsWithChildren) => {
             setRole(response.user.role);
         }
     }, [response]);
+
+    useEffect(() => {
+        if (error) {
+            localStorage.removeItem("token");
+            setConnected(false);
+        }
+    }, [error]);
 
     return (
         <AuthContext.Provider value={contextValues}>
