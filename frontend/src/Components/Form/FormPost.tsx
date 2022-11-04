@@ -130,10 +130,13 @@ const FormPost = ({classes, buttonLabel, classesIcon, post, tabIndex, id, name, 
             resetField("content");
             auto_grow();
         }
+    }, [response]);
+
+    useEffect(() => {
         if (error) {
             dispatchModal({type: "display", payload: error});
         }
-    }, [response, error]);
+    }, [error]);
 
     return (
         <>

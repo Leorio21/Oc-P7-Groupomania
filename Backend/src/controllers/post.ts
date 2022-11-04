@@ -67,7 +67,7 @@ export const createPost = async (
         if (files["photo"]) {
             imageExt = files["photo"][0].filename.split(".")[1];
             imageName = files["photo"][0].filename;
-            if (imageExt !== "gif") {
+            if (imageExt !== "gif" && imageExt !== "webp") {
                 imageName = files["photo"][0].filename.split(".")[0] + ".webp";
                 try {
                     await sharp(`./images/${files["photo"][0].filename}`).toFile(
@@ -98,7 +98,7 @@ export const createPost = async (
         }
         return res.status(400).json({ error });
     } finally {
-        if (files["photo"] && imageExt !== "gif") {
+        if (files["photo"] && imageExt !== "gif" && imageExt !== "webp") {
             await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }
@@ -138,7 +138,7 @@ export const modifyPost = async (
             if (files["photo"]) {
                 imageExt = files["photo"][0].filename.split(".")[1];
                 imageName = files["photo"][0].filename;
-                if (imageExt !== "gif") {
+                if (imageExt !== "gif" && imageExt !== "webp") {
                     imageName = files["photo"][0].filename.split(".")[0] + ".webp";
                     try {
                         await sharp(
@@ -192,7 +192,7 @@ export const modifyPost = async (
         }
         return res.status(400).json({ error });
     } finally {
-        if (files["photo"] && imageExt !== "gif") {
+        if (files["photo"] && imageExt !== "gif" && imageExt !== "webp") {
             await fs.unlink(`images/${files["photo"][0].filename}`);
         }
     }

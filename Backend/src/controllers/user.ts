@@ -197,7 +197,7 @@ export const modify = async (
             if (files["avatar"]) {
                 avatarImageExt = files["avatar"][0].filename.split(".")[1];
                 avatarImageName = files["avatar"][0].filename;
-                if (avatarImageExt !== "gif") {
+                if (avatarImageExt !== "gif" && avatarImageExt !== "webp") {
                     avatarImageName = files["avatar"][0].filename.split(".")[0] + ".webp";
                     try {
                         await sharp(
@@ -223,7 +223,7 @@ export const modify = async (
             if (files["bgPicture"]) {
                 bgImageExt = files["bgPicture"][0].filename.split(".")[1];
                 bgImageName = files["bgPicture"][0].filename;
-                if (bgImageExt !== "gif") {
+                if (bgImageExt !== "gif" && bgImageExt !== "webp") {
                     bgImageName = files["bgPicture"][0].filename.split(".")[0] + ".webp";
                     try {
                         await sharp(
@@ -291,10 +291,10 @@ export const modify = async (
     } catch (error) {
         return res.status(403).json({ error });
     } finally {
-        if (files["avatar"] && avatarImageExt !== "gif") {
+        if (files["avatar"] && avatarImageExt !== "gif" && bgImageExt !== "webp") {
             await fs.unlink(`images/${files["avatar"][0].filename}`);
         }
-        if (files["bgPicture"] && bgImageExt !== "gif") {
+        if (files["bgPicture"] && bgImageExt !== "gif" && bgImageExt !== "webp") {
             await fs.unlink(`images/${files["bgPicture"][0].filename}`);
         }
     }
@@ -334,6 +334,12 @@ export const deleteUser = async (
             user.password
         );
         if (validUser || validAdmin) {
+            if (user.background) {
+                await fs.unlink(`images/${user.background.split("images/")[1]}`);
+            }
+            if (user.avatar) {
+                await fs.unlink(`images/${user.avatar.split("images/")[1]}`);
+            }
             await prisma.user.delete({
                 where: {
                     id: +req.params.id,

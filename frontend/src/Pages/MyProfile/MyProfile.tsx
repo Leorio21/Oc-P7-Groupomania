@@ -141,6 +141,10 @@ const MyProfile = () => {
         }, [userId]
     );
 
+    const modifyRole = (newRole: string) => {
+        setUserRole(newRole);
+    };
+
     useEffect(() => {
         if(getValues("bgPicture")) {
             if (getValues("bgPicture").length > 0) {
@@ -258,7 +262,9 @@ const MyProfile = () => {
                                     id="role"
                                     role={userRole}
                                     register={register}
-                                    options={["USER", "MODERATOR", "ADMIN"]} />
+                                    options={["USER", "MODERATOR", "ADMIN"]}
+                                    onModifyHandler={modifyRole}
+                                />
                             </>
                             :
                             <div className={classNames(cn.personnal_info)} >

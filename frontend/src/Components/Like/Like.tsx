@@ -1,11 +1,10 @@
 import { ThumbUpIcon } from "@heroicons/react/outline";
 import { ThumbUpIcon as ThumbUpIconSolid } from "@heroicons/react/solid";
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 
 import classNames from "classnames";
 import cn from "./Like.module.scss";
 import { OnePostLike } from "../../interface/Index";
-import { AuthContext } from "../../Context/AuthContext";
 import { useAxios } from "../../Hooks/Axios";
 import Loader from "../Loader/Loader";
 import Modal from "../Modal/Modal";
@@ -32,8 +31,6 @@ interface LikeProps {
 
 const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
 
-    const authContext = useContext(AuthContext);
-    const [postLike, setPostLike] = useState(likeData);
     const [textError, dispatchModal] = useReducer(reducerModal, initilTextError);
     const { response, isLoading, error, axiosFunction } = useAxios<{like: OnePostLike}>({
         url: `/post/${postId}/like`,
@@ -50,29 +47,22 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
         axiosFunction();
         
     };
-
+    
     useEffect(() => {
         if (response) {
-            if (userLikePost) {
-                setPostLike((prevState) => {
-                    const newLikeArray = prevState.filter((like) => like.userId !== authContext?.userId);
-                    return newLikeArray;
-                });
-                onClickLike(!userLikePost);
-            } else {
-                const newLike: OnePostLike = { ...response.like };
-                setPostLike((prevState) => {
-                    const newLikeArray = [...prevState];
-                    newLikeArray.push(newLike);
-                    return newLikeArray;
-                });
+            if (response.like) {
                 onClickLike(!userLikePost, response.like.id);
+            } else {
+                onClickLike(!userLikePost);
             }
         }
+    }, [response]);
+
+    useEffect(() => {
         if (error) {
             dispatchModal({type: "display", payload: error});
         }
-    }, [response, error]);
+    }, [error]);
 
     if (isLoading) {
         return (
@@ -83,8 +73,8 @@ const Like = ({likeData, userLikePost, postId, onClickLike}: LikeProps) => {
     return (
         <>
             <div className={classNames(cn.like_container)}>
-                <span className={classNames(cn.nbLike)}>{postLike.length}</span>
-                {postLike.length > 0 && <div className={classNames(cn.liker_list)}>{
+                <span className={classNames(cn.nbLike)}>{likeData.length}</span>
+                {likeData.length > 0 && <div className={classNames(cn.liker_list)}>{
                     likeData.map((like) => {
                         return (
                             <div key={like.id}>{like.user.firstName} {like.user.lastName}</div>

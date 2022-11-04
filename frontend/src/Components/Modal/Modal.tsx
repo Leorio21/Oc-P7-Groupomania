@@ -17,7 +17,7 @@ const Modal = ({text, onCloseModal}: ModalProps) => {
     
     return createPortal(
         <div className={classNames(cn.overlay)} onClick={onClickHandler}>
-            <button className={classNames(cn["modal-button"])} onClick={onClickHandler}>X</button>
+            <button className={classNames(cn["modal-button"])} onClick={onClickHandler} tabIndex={0}>X</button>
             <div className={classNames(cn["modal-card"])}>
                 {text}
             </div>

@@ -20,7 +20,6 @@ const Connect = () => {
     const [activeForm, toggleForm] = useReducer(reducerForm, initialForm);
     
     const onKeyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        console.log(event);
         if (event.key === " " || event.key === "Enter") {
             toggleForm();
         }
